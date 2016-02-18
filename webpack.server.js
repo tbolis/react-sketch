@@ -13,11 +13,15 @@ const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlug
 const srcPath = path.join(__dirname, 'src');
 const examplesPath = path.join(__dirname, 'examples');
 
+const OpenBrowserPlugin = require('open-browser-webpack-plugin');
+
+const port = 9999;
+
 var config = {
-    port: 9999,
+    port: port,
     entry: {
         examples: [
-            'webpack-dev-server/client?http://localhost:9999',
+            'webpack-dev-server/client?http://localhost:' + port,
             'webpack/hot/only-dev-server',
             path.join(examplesPath, 'run')
         ]
@@ -38,7 +42,7 @@ var config = {
         stats: {colors: true},
         publicPath: '/',
         noInfo: false,
-        port: 9999,
+        port: port,
         hot: true
     },
     module: {
@@ -71,7 +75,8 @@ var config = {
             inject: 'body',
             filename: 'index.html',
             chunks: ['examples']
-        })
+        }),
+        new OpenBrowserPlugin({url: 'http://localhost:' + port}),
     ]
 };
 
@@ -80,6 +85,6 @@ new WebpackDevServer(webpack(config), config.devServer)
             if (err) {
                 console.log(err);
             }
-            console.log('Go to http://localhost:' + config.port);
+            console.log('Serving from http://localhost:' + config.port);
         }
     );
