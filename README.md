@@ -8,8 +8,21 @@ A Simple Sketch tool for React based applications
 
 ## Installation
 
+Note that react and react-dom have been declared as peer dependencies and **should** exist in your project when using 
+react-sketch as a library, if not do the following:
+
 ```sh
-npm install react-sketch
+npm install react --save
+npm install react-dom --save
+```
+
+```sh
+npm install react-sketch --save
+```
+
+or in one command
+```sh
+npm install --save react  react-dom react-sketch
 ```
 
 ## Usage
@@ -31,14 +44,6 @@ class SketchFieldDemo extends React.Component {
      }
 }
 
-```
-
-Note that react and react-dom have been declared as peer dependencies and **should** exist in your project when using 
-react-sketch as a library, if not do the following:
-
-```sh
-npm install react --save
-npm install react-dom --save
 ```
 
 ## Examples

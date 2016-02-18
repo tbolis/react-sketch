@@ -36,8 +36,8 @@
     "precommit-check"
   ],
   "peerDependencies": {
-    "react": "latest",
-    "react-dom": "latest"
+    "react": "^0.14.7",
+    "react-dom": "^0.14.7"
   },
   "devDependencies": {
     "babel": "^5.0.0",
