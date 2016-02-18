@@ -64,3 +64,8 @@ See https://github.com/tbolis/react-sketch/blob/master/CHANGELOG.md
 ## License
 
 MIT, do remember to add a reference if you find it useful :)
+
+
+[npm-url]: https://www.npmjs.com/package/react-sketch
+[downloads-url]: https://www.npmjs.com/package/react-sketch
+[travis-url]: https://travis-ci.org/mulesoft/react-sketch
