@@ -70,10 +70,11 @@ See https://github.com/tbolis/react-sketch/blob/master/CHANGELOG.md
 
 MIT, do remember to add a reference if you find it useful :)
 
-
+[github-image]: https://img.shields.io/github/release/tbolis/react-sketch.svg
+[github-url]: https://github.com/tbolis/react-sketch/releases
 [npm-image]: https://img.shields.io/npm/v/react-sketch.svg?style=flat
 [npm-url]: https://www.npmjs.com/package/react-sketch
 [downloads-image]: https://img.shields.io/npm/dm/react-sketch.svg?style=flat
 [downloads-url]: https://www.npmjs.com/package/react-sketch
-[travis-image]: https://img.shields.io/travis/mulesoft/react-sketch.svg?style=flat
-[travis-url]: https://travis-ci.org/mulesoft/react-sketch
+[travis-image]: https://img.shields.io/travis/tbolis/react-sketch.svg?style=flat
+[travis-url]: https://travis-ci.org/tbolis/react-sketch
