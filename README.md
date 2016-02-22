@@ -14,9 +14,6 @@ react-sketch as a library, if not do the following:
 ```sh
 npm install react --save
 npm install react-dom --save
-```
-
-```sh
 npm install react-sketch --save
 ```
 
