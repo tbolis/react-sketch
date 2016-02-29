@@ -1,5 +1,5 @@
 import CanvasTool from './CanvasTool'
-import {mousePosition} from './utils';
+import {pointerPosition} from './utils';
 
 class Pencil extends CanvasTool {
 
@@ -8,7 +8,7 @@ class Pencil extends CanvasTool {
     }
 
     doMouseDown(event) {
-        let [_x, _y] = mousePosition(event);
+        let [_x, _y] = pointerPosition(event);
         // store initial position of mouse
         [this._startX, this._startY] = [_x, _y];
         [this._x, this._y] = [_x, _y];
@@ -18,7 +18,7 @@ class Pencil extends CanvasTool {
 
     doMouseMove(event) {
         let [_prevX,_prevY] = [this._x, this._y];
-        let [_currX, _currY] = mousePosition(event);
+        let [_currX, _currY] = pointerPosition(event);
         if (this._isMouseDown) {
             this._ctx.beginPath();
             this._ctx.moveTo(_prevX, _prevY);

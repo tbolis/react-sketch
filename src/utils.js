@@ -5,7 +5,7 @@
  * @returns *[] tuple of position x,y
  * @private
  */
-export function mousePosition(event) {
+export function pointerPosition(event) {
     event = event || window.event;
     var target = event.target || event.srcElement,
         style = target.currentStyle || window.getComputedStyle(target, null),
@@ -13,6 +13,8 @@ export function mousePosition(event) {
         borderTopWidth = parseInt(style['borderTopWidth'], 10),
         rect = target.getBoundingClientRect(),
         _x = event.clientX - borderLeftWidth - rect.left,
-        _y = event.clientY - borderTopWidth - rect.top;
-    return [_x, _y];
+        _y = event.clientY - borderTopWidth - rect.top,
+        _touchX = event.changedTouches ? event.changedTouches[0].clientX - borderLeftWidth - rect.left : null,
+        _touchY = event.changedTouches ? event.changedTouches[0].clientY - borderTopWidth - rect.top : null;
+    return [(_x || _touchX), (_y || _touchY)];
 }

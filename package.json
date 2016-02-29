@@ -1,7 +1,7 @@
 {
   "name": "react-sketch",
-  "version": "0.1.0",
-  "description": "Sketch Element for React",
+  "version": "0.1.1",
+  "description": "Simple Sketch Element for React based applications",
   "keywords": [
     "React",
     "canvas",

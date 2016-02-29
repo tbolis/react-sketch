@@ -54,9 +54,16 @@ class SketchField extends React.Component {
     componentDidMount() {
         // Assign the events to canvas element
         this._canvas.addEventListener('mouseup', this._mouseUp, false);
+        this._canvas.addEventListener('touchend', this._mouseUp, false);
+
         this._canvas.addEventListener('mousedown', this._mouseDown, false);
+        this._canvas.addEventListener('touchstart', this._mouseDown, false);
+
         this._canvas.addEventListener('mousemove', this._mouseMove, false);
-        this._canvas.addEventListener('mouseout', this._mouseOut, false);
+        this._canvas.addEventListener('touchmove', this._mouseMove, false);
+
+        this._canvas.addEventListener('mouseout', this._mouseOut);
+
         // Handle the resize of Canvas
         this._canvas.width = ReactDOM.findDOMNode(this).offsetWidth;
         window.addEventListener('resize', this._resize, false);
@@ -131,6 +138,7 @@ class SketchField extends React.Component {
      * @private
      */
     _mouseUp(event) {
+        if (event) event.preventDefault();
         // Call corresponding tool action
         let tool = this._tools[this.props.tool || Tool.Pencil];
         tool.doMouseUp(event);
@@ -152,6 +160,7 @@ class SketchField extends React.Component {
      * @private
      */
     _mouseMove(event) {
+        if (event) event.preventDefault();
         let tool = this._tools[this.props.tool || Tool.Pencil];
         tool.doMouseMove(event);
     }
@@ -163,6 +172,7 @@ class SketchField extends React.Component {
      * @private
      */
     _mouseDown(event) {
+        if (event) event.preventDefault();
         let tool = this._tools[this.props.tool || Tool.Pencil];
         tool.doMouseDown(event);
     }
@@ -174,6 +184,7 @@ class SketchField extends React.Component {
      * @private
      */
     _mouseOut(event) {
+        if (event) event.preventDefault();
         let tool = this._tools[this.props.tool || Tool.Pencil];
         tool.doMouseOut(event);
         // there is no direct on change event

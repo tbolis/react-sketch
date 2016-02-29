@@ -1,5 +1,5 @@
 import CanvasTool from './CanvasTool'
-import {mousePosition} from './utils';
+import {pointerPosition} from './utils';
 
 class Rectangle extends CanvasTool {
 
@@ -9,7 +9,7 @@ class Rectangle extends CanvasTool {
     }
 
     doMouseDown(event) {
-        let [_x, _y] = mousePosition(event);
+        let [_x, _y] = pointerPosition(event);
         // store initial position of mouse
         [this._startX, this._startY] = [_x, _y];
         [this._x, this._y] = [_x, _y];
@@ -20,7 +20,7 @@ class Rectangle extends CanvasTool {
 
     doMouseMove(event) {
         let [_startX,_startY] = [this._startX, this._startY];
-        let [_currX, _currY] = mousePosition(event);
+        let [_currX, _currY] = pointerPosition(event);
         if (this._isMouseDown) {
             this._ctx.beginPath();
             this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);

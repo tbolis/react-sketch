@@ -6,6 +6,8 @@
 
 # Linux trash folder which might appear on any partition or disk
 .Trash-*
+
+
 ### JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
 
@@ -53,6 +55,8 @@ atlassian-ide-plugin.xml
 com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
+
+
 ### OSX template
 .DS_Store
 .AppleDouble
@@ -78,6 +82,8 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+
 ### Eclipse template
 *.pydevproject
 .metadata
@@ -118,6 +124,8 @@ local.properties
 
 # TeXlipse plugin
 .texlipse
+
+
 ### Node template
 # Logs
 logs
@@ -147,6 +155,9 @@ build/Release
 # Dependency directory
 # https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
 node_modules
+
+lib/
+
 ### Windows template
 # Windows image file caches
 Thumbs.db
