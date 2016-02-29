@@ -1,5 +1,6 @@
 # react-sketch
 
+[![GitHub release][github-image][github-url]]
 [![NPM version][npm-image]][npm-url]
 [![NPM downloads][downloads-image]][downloads-url]
 [![Build status][travis-image]][travis-url]
