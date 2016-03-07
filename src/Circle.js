@@ -30,7 +30,7 @@ class Circle extends CanvasTool {
                 image.src = this._background;
                 this._ctx.drawImage(image, 0, 0);
             }
-            this._ctx.arc(_startX, _startY,
+            this._ctx.arc(_currX, _currY,
                 linearDistance({x: _startX, y: _startY}, {x: _currX, y: _currY}), 0, 2 * Math.PI, false);
             this._ctx.fill();
             this._ctx.stroke();
