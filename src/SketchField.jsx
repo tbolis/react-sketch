@@ -76,9 +76,9 @@ class SketchField extends React.Component {
         this._history = new History(this.props.undoSteps);
         // Initialize the tools
         this._tools = {};
+        this._tools[Tool.Circle] = new Circle(this._canvas, this._ctx);
         this._tools[Tool.Line] = new Line(this._canvas, this._ctx);
         this._tools[Tool.Pencil] = new Pencil(this._canvas, this._ctx);
-        this._tools[Tool.Circle] = new Circle(this._canvas, this._ctx);
         this._tools[Tool.Rectangle] = new Rectangle(this._canvas, this._ctx);
     }
 

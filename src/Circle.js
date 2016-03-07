@@ -22,7 +22,6 @@ class Circle extends CanvasTool {
         let [_startX,_startY] = [this._startX, this._startY];
         let [_currX, _currY] = pointerPosition(event);
         if (this._isMouseDown) {
-
             this._ctx.beginPath();
             this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
             if (this._background) {
