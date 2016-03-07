@@ -18,3 +18,17 @@ export function pointerPosition(event) {
         _touchY = event.changedTouches ? event.changedTouches[0].clientY - borderTopWidth - rect.top : null;
     return [(_x || _touchX), (_y || _touchY)];
 }
+
+/**
+ * Calculate the distance of two x,y points
+ *
+ * @param point1 an object with x,y attributes representing the start point
+ * @param point2 an object with x,y attributes representing the end point
+ *
+ * @returns {number}
+ */
+export const linearDistance = (point1, point2) => {
+    let xs = point2.x - point1.x;
+    let ys = point2.y - point1.y;
+    return Math.sqrt(xs * xs + ys * ys);
+};

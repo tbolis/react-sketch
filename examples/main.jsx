@@ -168,6 +168,7 @@ class SketchFieldDemo extends React.Component {
                                 <MenuItem value={Tools.Pencil} primaryText="Pencil"/>
                                 <MenuItem value={Tools.Line} primaryText="Line"/>
                                 <MenuItem value={Tools.Rectangle} primaryText="Rectangle"/>
+                                <MenuItem value={Tools.Circle} primaryText="Circle"/>
                             </SelectField>
                             <br/>
                             <br/>
