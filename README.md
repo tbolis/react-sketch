@@ -7,6 +7,9 @@
 
 A Simple Sketch tool for React based applications
 
+![warning-image] _Please note that this module is still in early development!_
+
+
 ## Installation
 
 Note that react and react-dom have been declared as peer dependencies and **should** exist in your project when using 
@@ -68,6 +71,7 @@ See https://github.com/tbolis/react-sketch/blob/master/CHANGELOG.md
 
 MIT, do remember to add a reference if you find it useful :)
 
+[warning-image]: /docs/img/warning.png
 [github-image]: https://img.shields.io/github/release/tbolis/react-sketch.svg
 [github-url]: https://github.com/tbolis/react-sketch/releases
 [npm-image]: https://img.shields.io/npm/v/react-sketch.svg?style=flat
