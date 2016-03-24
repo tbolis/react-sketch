@@ -157,6 +157,7 @@ build/Release
 node_modules
 
 lib/
+build/
 
 ### Windows template
 # Windows image file caches

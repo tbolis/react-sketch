@@ -5,7 +5,7 @@
 [![NPM downloads][downloads-image]][downloads-url]
 [![Build status][travis-image]][travis-url]
 
-A Simple Sketch tool for React based applications
+A Sketch tool for React based applications, backed-up by [fabricjs](http://fabricjs.com/)
 
 ## Installation
 
@@ -21,6 +21,18 @@ npm install react-sketch --save
 or in one command
 ```sh
 npm install --save react  react-dom react-sketch
+```
+
+### Source installation
+
+In order to build from source, read the [relevant instructions](http://fabricjs.com/fabric-intro-part-4/#node) first. 
+
+On an ubuntu machine perform the following steps to install, node version should be >=0.4.0 && <1.0.0, tested with 0.12.12
+
+```sh
+$ sudo apt-get install libcairo2-dev libjpeg-dev libgif-dev
+$ sudo npm install -g canvas
+$ npm install
 ```
 
 ## Usage

@@ -1,12 +1,13 @@
 {
   "name": "react-sketch",
-  "version": "0.1.1",
-  "description": "Simple Sketch Element for React based applications",
+  "version": "0.1.2",
+  "description": "Sketch Element for React based applications, backed-up by fabricjs",
   "keywords": [
-    "React",
+    "react",
     "canvas",
     "sketch",
-    "react-component"
+    "fabric",
+    "fabrickjs"
   ],
   "author": {
     "name": "Thomas Bolis",
@@ -22,19 +23,17 @@
   "license": "MIT",
   "main": "./lib",
   "scripts": {
+    "clean": "rimraf lib && rimraf build",
     "prebuild": "rimraf lib",
     "build": "babel ./src --out-dir ./lib",
+    "build:examples": "webpack --config webpack.examples.cfg.js",
     "prepublish": "npm run test && npm run build",
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",
-    "precommit": "npm run lint",
     "start": "node webpack.server.js",
     "test": "karma start karma.config.js",
     "posttest": "npm run lint"
   },
-  "pre-commit": [
-    "precommit-check"
-  ],
   "peerDependencies": {
     "react": "^0.14.7",
     "react-dom": "^0.14.7"
@@ -80,5 +79,7 @@
     "webpack": "^1.12.11",
     "webpack-dev-server": "^1.14.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "fabric": "^1.5.0"
+  }
 }

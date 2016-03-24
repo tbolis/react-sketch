@@ -7,15 +7,10 @@ import 'flexboxgrid';
 import './main.css';
 
 import {
-    Card,CardText,CardTitle,CardHeader,
-    AppBar,Divider,GridList,GridTile,
-    Slider,
-    Toggle,
-    MenuItem,
-    SelectField,
-    RaisedButton,FlatButton,IconButton,
-    FloatingActionButton,
-    Toolbar,ToolbarGroup,ToolbarSeparator,ToolbarTitle
+    Card,CardText,CardTitle,
+    AppBar,GridList,GridTile,
+    Slider, Toggle, MenuItem,
+    SelectField, IconButton
 } from 'material-ui';
 
 import UndoIcon from 'material-ui/lib/svg-icons/content/undo';
@@ -26,7 +21,6 @@ import RemoveIcon from 'material-ui/lib/svg-icons/content/clear';
 
 import Tools from '../src/Tools';
 import SketchField from '../src/SketchField';
-
 
 const styles = {
     root: {
@@ -169,6 +163,7 @@ class SketchFieldDemo extends React.Component {
                                 <MenuItem value={Tools.Line} primaryText="Line"/>
                                 <MenuItem value={Tools.Rectangle} primaryText="Rectangle"/>
                                 <MenuItem value={Tools.Circle} primaryText="Circle"/>
+                                <MenuItem value={Tools.Text} primaryText="Text"/>
                             </SelectField>
                             <br/>
                             <br/>
