@@ -51,8 +51,10 @@ class SketchFieldDemo extends React.Component {
         this._undo = this._undo.bind(this);
         this._redo = this._redo.bind(this);
         this._clear = this._clear.bind(this);
+        this._toggleEdit = this._toggleEdit.bind(this);
 
         this.state = {
+            drawingMode: true,
             color: 'black',
             lineWidth: 2,
             fill: '#68CCCA',
@@ -121,6 +123,12 @@ class SketchFieldDemo extends React.Component {
         })
     }
 
+    _toggleEdit = (event, toggled) => {
+        this.setState({
+            drawingMode: !toggled
+        });
+    };
+
     render() {
         return (
             <div className='row'>
@@ -150,10 +158,14 @@ class SketchFieldDemo extends React.Component {
                                  tool={this.state.tool}
                                  color={this.state.color}
                                  ref={(c) => this._sketch = c}
+                                 drawingMode={this.state.drawingMode}
                                  lineWidth={this.state.lineWidth}
                                  fill={this.state.fillWithColor ? this.state.fill : 'transparent'}/>
                 </div>
                 <div className='col-xs-5 col-sm-5 col-md-3 col-lg-3'>
+                    <Card style={{margin:'5px 10px 5px 0'}}>
+                        <Toggle label="Edit" onToggle={this._toggleEdit}/>
+                    </Card>
                     <Card style={{margin:'5px 10px 5px 0'}}>
                         <CardTitle title='Select Tool'/>
                         <CardText>

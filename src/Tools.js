@@ -4,5 +4,6 @@ export default {
     Eraser: 'eraser',
     Line: 'line',
     Pencil: 'pencil',
-    Rectangle: 'rectangle'
+    Rectangle: 'rectangle',
+    Text: 'text'
 }

@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import History from './History';
 import ReactDOM from 'react-dom';
 const fabric = require('fabric').fabric;
 
@@ -8,6 +9,31 @@ const fabric = require('fabric').fabric;
  * Sketch Tool based on FabricJS for React Applications
  */
 class SketchField extends React.Component {
+
+    static propTypes = {
+        // the color of the line
+        color: React.PropTypes.string,
+        // the fill color of the shape when applicable
+        fill: React.PropTypes.string,
+        // The width of the line
+        lineWidth: React.PropTypes.number,
+        // number of undo/redo steps to maintain
+        undoSteps: React.PropTypes.number,
+        // The tool to use, can be pencil, rectangle, circle, brush;
+        tool: React.PropTypes.string,
+        // image format when calling toDataURL
+        imageFormat: React.PropTypes.string,
+        //enable/disable drawing mode
+        drawingMode: React.PropTypes.bool
+    };
+
+    static defaultProps = {
+        color: 'black',
+        fill: 'transparent',
+        lineWidth: 2,
+        undoSteps: 10,
+        drawingMode: true
+    };
 
     constructor(props, context) {
         super(props, context);
@@ -18,17 +44,53 @@ class SketchField extends React.Component {
     }
 
     componentDidMount() {
-        this._fc = new fabric.Canvas(this._canvas.id, {
-            isDrawingMode: true
+        let canvas = new fabric.Canvas(this._canvas.id, {
+            isDrawingMode: this.props.drawingMode
         });
+        canvas.freeDrawingBrush.width = parseInt(this.props.lineWidth, 10) || 1;
+        canvas.freeDrawingBrush.color = this.props.color;
+        this._fc = canvas;
         window.addEventListener('resize', this._resize, false);
         let width = ReactDOM.findDOMNode(this).offsetWidth;
-        this.setState({parentWidth: width});
-        this._fc.setWidth(width);
-        this._fc.calcOffset();
+        this.setState({
+            parentWidth: width
+        }, () => {
+            canvas.setWidth(width);
+            canvas.calcOffset();
+
+        });
+        // Initialize History
+        this._history = new History(this.props.undoSteps);
+
+        canvas.on('object:added', (e) => {
+            let obj = e.target;
+            this._history.keep(obj);
+        });
+        canvas.on('object:modified', (e) => {
+            let obj = e.target;
+            this._history.keep(obj);
+        });
     }
 
     componentWillUnmount = () => window.removeEventListener('resize', this._resize);
+
+    componentWillReceiveProps(props) {
+        // mess with drawing mode
+        let canvas = this._fc;
+        if (this.props.drawingMode !== props.drawingMode) {
+            canvas.isDrawingMode = props.drawingMode;
+        }
+        // mess with width of line
+        if (canvas.freeDrawingBrush) {
+            if (this.props.lineWidth !== props.lineWidth) {
+                canvas.freeDrawingBrush.width = parseInt(props.lineWidth, 10) || 1;
+            }
+            if (this.props.color !== props.color) {
+                canvas.freeDrawingBrush.color = props.color || 'black';
+            }
+
+        }
+    }
 
     /**
      * Track the resize of the window and update our state
@@ -161,24 +223,10 @@ class SketchField extends React.Component {
     }
 
     /**
-     * Set the content of Canvas to the given one
-     *
-     * @param drawing the content to set to the canvas
-     */
-    setContent(drawing) {
-        var image = new Image();
-        image.src = drawing;
-        this._ctx.drawImage(image, 0, 0);
-        this._ctx.stroke();
-        this._history.keep(drawing);
-        this.setState({content: drawing});
-    }
-
-    /**
      * Clear the content of the canvas, this will also keep the last version of it to history
      */
     clear() {
-
+        this._fc.clear()
     }
 
     render() {
@@ -193,10 +241,9 @@ class SketchField extends React.Component {
             } = this.props;
         return (
             <div className={className} style={style}>
-                <canvas id={new Date().getTime() +''}
-                        ref={(c) => this._canvas = c}
-                        width={width || this.state.parentWidth}
-                        height={height || 512}>
+                <canvas
+                    id={'c' + new Date().getTime()} ref={(c) => this._canvas = c}
+                    width={width || this.state.parentWidth} height={height || 512}>
                     Canvas is not supported by your browser :(
                 </canvas>
             </div>
