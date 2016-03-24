@@ -47,8 +47,11 @@ class SketchField extends React.Component {
         let canvas = new fabric.Canvas(this._canvas.id, {
             isDrawingMode: this.props.drawingMode
         });
-        canvas.freeDrawingBrush.width = parseInt(this.props.lineWidth, 10) || 1;
-        canvas.freeDrawingBrush.color = this.props.color;
+
+        let {freeDrawingBrush} = canvas;
+        freeDrawingBrush.width = parseInt(this.props.lineWidth, 10) || 1;
+        freeDrawingBrush.color = this.props.color;
+
         this._fc = canvas;
         window.addEventListener('resize', this._resize, false);
         let width = ReactDOM.findDOMNode(this).offsetWidth;
