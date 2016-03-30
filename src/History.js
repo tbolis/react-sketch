@@ -18,7 +18,8 @@ class History {
     }
 
     last() {
-        return this.undoList[this.undoList.length - 1];
+        let last = this.undoList.length - 1;
+        return this.undoList[last];
     }
 
     /**
@@ -41,13 +42,14 @@ class History {
     undo() {
         if (this.undoList.length > 0) {
             // keep the latest to the redoList
-            this.redoList.push(this.undoList.pop());
+            let last = this.undoList.pop();
+            this.redoList.push(last);
             if (this.redoList.length > this.undoLimit) {
                 this.redoList.shift();
             }
+            return last
         }
-        // deliver the last one but do not remove it
-        return this.undoList.length > 0 ? this.undoList[this.undoList.length - 1] : null;
+        return null;
     }
 
 
@@ -58,8 +60,9 @@ class History {
      */
     redo() {
         if (this.redoList.length > 0) {
-            this.undoList.push(this.redoList.pop());
-            return this.undoList.length > 0 ? this.undoList[this.undoList.length - 1] : null;
+            let last = this.redoList.pop();
+            this.undoList.push(last);
+            return last;
         }
         return null;
     }

@@ -1,9 +1,12 @@
 'use strict';
 
 import React from 'react';
-import History from './History';
 import ReactDOM from 'react-dom';
 const fabric = require('fabric').fabric;
+
+import History from './History';
+import {uuid4} from './utils';
+
 
 /**
  * Sketch Tool based on FabricJS for React Applications
@@ -12,9 +15,9 @@ class SketchField extends React.Component {
 
     static propTypes = {
         // the color of the line
-        color: React.PropTypes.string,
+        lineColor: React.PropTypes.string,
         // the fill color of the shape when applicable
-        fill: React.PropTypes.string,
+        fillColor: React.PropTypes.string,
         // The width of the line
         lineWidth: React.PropTypes.number,
         // number of undo/redo steps to maintain
@@ -24,22 +27,29 @@ class SketchField extends React.Component {
         // image format when calling toDataURL
         imageFormat: React.PropTypes.string,
         //enable/disable drawing mode
-        drawingMode: React.PropTypes.bool
+        drawingMode: React.PropTypes.bool,
+        // Scale the drawing when we resize the canvas
+        scaleOnResize: React.PropTypes.bool
     };
 
     static defaultProps = {
-        color: 'black',
-        fill: 'transparent',
-        lineWidth: 2,
+        lineColor: 'black',
+        fillColor: 'transparent',
+        lineWidth: 1,
         undoSteps: 10,
-        drawingMode: true
+        drawingMode: true,
+        scaleOnResize: true
     };
 
     constructor(props, context) {
         super(props, context);
         this._resize = this._resize.bind(this);
+        this._onObjectAdded = this._onObjectAdded.bind(this);
+        this._onObjectModified = this._onObjectModified.bind(this);
+        this._onObjectRemoved = this._onObjectRemoved.bind(this);
         this.state = {
-            parentWidth: 1
+            parentWidth: 10,
+            action: true
         };
     }
 
@@ -47,35 +57,24 @@ class SketchField extends React.Component {
         let canvas = new fabric.Canvas(this._canvas.id, {
             isDrawingMode: this.props.drawingMode
         });
-
-        let {freeDrawingBrush} = canvas;
-        freeDrawingBrush.width = parseInt(this.props.lineWidth, 10) || 1;
-        freeDrawingBrush.color = this.props.color;
-
         this._fc = canvas;
+        // Initial line configuration
+        let {freeDrawingBrush} = canvas;
+        freeDrawingBrush.width = this.props.lineWidth;
+        freeDrawingBrush.color = this.props.lineColor;
+        // Control resize
         window.addEventListener('resize', this._resize, false);
-        let width = ReactDOM.findDOMNode(this).offsetWidth;
-        this.setState({
-            parentWidth: width
-        }, () => {
-            canvas.setWidth(width);
-            canvas.calcOffset();
-
-        });
-        // Initialize History
+        this._resize(null);
+        //// Initialize History, with maximum number of undo steps
         this._history = new History(this.props.undoSteps);
-
-        canvas.on('object:added', (e) => {
-            let obj = e.target;
-            this._history.keep(obj);
-        });
-        canvas.on('object:modified', (e) => {
-            let obj = e.target;
-            this._history.keep(obj);
-        });
+        canvas.on('object:added', this._onObjectAdded);
+        canvas.on('object:modified', this._onObjectModified);
+        canvas.on('object:removed', this._onObjectRemoved);
     }
 
-    componentWillUnmount = () => window.removeEventListener('resize', this._resize);
+    componentWillUnmount() {
+        window.removeEventListener('resize', this._resize);
+    }
 
     componentWillReceiveProps(props) {
         // mess with drawing mode
@@ -83,16 +82,42 @@ class SketchField extends React.Component {
         if (this.props.drawingMode !== props.drawingMode) {
             canvas.isDrawingMode = props.drawingMode;
         }
-        // mess with width of line
-        if (canvas.freeDrawingBrush) {
-            if (this.props.lineWidth !== props.lineWidth) {
-                canvas.freeDrawingBrush.width = parseInt(props.lineWidth, 10) || 1;
+        // mess with line options
+        let {freeDrawingBrush} = canvas;
+        if (freeDrawingBrush) {
+            let {lineWidth,lineColor} = this.props;
+            if (lineWidth !== props.lineWidth) {
+                freeDrawingBrush.width = props.lineWidth;
             }
-            if (this.props.color !== props.color) {
-                canvas.freeDrawingBrush.color = props.color || 'black';
+            if (lineColor !== props.lineColor) {
+                freeDrawingBrush.color = props.lineColor || 'black';
             }
-
         }
+    }
+
+    _onObjectAdded(e) {
+        if (!this.state.action) {
+            this.setState({action: true});
+            return;
+        }
+        let obj = e.target;
+        obj.version = 1;
+        let state = JSON.stringify(obj.originalState);
+        // object, previous state, current state
+        this._history.keep([obj, state, state]);
+    }
+
+    _onObjectModified(e) {
+        let obj = e.target;
+        obj.version += 1;
+        let prevState = JSON.stringify(obj.originalState);
+        obj.saveState();
+        let currState = JSON.stringify(obj.originalState);
+        this._history.keep([obj, prevState, currState]);
+    }
+
+    _onObjectRemoved(e) {
+        let obj = e.target;
     }
 
     /**
@@ -105,97 +130,86 @@ class SketchField extends React.Component {
         if (event) {
             event.preventDefault()
         }
+        // if disabled then do not perform the resize
+        if (!this.props.scaleOnResize) return;
         let canvas = this._fc;
         let domNode = ReactDOM.findDOMNode(this);
         let width = domNode.offsetWidth;
+        let height = domNode.offsetHeight;
         let prevWidth = canvas.getWidth();
+        let prevHeight = canvas.getHeight();
         let factor = width / prevWidth;
+        let hfactor = height / prevHeight;
         canvas.setWidth(width);
+        canvas.setHeight(height);
         if (canvas.backgroundImage) {
             // Need to scale background images as well
             let bi = canvas.backgroundImage;
             bi.width = bi.width * factor;
-            bi.height = bi.height * factor;
+            bi.height = bi.height * hfactor;
         }
         let objects = canvas.getObjects();
         for (let i in objects) {
             let obj = objects[i];
-
             let scaleX = obj.scaleX;
             let scaleY = obj.scaleY;
             let left = obj.left;
             let top = obj.top;
-
             let tempScaleX = scaleX * factor;
-            let tempScaleY = scaleY * factor;
+            let tempScaleY = scaleY * hfactor;
             let tempLeft = left * factor;
-            let tempTop = top * factor;
-
+            let tempTop = top * hfactor;
             obj.scaleX = tempScaleX;
             obj.scaleY = tempScaleY;
             obj.left = tempLeft;
             obj.top = tempTop;
-
             obj.setCoords();
         }
         canvas.renderAll();
         canvas.calcOffset();
+        this.setState({
+            parentWidth: width,
+            parentHeight: height
+        });
     }
 
     /**
      * Perform an undo operation on canvas, if it cannot undo it will leave the canvas intact
      */
     undo() {
-        //let history = this._history;
-        //// we do not want the latest canvas but the one before  that
-        //if (history.canUndo()) {
-        //    let ctx = this._ctx;
-        //    let canvas = this._canvas;
-        //    if (ctx) {
-        //        ctx.beginPath();
-        //        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        //        let image = new Image();
-        //        let undoCanvas = history.undo();
-        //        image.src = undoCanvas;
-        //        ctx.drawImage(image, 0, 0);
-        //        ctx.stroke();
-        //        ctx.closePath();
-        //        this.setState({
-        //            content: undoCanvas
-        //        });
-        //        if (this.props.onChange) {
-        //            this.props.onChange(event, undoCanvas);
-        //        }
-        //    }
-        //}
+        let history = this._history;
+        // we do not want the latest canvas but the one before  that
+        if (history.canUndo()) {
+            let [obj,prevState,currState] = history.undo();
+            if (obj.version === 1) obj.remove();
+            else {
+                obj.setOptions(JSON.parse(prevState));
+                obj.setCoords();
+                obj.version -= 1;
+            }
+            this._fc.renderAll();
+        }
     }
 
     /**
      * Perform a redo operation on canvas, if it cannot redo it will leave the canvas intact
      */
     redo() {
-        //let history = this._history;
-        //if (history.canRedo()) {
-        //    let ctx = this._ctx;
-        //    let canvas = this._canvas;
-        //    if (ctx) {
-        //        ctx.beginPath();
-        //        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        //        let image = new Image();
-        //        let redoCanvas = history.redo();
-        //        image.src = redoCanvas;
-        //        ctx.drawImage(image, 0, 0);
-        //        ctx.stroke();
-        //        ctx.closePath();
-        //        this.setState({
-        //            content: redoCanvas
-        //        });
-        //        // there is no direct on change event
-        //        if (this.props.onChange) {
-        //            this.props.onChange(event, redoCanvas);
-        //        }
-        //    }
-        //}
+        let history = this._history;
+        if (history.canRedo()) {
+            let canvas = this._fc;
+            let [obj,prevState,currState] = history.redo();
+            obj.setOptions(JSON.parse(currState));
+            if (obj.version === 1) {
+                this.setState({action: false}, ()=> {
+                    canvas.add(obj);
+                });
+            } else {
+                obj.setCoords();
+                obj.version += 1;
+            }
+            canvas.renderAll();
+        }
     }
 
     /**
@@ -243,11 +257,14 @@ class SketchField extends React.Component {
             ...other
             } = this.props;
         return (
-            <div className={className} style={style}>
+            <div className={className} style={style} ref={(c) => this._canvasWrapper = c}>
                 <canvas
-                    id={'c' + new Date().getTime()} ref={(c) => this._canvas = c}
-                    width={width || this.state.parentWidth} height={height || 512}>
-                    Canvas is not supported by your browser :(
+                    id={uuid4()}
+                    height={height || 512}
+                    ref={(c) => this._canvas = c}
+                    style={{border:'1px solid grey'}}>
+                    width={width || this.state.parentWidth}
+                    Sorry, Canvas HTML5 element is not supported by your browser :(
                 </canvas>
             </div>
         )
