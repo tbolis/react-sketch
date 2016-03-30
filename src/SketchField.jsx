@@ -138,14 +138,14 @@ class SketchField extends React.Component {
         let height = domNode.offsetHeight;
         let prevWidth = canvas.getWidth();
         let prevHeight = canvas.getHeight();
-        let factor = width / prevWidth;
+        let wfactor = width / prevWidth;
         let hfactor = height / prevHeight;
         canvas.setWidth(width);
         canvas.setHeight(height);
         if (canvas.backgroundImage) {
             // Need to scale background images as well
             let bi = canvas.backgroundImage;
-            bi.width = bi.width * factor;
+            bi.width = bi.width * wfactor;
             bi.height = bi.height * hfactor;
         }
         let objects = canvas.getObjects();
@@ -155,9 +155,9 @@ class SketchField extends React.Component {
             let scaleY = obj.scaleY;
             let left = obj.left;
             let top = obj.top;
-            let tempScaleX = scaleX * factor;
+            let tempScaleX = scaleX * wfactor;
             let tempScaleY = scaleY * hfactor;
-            let tempLeft = left * factor;
+            let tempLeft = left * wfactor;
             let tempTop = top * hfactor;
             obj.scaleX = tempScaleX;
             obj.scaleY = tempScaleY;
@@ -261,8 +261,7 @@ class SketchField extends React.Component {
                 <canvas
                     id={uuid4()}
                     height={height || 512}
-                    ref={(c) => this._canvas = c}
-                    style={{border:'1px solid grey'}}>
+                    ref={(c) => this._canvas = c}>
                     width={width || this.state.parentWidth}
                     Sorry, Canvas HTML5 element is not supported by your browser :(
                 </canvas>

@@ -189,13 +189,9 @@ class SketchFieldDemo extends React.Component {
                                 lineWidth={this.state.lineWidth}
                                 fillColor={this.state.fillWithColor ? this.state.fill : 'transparent'}
                                 scaleOnResize={true}
+                                height={660}
 
 
-                                fullWidth={true}
-
-
-                                height='660px'
-                                style={{position:'relative'}}
                                 onChange={(c,d) => this.setState({canUndo: this._sketch.canUndo()})}
                                 tool={this.state.tool}
 
