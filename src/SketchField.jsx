@@ -2,10 +2,10 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-const fabric = require('fabric').fabric;
-
-import History from './History';
+import History from './history';
 import {uuid4} from './utils';
+
+const fabric = require('fabric').fabric;
 
 
 /**
@@ -178,17 +178,16 @@ class SketchField extends React.Component {
      */
     undo() {
         let history = this._history;
-        // we do not want the latest canvas but the one before  that
-        if (history.canUndo()) {
-            let [obj,prevState,currState] = history.undo();
-            if (obj.version === 1) obj.remove();
-            else {
-                obj.setOptions(JSON.parse(prevState));
-                obj.setCoords();
-                obj.version -= 1;
-            }
+        let [obj,prevState,currState] = history.getCurrent();
+        if (obj.version === 1) {
+            obj.remove();
+        } else {
+            obj.setOptions(JSON.parse(prevState));
+            obj.setCoords();
+            obj.version -= 1;
             this._fc.renderAll();
         }
+        history.undo();
     }
 
     /**
@@ -261,8 +260,8 @@ class SketchField extends React.Component {
                 <canvas
                     id={uuid4()}
                     height={height || 512}
-                    ref={(c) => this._canvas = c}>
-                    width={width || this.state.parentWidth}
+                    ref={(c) => this._canvas = c}
+                    width={width || this.state.parentWidth}>
                     Sorry, Canvas HTML5 element is not supported by your browser :(
                 </canvas>
             </div>
