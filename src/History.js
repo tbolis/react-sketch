@@ -6,6 +6,7 @@ class History {
         this.undoLimit = undoLimit;
         this.undoList = [];
         this.redoList = [];
+        this.current = null;
     }
 
     /**
@@ -17,52 +18,60 @@ class History {
         return this.undoLimit;
     }
 
-    last() {
-        let last = this.undoList.length - 1;
-        return this.undoList[last];
+    /**
+     * Get Current state
+     *
+     * @returns {null|*}
+     */
+    getCurrent() {
+        return this.current;
     }
 
     /**
      * Keep an object to history
+     *
+     * This method will set the object as current value and will push the previous "current" object to the undo history
+     *
      * @param obj
      */
     keep(obj) {
-        this.undoList.push(obj);
         this.redoList = [];
+        if (this.current) {
+            this.undoList.push(this.current);
+        }
         if (this.undoList.length > this.undoLimit) {
             this.undoList.shift();
         }
+        this.current = obj;
     }
 
     /**
-     * Undo the last object
+     * Undo the last object, this operation will set the current object to one step back in time
      *
-     * @returns {Object} the object before the last keep
+     * @returns the new current value after the undo operation, else null if no undo operation was possible
      */
     undo() {
         if (this.undoList.length > 0) {
-            // keep the latest to the redoList
-            let last = this.undoList.pop();
-            this.redoList.push(last);
+            this.redoList.push(this.current);
             if (this.redoList.length > this.undoLimit) {
                 this.redoList.shift();
             }
-            return last
+            this.current = this.undoList.pop();
+            return this.current;
         }
         return null;
     }
 
-
     /**
      * Redo the last object, redo happens only if no keep operations have been performed
      *
-     * @returns {null}
+     * @returns the new current value after the redo operation, or null if no redo operation was possible
      */
     redo() {
         if (this.redoList.length > 0) {
-            let last = this.redoList.pop();
-            this.undoList.push(last);
-            return last;
+            this.undoList.push(this.current);
+            this.current = this.redoList.pop();
+            return this.current;
         }
         return null;
     }
@@ -91,6 +100,7 @@ class History {
     clear() {
         this.undoList = [];
         this.redoList = [];
+        this.current = null;
     }
 }
 
