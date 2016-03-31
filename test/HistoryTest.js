@@ -9,7 +9,7 @@ import History from 'History';
 describe('History', () => {
 
     it('Loads Normally', () => {
-        require('../src/History')
+        require('../src/history')
     });
 
     it('Undo limit is set', () => {
