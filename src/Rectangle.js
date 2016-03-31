@@ -1,4 +1,4 @@
-import CanvasTool from './CanvasTool'
+import CanvasTool from './fabrictool'
 import {pointerPosition} from './utils';
 
 class Rectangle extends CanvasTool {

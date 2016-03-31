@@ -1,10 +1,9 @@
 /**
  * "Abstract" like base class for a Canvas tool
  */
-class CanvasTool {
-    constructor(canvas, ctx) {
+class FabricCanvasTool {
+    constructor(canvas) {
         this._canvas = canvas;
-        this._ctx = ctx;
     }
 
     doMouseUp(event) {
@@ -24,4 +23,4 @@ class CanvasTool {
     }
 }
 
-export default CanvasTool;
+export default FabricCanvasTool;

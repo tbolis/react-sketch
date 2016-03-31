@@ -5,5 +5,6 @@ export default {
     Line: 'line',
     Pencil: 'pencil',
     Rectangle: 'rectangle',
-    Text: 'text'
+    Text: 'text',
+    Select: 'select'
 }

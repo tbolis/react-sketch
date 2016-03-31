@@ -51,11 +51,13 @@ class History {
      * @returns the new current value after the undo operation, else null if no undo operation was possible
      */
     undo() {
-        if (this.undoList.length > 0) {
+        if (this.current) {
             this.redoList.push(this.current);
             if (this.redoList.length > this.undoLimit) {
                 this.redoList.shift();
             }
+        }
+        if (this.undoList.length > 0) {
             this.current = this.undoList.pop();
             return this.current;
         }

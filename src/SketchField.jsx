@@ -1,12 +1,15 @@
 'use strict';
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import History from './history';
 import {uuid4} from './utils';
 
-const fabric = require('fabric').fabric;
+import Select from './select'
+import Pencil from './pencil'
+import Line from './line'
+import Tool from './tools'
 
+const fabric = require('fabric').fabric;
 
 /**
  * Sketch Tool based on FabricJS for React Applications
@@ -44,9 +47,14 @@ class SketchField extends React.Component {
     constructor(props, context) {
         super(props, context);
         this._resize = this._resize.bind(this);
+        this._initTools = this._initTools.bind(this);
+        this._onMouseUp = this._onMouseUp.bind(this);
+        this._onMouseOut = this._onMouseOut.bind(this);
+        this._onMouseDown = this._onMouseDown.bind(this);
+        this._onMouseMove = this._onMouseMove.bind(this);
         this._onObjectAdded = this._onObjectAdded.bind(this);
-        this._onObjectModified = this._onObjectModified.bind(this);
         this._onObjectRemoved = this._onObjectRemoved.bind(this);
+        this._onObjectModified = this._onObjectModified.bind(this);
         this.state = {
             parentWidth: 10,
             action: true
@@ -54,22 +62,34 @@ class SketchField extends React.Component {
     }
 
     componentDidMount() {
-        let canvas = new fabric.Canvas(this._canvas.id, {
-            isDrawingMode: this.props.drawingMode
-        });
-        this._fc = canvas;
-        // Initial line configuration
-        let {freeDrawingBrush} = canvas;
-        freeDrawingBrush.width = this.props.lineWidth;
-        freeDrawingBrush.color = this.props.lineColor;
+        let canvas = this._fc = new fabric.Canvas(this._canvas.id);
+        this._initTools(canvas);
+
+        let tool = this._tools[this.props.tool];
+        tool.configureCanvas(this.props);
+
         // Control resize
         window.addEventListener('resize', this._resize, false);
         this._resize(null);
-        //// Initialize History, with maximum number of undo steps
+
+        // Initialize History, with maximum number of undo steps
         this._history = new History(this.props.undoSteps);
+
+        // Events binding
         canvas.on('object:added', this._onObjectAdded);
         canvas.on('object:modified', this._onObjectModified);
         canvas.on('object:removed', this._onObjectRemoved);
+        canvas.on('mouse:down', this._onMouseDown);
+        canvas.on('mouse:move', this._onMouseMove);
+        canvas.on('mouse:up', this._onMouseUp);
+        canvas.on('mouse:out', this._onMouseOut);
+    }
+
+    _initTools(fabricCanvas) {
+        this._tools = {};
+        this._tools[Tool.Select] = new Select(fabricCanvas);
+        this._tools[Tool.Pencil] = new Pencil(fabricCanvas);
+        this._tools[Tool.Line] = new Line(fabricCanvas);
     }
 
     componentWillUnmount() {
@@ -77,22 +97,11 @@ class SketchField extends React.Component {
     }
 
     componentWillReceiveProps(props) {
-        // mess with drawing mode
-        let canvas = this._fc;
-        if (this.props.drawingMode !== props.drawingMode) {
-            canvas.isDrawingMode = props.drawingMode;
-        }
-        // mess with line options
-        let {freeDrawingBrush} = canvas;
-        if (freeDrawingBrush) {
-            let {lineWidth,lineColor} = this.props;
-            if (lineWidth !== props.lineWidth) {
-                freeDrawingBrush.width = props.lineWidth;
-            }
-            if (lineColor !== props.lineColor) {
-                freeDrawingBrush.color = props.lineColor || 'black';
-            }
-        }
+        //if (this.props.tool !== props.tool) {
+        // tool has changed
+        let tool = this._tools[props.tool] || this._tools['pencil'];
+        tool.configureCanvas(props);
+        //}
     }
 
     _onObjectAdded(e) {
@@ -120,15 +129,47 @@ class SketchField extends React.Component {
         let obj = e.target;
     }
 
+    _onMouseDown(e) {
+        let tool = this._tools[this.props.tool];
+        if (tool) {
+            tool.doMouseDown(e);
+        }
+    }
+
+    _onMouseMove(e) {
+        let tool = this._tools[this.props.tool];
+        if (tool) {
+            tool.doMouseMove(e);
+        }
+    }
+
+    _onMouseUp(e) {
+        let tool = this._tools[this.props.tool];
+        if (tool) {
+            tool.doMouseUp(e);
+        }
+        //// there is no direct on change event
+        //if (this.props.onChange) {
+        //    this.props.onChange(event.e, this._fc.toDataURL('png'));
+        //}
+    }
+
+    _onMouseOut(e) {
+        let tool = this._tools[this.props.tool];
+        if (tool) {
+            tool.doMouseOut(e);
+        }
+    }
+
     /**
      * Track the resize of the window and update our state
      *
-     * @param event the resize event
+     * @param e the resize event
      * @private
      */
-    _resize(event) {
-        if (event) {
-            event.preventDefault()
+    _resize(e) {
+        if (e) {
+            e.preventDefault()
         }
         // if disabled then do not perform the resize
         if (!this.props.scaleOnResize) return;
@@ -179,6 +220,7 @@ class SketchField extends React.Component {
     undo() {
         let history = this._history;
         let [obj,prevState,currState] = history.getCurrent();
+        history.undo();
         if (obj.version === 1) {
             obj.remove();
         } else {
@@ -187,7 +229,6 @@ class SketchField extends React.Component {
             obj.version -= 1;
             this._fc.renderAll();
         }
-        history.undo();
     }
 
     /**
@@ -198,12 +239,12 @@ class SketchField extends React.Component {
         if (history.canRedo()) {
             let canvas = this._fc;
             let [obj,prevState,currState] = history.redo();
-            obj.setOptions(JSON.parse(currState));
             if (obj.version === 1) {
-                this.setState({action: false}, ()=> {
+                this.setState({action: false}, () => {
                     canvas.add(obj);
                 });
             } else {
+                obj.setOptions(JSON.parse(currState));
                 obj.setCoords();
                 obj.version += 1;
             }

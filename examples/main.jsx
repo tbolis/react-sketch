@@ -19,7 +19,7 @@ import ClearIcon from 'material-ui/lib/svg-icons/action/delete';
 import SaveIcon from 'material-ui/lib/svg-icons/content/save';
 import RemoveIcon from 'material-ui/lib/svg-icons/content/clear';
 
-import Tools from '../src/Tools';
+import Tools from '../src/tools';
 import SketchField from '../src/SketchField';
 
 const styles = {
@@ -54,7 +54,6 @@ class SketchFieldDemo extends React.Component {
         this._toggleEdit = this._toggleEdit.bind(this);
 
         this.state = {
-            drawingMode: true,
             lineColor: 'black',
             lineWidth: 2,
             shadowWidth: 0,
@@ -185,6 +184,7 @@ class SketchFieldDemo extends React.Component {
                                 className='canvas-area'
                                 ref={(c) => this._sketch = c}
                                 drawingMode={this.state.drawingMode}
+                                selectionMode={this.state.selectionMode}
                                 lineColor={this.state.lineColor}
                                 lineWidth={this.state.lineWidth}
                                 fillColor={this.state.fillWithColor ? this.state.fill : 'transparent'}
@@ -192,7 +192,9 @@ class SketchFieldDemo extends React.Component {
                                 height={660}
 
 
+
                                 onChange={(c,d) => this.setState({canUndo: this._sketch.canUndo()})}
+
                                 tool={this.state.tool}
 
 
@@ -200,17 +202,18 @@ class SketchFieldDemo extends React.Component {
                         </div>
                     </div>
                     <div className='col-xs-5 col-sm-5 col-md-3 col-lg-3'>
-                        <Card style={{margin:'5px 10px 5px 0'}}>
-                            <CardTitle title='Options'/>
-                            <CardText>
-                                <Toggle label="Edit" onToggle={this._toggleEdit}/>
-                            </CardText>
-                        </Card>
+                        {/*<Card style={{margin:'5px 10px 5px 0'}}>
+                         <CardTitle title='Options'/>
+                         <CardText>
+                         <Toggle label="Edit" onToggle={this._toggleEdit}/>
+                         </CardText>
+                         </Card>*/}
                         <Card style={{margin:'5px 10px 5px 0'}}>
                             <CardTitle title='Tools'/>
                             <CardText>
                                 <label htmlFor='tool'>Canvas Tool</label><br/>
                                 <SelectField ref='tool' value={this.state.tool} onChange={this._selectTool}>
+                                    <MenuItem value={Tools.Select} primaryText="Select"/>
                                     <MenuItem value={Tools.Pencil} primaryText="Pencil"/>
                                     <MenuItem value={Tools.Line} primaryText="Line"/>
                                     <MenuItem value={Tools.Rectangle} primaryText="Rectangle"/>

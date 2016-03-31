@@ -1,7 +1,7 @@
 'use strict';
 
 import SketchField from './SketchField'
-import Tools from './Tools'
+import Tools from './tools'
 
 export {SketchField}
 export {Tools}
