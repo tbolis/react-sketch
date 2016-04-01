@@ -145,7 +145,7 @@ class SketchFieldDemo extends React.Component {
                 {/* Application Bar with tools */}
 
                 <div className='row'>
-                    <div className='col-xs-12 col-sm-12 col-md-12 col-lg-12' style={{height:'64px'}}>
+                    <div className='col-xs-12 col-sm-12 col-md-12 col-lg-12'>
                         <AppBar title='Sketch Tool' showMenuIconButton={false}>
                             <IconButton
                                 onTouchTap={this._undo}
@@ -207,7 +207,8 @@ class SketchFieldDemo extends React.Component {
                          <Toggle label="Edit" onToggle={this._toggleEdit}/>
                          </CardText>
                          </Card>*/}
-                        <Card style={{margin:'5px 10px 5px 0'}}>
+
+                        <Card style={{margin:'10px 10px 5px 0'}}>
                             <CardTitle title='Tools'/>
                             <CardText>
                                 <label htmlFor='tool'>Canvas Tool</label><br/>

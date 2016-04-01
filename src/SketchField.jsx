@@ -76,7 +76,7 @@ class SketchField extends React.Component {
         this._resize(null);
 
         // Initialize History, with maximum number of undo steps
-        this._history = new History(this.props.undoSteps, true);
+        this._history = new History(this.props.undoSteps);
 
         // Events binding
         canvas.on('object:added', this._onObjectAdded);
