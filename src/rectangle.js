@@ -13,8 +13,6 @@ class Rectangle extends FabricCanvasTool {
     }
 
     doMouseDown(o) {
-        console.log(this._fill);
-
         let canvas = this._canvas;
         this.isDown = true;
         let pointer = canvas.getPointer(o.e);
@@ -27,8 +25,8 @@ class Rectangle extends FabricCanvasTool {
             originY: 'top',
             width: pointer.x - this.startX,
             height: pointer.y - this.startY,
-            strokeWidth: 3,
             stroke: this._color,
+            strokeWidth: this._width,
             fill: this._fill,
             //fill: 'rgba(255,0,0,0.5)',
             transparentCorners: false,
