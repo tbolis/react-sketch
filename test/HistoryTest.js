@@ -29,16 +29,16 @@ describe('History', () => {
     });
 
     it('Can undo/redo object', () => {
-        let instance = new History();
+        let instance = new History(15, true);
         instance.keep('1');
         instance.keep('2');
         expect(instance.canUndo()).to.be.true;
         expect(instance.getCurrent()).to.equal('2');
         expect(instance.undo()).to.equal('1');
         expect(instance.undo()).to.not.exist;
+        expect(instance.getCurrent()).to.not.exist;
+        expect(instance.redo()).to.equal('1');
         expect(instance.getCurrent()).to.equal('1');
-        expect(instance.redo()).to.equal('2');
-        expect(instance.getCurrent()).to.equal('2');
     });
 
     it('Multiple undo/redo of objects', ()=> {
@@ -54,6 +54,7 @@ describe('History', () => {
         expect(instance.undo()).to.equal('2');
         expect(instance.undo()).to.equal('1');
         expect(instance.undo()).to.not.exist;
+        expect(instance.redo()).to.equal('1');
         expect(instance.redo()).to.equal('2');
         expect(instance.redo()).to.equal('3');
         expect(instance.redo()).to.equal('4');

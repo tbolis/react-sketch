@@ -43,7 +43,8 @@ class SketchField extends React.Component {
         fillColor: 'transparent',
         opacity: 1.0,
         undoSteps: 15,
-        scaleOnResize: true
+        scaleOnResize: true,
+        tool: Tool.Pencil
     };
 
     constructor(props, context) {
@@ -75,7 +76,7 @@ class SketchField extends React.Component {
         this._resize(null);
 
         // Initialize History, with maximum number of undo steps
-        this._history = new History(this.props.undoSteps);
+        this._history = new History(this.props.undoSteps, true);
 
         // Events binding
         canvas.on('object:added', this._onObjectAdded);
@@ -252,9 +253,9 @@ class SketchField extends React.Component {
             } else {
                 obj.version += 1;
                 obj.setOptions(JSON.parse(currState));
-                obj.setCoords();
-                canvas.renderAll();
             }
+            obj.setCoords();
+            canvas.renderAll();
         }
     }
 

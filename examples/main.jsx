@@ -158,6 +158,9 @@ class SketchFieldDemo extends React.Component {
                                 disabled={!this.state.canRedo}>
                                 <RedoIcon/>
                             </IconButton>
+                            &nbsp;
+                            &nbsp;
+                            &nbsp;
                             <IconButton
                                 onTouchTap={this._clear}
                                 iconStyle={styles.iconButton}>
