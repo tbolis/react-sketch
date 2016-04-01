@@ -9,9 +9,12 @@ class Rectangle extends FabricCanvasTool {
         canvas.forEachObject((o) => o.selectable = o.evented = false);
         this._width = props.lineWidth;
         this._color = props.lineColor;
+        this._fill = props.fillColor;
     }
 
     doMouseDown(o) {
+        console.log(this._fill);
+
         let canvas = this._canvas;
         this.isDown = true;
         let pointer = canvas.getPointer(o.e);
@@ -26,7 +29,8 @@ class Rectangle extends FabricCanvasTool {
             height: pointer.y - this.startY,
             strokeWidth: 3,
             stroke: this._color,
-            fill: 'rgba(255,0,0,0.5)',
+            fill: this._fill,
+            //fill: 'rgba(255,0,0,0.5)',
             transparentCorners: false,
             selectable: false,
             evented: false,

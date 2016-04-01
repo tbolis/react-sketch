@@ -8,6 +8,7 @@ import Select from './select'
 import Pencil from './pencil'
 import Line from './line'
 import Rectangle from './rectangle'
+import Circle from './circle'
 import Tool from './tools'
 
 const fabric = require('fabric').fabric;
@@ -20,28 +21,28 @@ class SketchField extends React.Component {
     static propTypes = {
         // the color of the line
         lineColor: React.PropTypes.string,
-        // the fill color of the shape when applicable
-        fillColor: React.PropTypes.string,
         // The width of the line
         lineWidth: React.PropTypes.number,
+        // the fill color of the shape when applicable
+        fillColor: React.PropTypes.string,
+        // the opacity of the object
+        opacity: React.PropTypes.number,
         // number of undo/redo steps to maintain
         undoSteps: React.PropTypes.number,
         // The tool to use, can be pencil, rectangle, circle, brush;
         tool: React.PropTypes.string,
         // image format when calling toDataURL
         imageFormat: React.PropTypes.string,
-        //enable/disable drawing mode
-        drawingMode: React.PropTypes.bool,
         // Scale the drawing when we resize the canvas
         scaleOnResize: React.PropTypes.bool
     };
 
     static defaultProps = {
         lineColor: 'black',
-        fillColor: 'transparent',
         lineWidth: 1,
-        undoSteps: 10,
-        drawingMode: true,
+        fillColor: 'transparent',
+        opacity: 1.0,
+        undoSteps: 15,
         scaleOnResize: true
     };
 
@@ -92,6 +93,7 @@ class SketchField extends React.Component {
         this._tools[Tool.Pencil] = new Pencil(fabricCanvas);
         this._tools[Tool.Line] = new Line(fabricCanvas);
         this._tools[Tool.Rectangle] = new Rectangle(fabricCanvas);
+        this._tools[Tool.Circle] = new Circle(fabricCanvas);
     }
 
     componentWillUnmount() {

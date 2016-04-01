@@ -56,9 +56,9 @@ class SketchFieldDemo extends React.Component {
         this.state = {
             lineColor: 'black',
             lineWidth: 2,
+            fillColor: '#68CCCA',
             shadowWidth: 0,
             shadowOffset: 0,
-            fillColor: '#68CCCA',
             tool: Tools.Pencil,
             fillWithColor: false,
             drawings: [],
@@ -183,11 +183,9 @@ class SketchFieldDemo extends React.Component {
                                 name='sketch'
                                 className='canvas-area'
                                 ref={(c) => this._sketch = c}
-                                drawingMode={this.state.drawingMode}
-                                selectionMode={this.state.selectionMode}
                                 lineColor={this.state.lineColor}
                                 lineWidth={this.state.lineWidth}
-                                fillColor={this.state.fillWithColor ? this.state.fill : 'transparent'}
+                                fillColor={this.state.fillWithColor ? this.state.fillColor : 'transparent'}
                                 scaleOnResize={true}
                                 height={660}
 
