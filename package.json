@@ -1,13 +1,13 @@
 {
   "name": "react-sketch",
-  "version": "0.1.2",
-  "description": "Sketch Element for React based applications, backed-up by fabricjs",
+  "version": "0.2.0",
+  "description": "Sketch Element for React based applications, backed-up by fabricjs as its core",
   "keywords": [
     "react",
     "canvas",
     "sketch",
     "fabric",
-    "fabrickjs"
+    "fabric.js"
   ],
   "author": {
     "name": "Thomas Bolis",

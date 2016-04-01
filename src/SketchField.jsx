@@ -7,6 +7,7 @@ import {uuid4} from './utils';
 import Select from './select'
 import Pencil from './pencil'
 import Line from './line'
+import Rectangle from './rectangle'
 import Tool from './tools'
 
 const fabric = require('fabric').fabric;
@@ -90,6 +91,7 @@ class SketchField extends React.Component {
         this._tools[Tool.Select] = new Select(fabricCanvas);
         this._tools[Tool.Pencil] = new Pencil(fabricCanvas);
         this._tools[Tool.Line] = new Line(fabricCanvas);
+        this._tools[Tool.Rectangle] = new Rectangle(fabricCanvas);
     }
 
     componentWillUnmount() {
@@ -122,7 +124,6 @@ class SketchField extends React.Component {
         let prevState = JSON.stringify(obj.originalState);
         obj.saveState();
         let currState = JSON.stringify(obj.originalState);
-        console.log(obj.version)
         this._history.keep([obj, prevState, currState]);
     }
 
@@ -246,13 +247,12 @@ class SketchField extends React.Component {
                     canvas.add(obj);
                     obj.version = 1;
                 });
+            } else {
+                obj.version += 1;
+                obj.setOptions(JSON.parse(currState));
+                obj.setCoords();
+                canvas.renderAll();
             }
-            obj.version += 1;
-            obj.setOptions(JSON.parse(currState));
-            obj.setCoords();
-            canvas.renderAll();
-            console.log(prevState, currState)
-
         }
     }
 
