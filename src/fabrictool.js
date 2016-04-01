@@ -6,6 +6,10 @@ class FabricCanvasTool {
         this._canvas = canvas;
     }
 
+    configureCanvas(props) {
+
+    }
+
     doMouseUp(event) {
 
     }

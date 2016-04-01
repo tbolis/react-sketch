@@ -6,7 +6,9 @@ const fabric = require('fabric').fabric;
 class Line extends FabricCanvasTool {
 
     configureCanvas(props) {
-        this._canvas.isDrawingMode = this._canvas.selection = false;
+        let canvas = this._canvas;
+        canvas.isDrawingMode = canvas.selection = false;
+        canvas.forEachObject((o) => o.selectable = o.evented = false);
         this._width = props.lineWidth;
         this._color = props.lineColor;
     }
@@ -21,7 +23,9 @@ class Line extends FabricCanvasTool {
             fill: this._color,
             stroke: this._color,
             originX: 'center',
-            originY: 'center'
+            originY: 'center',
+            selectable: false,
+            evented: false
         });
         canvas.add(this.line);
     }
@@ -31,6 +35,7 @@ class Line extends FabricCanvasTool {
         let canvas = this._canvas;
         var pointer = canvas.getPointer(o.e);
         this.line.set({x2: pointer.x, y2: pointer.y});
+        this.line.setCoords();
         canvas.renderAll();
     }
 

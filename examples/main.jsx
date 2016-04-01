@@ -192,11 +192,9 @@ class SketchFieldDemo extends React.Component {
                                 height={660}
 
 
-
                                 onChange={(c,d) => this.setState({canUndo: this._sketch.canUndo()})}
 
                                 tool={this.state.tool}
-
 
                             />
                         </div>

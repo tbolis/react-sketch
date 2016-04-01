@@ -4,9 +4,12 @@ import {pointerPosition} from './utils';
 class Select extends FabricCanvasTool {
 
     configureCanvas(props) {
-        console.log('Select Tool');
-        this._canvas.isDrawingMode = false;
-        this._canvas.selection = true;
+        let canvas = this._canvas;
+        canvas.isDrawingMode = false;
+        canvas.selection = true;
+        canvas.forEachObject((o) => {
+            o.selectable = o.evented = true;
+        });
     }
 }
 

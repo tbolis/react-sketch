@@ -122,11 +122,13 @@ class SketchField extends React.Component {
         let prevState = JSON.stringify(obj.originalState);
         obj.saveState();
         let currState = JSON.stringify(obj.originalState);
+        console.log(obj.version)
         this._history.keep([obj, prevState, currState]);
     }
 
     _onObjectRemoved(e) {
         let obj = e.target;
+        obj.version = 0;
     }
 
     _onMouseDown(e) {
@@ -239,16 +241,18 @@ class SketchField extends React.Component {
         if (history.canRedo()) {
             let canvas = this._fc;
             let [obj,prevState,currState] = history.redo();
-            if (obj.version === 1) {
+            if (obj.version === 0) {
                 this.setState({action: false}, () => {
                     canvas.add(obj);
+                    obj.version = 1;
                 });
-            } else {
-                obj.setOptions(JSON.parse(currState));
-                obj.setCoords();
-                obj.version += 1;
             }
+            obj.version += 1;
+            obj.setOptions(JSON.parse(currState));
+            obj.setCoords();
             canvas.renderAll();
+            console.log(prevState, currState)
+
         }
     }
 
