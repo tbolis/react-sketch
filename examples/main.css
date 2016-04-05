@@ -20,7 +20,7 @@ body, html {
 }
 
 .canvas-area {
-    margin: 7px 0 0 2px;
+    margin: 7px 0 0 7px;
     border: 1px solid #0d3349;
-    background-color: #cccc99;
+    background-color: #ffffff;
 }

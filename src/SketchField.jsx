@@ -1,202 +1,223 @@
 'use strict';
-
 import React from 'react';
 import ReactDOM from 'react-dom';
+import History from './history';
+import {uuid4} from './utils';
 
-import Line from './Line';
-import Tool from './Tools'
-import Pencil from './Pencil';
-import History from './History';
-import Circle from './Circle';
-import Rectangle from './Rectangle';
+import Select from './select'
+import Pencil from './pencil'
+import Line from './line'
+import Rectangle from './rectangle'
+import Circle from './circle'
+import Tool from './tools'
+
+const fabric = require('fabric').fabric;
 
 /**
- * Sketch Tool for React Applications
+ * Sketch Tool based on FabricJS for React Applications
  */
 class SketchField extends React.Component {
 
     static propTypes = {
         // the color of the line
-        color: React.PropTypes.string,
-        // the fill color of the shape when applicable
-        fill: React.PropTypes.string,
+        lineColor: React.PropTypes.string,
         // The width of the line
         lineWidth: React.PropTypes.number,
+        // the fill color of the shape when applicable
+        fillColor: React.PropTypes.string,
+        // the opacity of the object
+        opacity: React.PropTypes.number,
         // number of undo/redo steps to maintain
         undoSteps: React.PropTypes.number,
         // The tool to use, can be pencil, rectangle, circle, brush;
         tool: React.PropTypes.string,
         // image format when calling toDataURL
-        imageFormat: React.PropTypes.string
+        imageFormat: React.PropTypes.string,
+        // Scale the drawing when we resize the canvas
+        scaleOnResize: React.PropTypes.bool
     };
 
     static defaultProps = {
-        color: 'black',
-        fill: 'transparent',
-        lineWidth: 2,
+        lineColor: 'black',
+        lineWidth: 1,
+        fillColor: 'transparent',
+        opacity: 1.0,
         undoSteps: 15,
-        tool: Tool.Pencil,
-        imageFormat: 'image/png'
+        scaleOnResize: true,
+        tool: Tool.Pencil
     };
 
     constructor(props, context) {
         super(props, context);
-        this._mouseUp = this._mouseUp.bind(this);
-        this._mouseDown = this._mouseDown.bind(this);
-        this._mouseMove = this._mouseMove.bind(this);
-        this._mouseOut = this._mouseOut.bind(this);
         this._resize = this._resize.bind(this);
+        this._initTools = this._initTools.bind(this);
+        this._onMouseUp = this._onMouseUp.bind(this);
+        this._onMouseOut = this._onMouseOut.bind(this);
+        this._onMouseDown = this._onMouseDown.bind(this);
+        this._onMouseMove = this._onMouseMove.bind(this);
+        this._onObjectAdded = this._onObjectAdded.bind(this);
+        this._onObjectRemoved = this._onObjectRemoved.bind(this);
+        this._onObjectModified = this._onObjectModified.bind(this);
         this.state = {
-            parentWidth: 1,
-            content: null
-        }
+            parentWidth: 10,
+            action: true
+        };
     }
 
     componentDidMount() {
-        // Assign the events to canvas element
-        this._canvas.addEventListener('mouseup', this._mouseUp, false);
-        this._canvas.addEventListener('touchend', this._mouseUp, false);
+        let canvas = this._fc = new fabric.Canvas(this._canvas.id);
+        this._initTools(canvas);
 
-        this._canvas.addEventListener('mousedown', this._mouseDown, false);
-        this._canvas.addEventListener('touchstart', this._mouseDown, false);
+        let tool = this._tools[this.props.tool];
+        tool.configureCanvas(this.props);
 
-        this._canvas.addEventListener('mousemove', this._mouseMove, false);
-        this._canvas.addEventListener('touchmove', this._mouseMove, false);
-
-        this._canvas.addEventListener('mouseout', this._mouseOut);
-
-        // Handle the resize of Canvas
-        this._canvas.width = ReactDOM.findDOMNode(this).offsetWidth;
+        // Control resize
         window.addEventListener('resize', this._resize, false);
-        // Create context
-        this._ctx = this._canvas.getContext('2d');
-        // config
-        this._configure(this.props);
-        // Initialize History
+        this._resize(null);
+
+        // Initialize History, with maximum number of undo steps
         this._history = new History(this.props.undoSteps);
-        // Initialize the tools
+
+        // Events binding
+        canvas.on('object:added', this._onObjectAdded);
+        canvas.on('object:modified', this._onObjectModified);
+        canvas.on('object:removed', this._onObjectRemoved);
+        canvas.on('mouse:down', this._onMouseDown);
+        canvas.on('mouse:move', this._onMouseMove);
+        canvas.on('mouse:up', this._onMouseUp);
+        canvas.on('mouse:out', this._onMouseOut);
+    }
+
+    _initTools(fabricCanvas) {
         this._tools = {};
-        this._tools[Tool.Circle] = new Circle(this._canvas, this._ctx);
-        this._tools[Tool.Line] = new Line(this._canvas, this._ctx);
-        this._tools[Tool.Pencil] = new Pencil(this._canvas, this._ctx);
-        this._tools[Tool.Rectangle] = new Rectangle(this._canvas, this._ctx);
+        this._tools[Tool.Select] = new Select(fabricCanvas);
+        this._tools[Tool.Pencil] = new Pencil(fabricCanvas);
+        this._tools[Tool.Line] = new Line(fabricCanvas);
+        this._tools[Tool.Rectangle] = new Rectangle(fabricCanvas);
+        this._tools[Tool.Circle] = new Circle(fabricCanvas);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this._resize);
     }
 
     componentWillReceiveProps(props) {
-        if (props.value && props.value !== this.state.content) {
-            this.setContent(props.value);
+        //if (this.props.tool !== props.tool) {
+        // tool has changed
+        let tool = this._tools[props.tool] || this._tools['pencil'];
+        tool.configureCanvas(props);
+        //}
+    }
+
+    _onObjectAdded(e) {
+        if (!this.state.action) {
+            this.setState({action: true});
+            return;
+        }
+        let obj = e.target;
+        obj.version = 1;
+        let state = JSON.stringify(obj.originalState);
+        // object, previous state, current state
+        this._history.keep([obj, state, state]);
+    }
+
+    _onObjectModified(e) {
+        let obj = e.target;
+        obj.version += 1;
+        let prevState = JSON.stringify(obj.originalState);
+        obj.saveState();
+        let currState = JSON.stringify(obj.originalState);
+        this._history.keep([obj, prevState, currState]);
+    }
+
+    _onObjectRemoved(e) {
+        let obj = e.target;
+        obj.version = 0;
+    }
+
+    _onMouseDown(e) {
+        let tool = this._tools[this.props.tool];
+        if (tool) {
+            tool.doMouseDown(e);
         }
     }
 
-    componentWillUnmount = () => window.removeEventListener('resize', this._resize);
-
-    componentWillUpdate = (props, state) => this._configure(props);
-
-    /**
-     * Configure the canvas drawing (color,fill, line width etc.)
-     *
-     * @param config the configuration to use
-     * @private
-     */
-    _configure(config) {
-        if (!config) return;
-
-        let ctx = this._ctx;
-        if ('color' in config) {
-            ctx.strokeStyle = config.color;
+    _onMouseMove(e) {
+        let tool = this._tools[this.props.tool];
+        if (tool) {
+            tool.doMouseMove(e);
         }
-        if ('lineWidth' in config) {
-            ctx.lineWidth = config.lineWidth;
+    }
+
+    _onMouseUp(e) {
+        let tool = this._tools[this.props.tool];
+        if (tool) {
+            tool.doMouseUp(e);
         }
-        if ('fill' in config) {
-            ctx.fillStyle = config.fill;
+        //// there is no direct on change event
+        //if (this.props.onChange) {
+        //    this.props.onChange(event.e, this._fc.toDataURL('png'));
+        //}
+    }
+
+    _onMouseOut(e) {
+        let tool = this._tools[this.props.tool];
+        if (tool) {
+            tool.doMouseOut(e);
         }
     }
 
     /**
      * Track the resize of the window and update our state
      *
-     * @param event the resize event
+     * @param e the resize event
      * @private
      */
-    _resize(event) {
-        let self = this;
-        let data = self._canvas.toDataURL();
-        this.setState({
-            parentWidth: ReactDOM.findDOMNode(this).offsetWidth
-        }, () => {
-            let img = new Image();
-            img.onload = function () {
-                self._ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, self._canvas.width, self._canvas.height);
-            };
-            img.src = data;
-        });
-    }
-
-    /**
-     * Mouse up event of canvas assigned as listener
-     *
-     * @param event the event
-     * @private
-     */
-    _mouseUp(event) {
-        if (event) event.preventDefault();
-        // Call corresponding tool action
-        let tool = this._tools[this.props.tool || Tool.Pencil];
-        tool.doMouseUp(event);
-        // store latest canvas context to history
-        let drawing = this._canvas.toDataURL(this.props.imageFormat);
-        this._history.keep(drawing);
-        // Keep content
-        this.setState({content: drawing});
-        // there is no direct on change event
-        if (this.props.onChange) {
-            this.props.onChange(event, drawing);
+    _resize(e) {
+        if (e) {
+            e.preventDefault()
         }
-    }
-
-    /**
-     * The mouse move event of the canvas assigned as listener
-     *
-     * @param event the mouse move event
-     * @private
-     */
-    _mouseMove(event) {
-        if (event) event.preventDefault();
-        let tool = this._tools[this.props.tool || Tool.Pencil];
-        tool.doMouseMove(event);
-    }
-
-    /**
-     * The mouse down event assigned to canvas
-     *
-     * @param event the corresponding event
-     * @private
-     */
-    _mouseDown(event) {
-        if (event) event.preventDefault();
-        let tool = this._tools[this.props.tool || Tool.Pencil];
-        tool.doMouseDown(event);
-    }
-
-    /**
-     * The mouse out event assigned to canvas
-     *
-     * @param event the corresponding event
-     * @private
-     */
-    _mouseOut(event) {
-        if (event) event.preventDefault();
-        let tool = this._tools[this.props.tool || Tool.Pencil];
-        tool.doMouseOut(event);
-        // there is no direct on change event
-        let content = this._canvas.toDataURL(this.props.imageFormat);
-        this.setState({
-            content: content
-        });
-        if (this.props.onChange) {
-            this.props.onChange(event, content);
+        // if disabled then do not perform the resize
+        if (!this.props.scaleOnResize) return;
+        let canvas = this._fc;
+        let domNode = ReactDOM.findDOMNode(this);
+        let width = domNode.offsetWidth;
+        let height = domNode.offsetHeight;
+        let prevWidth = canvas.getWidth();
+        let prevHeight = canvas.getHeight();
+        let wfactor = width / prevWidth;
+        let hfactor = height / prevHeight;
+        canvas.setWidth(width);
+        canvas.setHeight(height);
+        if (canvas.backgroundImage) {
+            // Need to scale background images as well
+            let bi = canvas.backgroundImage;
+            bi.width = bi.width * wfactor;
+            bi.height = bi.height * hfactor;
         }
+        let objects = canvas.getObjects();
+        for (let i in objects) {
+            let obj = objects[i];
+            let scaleX = obj.scaleX;
+            let scaleY = obj.scaleY;
+            let left = obj.left;
+            let top = obj.top;
+            let tempScaleX = scaleX * wfactor;
+            let tempScaleY = scaleY * hfactor;
+            let tempLeft = left * wfactor;
+            let tempTop = top * hfactor;
+            obj.scaleX = tempScaleX;
+            obj.scaleY = tempScaleY;
+            obj.left = tempLeft;
+            obj.top = tempTop;
+            obj.setCoords();
+        }
+        canvas.renderAll();
+        canvas.calcOffset();
+        this.setState({
+            parentWidth: width,
+            parentHeight: height
+        });
     }
 
     /**
@@ -204,26 +225,15 @@ class SketchField extends React.Component {
      */
     undo() {
         let history = this._history;
-        // we do not want the latest canvas but the one before  that
-        if (history.canUndo()) {
-            let ctx = this._ctx;
-            let canvas = this._canvas;
-            if (ctx) {
-                ctx.beginPath();
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                let image = new Image();
-                let undoCanvas = history.undo();
-                image.src = undoCanvas;
-                ctx.drawImage(image, 0, 0);
-                ctx.stroke();
-                ctx.closePath();
-                this.setState({
-                    content: undoCanvas
-                });
-                if (this.props.onChange) {
-                    this.props.onChange(event, undoCanvas);
-                }
-            }
+        let [obj,prevState,currState] = history.getCurrent();
+        history.undo();
+        if (obj.version === 1) {
+            obj.remove();
+        } else {
+            obj.setOptions(JSON.parse(prevState));
+            obj.setCoords();
+            obj.version -= 1;
+            this._fc.renderAll();
         }
     }
 
@@ -233,25 +243,19 @@ class SketchField extends React.Component {
     redo() {
         let history = this._history;
         if (history.canRedo()) {
-            let ctx = this._ctx;
-            let canvas = this._canvas;
-            if (ctx) {
-                ctx.beginPath();
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                let image = new Image();
-                let redoCanvas = history.redo();
-                image.src = redoCanvas;
-                ctx.drawImage(image, 0, 0);
-                ctx.stroke();
-                ctx.closePath();
-                this.setState({
-                    content: redoCanvas
+            let canvas = this._fc;
+            let [obj,prevState,currState] = history.redo();
+            if (obj.version === 0) {
+                this.setState({action: false}, () => {
+                    canvas.add(obj);
+                    obj.version = 1;
                 });
-                // there is no direct on change event
-                if (this.props.onChange) {
-                    this.props.onChange(event, redoCanvas);
-                }
+            } else {
+                obj.version += 1;
+                obj.setOptions(JSON.parse(currState));
             }
+            obj.setCoords();
+            canvas.renderAll();
         }
     }
 
@@ -283,36 +287,10 @@ class SketchField extends React.Component {
     }
 
     /**
-     * Set the content of Canvas to the given one
-     *
-     * @param drawing the content to set to the canvas
-     */
-    setContent(drawing) {
-        var image = new Image();
-        image.src = drawing;
-        this._ctx.drawImage(image, 0, 0);
-        this._ctx.stroke();
-        this._history.keep(drawing);
-        this.setState({content: drawing});
-    }
-
-    /**
      * Clear the content of the canvas, this will also keep the last version of it to history
      */
     clear() {
-        let ctx = this._ctx;
-        let canvas = this._canvas;
-        let history = this._history;
-        if (ctx) {
-            // keep last canvas first
-            history.keep(this._canvas.toDataURL(this.props.imageFormat));
-            // clear canvas
-            ctx.beginPath();
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.stroke();
-            ctx.closePath();
-        }
-        this.setState({content: null});
+        this._fc.clear()
     }
 
     render() {
@@ -325,13 +303,14 @@ class SketchField extends React.Component {
             height,
             ...other
             } = this.props;
-
         return (
-            <div className={className} style={style}>
+            <div className={className} style={style} ref={(c) => this._canvasWrapper = c}>
                 <canvas
+                    id={uuid4()}
+                    height={height || 512}
                     ref={(c) => this._canvas = c}
-                    width={width || this.state.parentWidth}
-                    height={height || '512px'}> Sorry, Canvas element is not supported
+                    width={width || this.state.parentWidth}>
+                    Sorry, Canvas HTML5 element is not supported by your browser :(
                 </canvas>
             </div>
         )

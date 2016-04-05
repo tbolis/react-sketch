@@ -9,30 +9,36 @@ import History from 'History';
 describe('History', () => {
 
     it('Loads Normally', () => {
-        require('../src/History')
+        require('../src/history')
     });
 
-    it('Undo limit is set', ()=> {
+    it('Undo limit is set', () => {
         let instance = new History();
         let instanceWithCustomUndoSteps = new History(15);
         expect(instance.getUndoLimit()).to.equal(10);
         expect(instanceWithCustomUndoSteps.getUndoLimit()).to.equal(15);
     });
 
-    it('Informs if can undo', ()=> {
+    it('Informs if can undo', () => {
         let instance = new History();
         expect(instance.canUndo()).to.be.false;
         instance.keep('1');
+        expect(instance.canUndo()).to.be.false;
+        instance.keep('2');
         expect(instance.canUndo()).to.be.true;
     });
 
-    it('Can undo/redo object', ()=> {
-        let instance = new History();
+    it('Can undo/redo object', () => {
+        let instance = new History(15, true);
         instance.keep('1');
         instance.keep('2');
         expect(instance.canUndo()).to.be.true;
+        expect(instance.getCurrent()).to.equal('2');
         expect(instance.undo()).to.equal('1');
-        expect(instance.redo()).to.equal('2');
+        expect(instance.undo()).to.not.exist;
+        expect(instance.getCurrent()).to.not.exist;
+        expect(instance.redo()).to.equal('1');
+        expect(instance.getCurrent()).to.equal('1');
     });
 
     it('Multiple undo/redo of objects', ()=> {
@@ -47,10 +53,13 @@ describe('History', () => {
         expect(instance.undo()).to.equal('3');
         expect(instance.undo()).to.equal('2');
         expect(instance.undo()).to.equal('1');
+        expect(instance.undo()).to.not.exist;
+        expect(instance.redo()).to.equal('1');
         expect(instance.redo()).to.equal('2');
         expect(instance.redo()).to.equal('3');
         expect(instance.redo()).to.equal('4');
         expect(instance.redo()).to.equal('5');
+        expect(instance.redo()).to.not.exist;
     });
 
     it('Redo is reset after a keep of a new object', ()=> {

@@ -32,14 +32,12 @@ module.exports = function (config) {
             resolve: {
                 extensions: ['', '.js', '.jsx'],
                 alias: {
-                    History: path.join(srcPath, 'History'),
+                    Utils: path.join(srcPath, 'utils'),
+                    History: path.join(srcPath, 'history'),
                     SketchField: path.join(srcPath, 'SketchField')
                 }
             },
             module: {
-                //preLoaders: [
-                //    {test: /\.(js|jsx)$/, loader: 'isparta', include: srcPath, exclude: testPath}
-                //],
                 loaders: [
                     {
                         test: /\.(js|jsx)$/,

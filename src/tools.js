@@ -1,8 +1,9 @@
+'use strict';
+
 export default {
-    Brush: 'brush',
     Circle: 'circle',
-    Eraser: 'eraser',
     Line: 'line',
     Pencil: 'pencil',
-    Rectangle: 'rectangle'
+    Rectangle: 'rectangle',
+    Select: 'select'
 }

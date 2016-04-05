@@ -7,15 +7,10 @@ import 'flexboxgrid';
 import './main.css';
 
 import {
-    Card,CardText,CardTitle,CardHeader,
-    AppBar,Divider,GridList,GridTile,
-    Slider,
-    Toggle,
-    MenuItem,
-    SelectField,
-    RaisedButton,FlatButton,IconButton,
-    FloatingActionButton,
-    Toolbar,ToolbarGroup,ToolbarSeparator,ToolbarTitle
+    Card,CardText,CardTitle,
+    AppBar,GridList,GridTile,
+    Slider, Toggle, MenuItem,
+    SelectField, IconButton
 } from 'material-ui';
 
 import UndoIcon from 'material-ui/lib/svg-icons/content/undo';
@@ -24,9 +19,8 @@ import ClearIcon from 'material-ui/lib/svg-icons/action/delete';
 import SaveIcon from 'material-ui/lib/svg-icons/content/save';
 import RemoveIcon from 'material-ui/lib/svg-icons/content/clear';
 
-import Tools from '../src/Tools';
+import Tools from '../src/tools';
 import SketchField from '../src/SketchField';
-
 
 const styles = {
     root: {
@@ -57,11 +51,14 @@ class SketchFieldDemo extends React.Component {
         this._undo = this._undo.bind(this);
         this._redo = this._redo.bind(this);
         this._clear = this._clear.bind(this);
+        this._toggleEdit = this._toggleEdit.bind(this);
 
         this.state = {
-            color: 'black',
+            lineColor: 'black',
             lineWidth: 2,
-            fill: '#68CCCA',
+            fillColor: '#68CCCA',
+            shadowWidth: 0,
+            shadowOffset: 0,
             tool: Tools.Pencil,
             fillWithColor: false,
             drawings: [],
@@ -127,83 +124,141 @@ class SketchFieldDemo extends React.Component {
         })
     }
 
+    _toggleEdit = (event, toggled) => {
+        this.setState({
+            drawingMode: !toggled
+        });
+    };
+
     render() {
+
+        let styles = {
+            iconButton: {
+                width: '42px',
+                height: '42px'
+            }
+        };
+
         return (
-            <div className='row'>
-                <div className='col-xs-12 col-sm-12 col-md-12 col-lg-12' style={{height:'64px'}}>
-                    <AppBar title='Sketch Tool' showMenuIconButton={false}>
-                        <IconButton onTouchTap={this._undo} disabled={!this.state.canUndo}>
-                            <UndoIcon/>
-                        </IconButton>
-                        <IconButton onTouchTap={this._redo} disabled={!this.state.canRedo}>
-                            <RedoIcon/>
-                        </IconButton>
-                        <IconButton onTouchTap={this._clear}>
-                            <ClearIcon/>
-                        </IconButton>
-                        <IconButton onTouchTap={this._save}>
-                            <SaveIcon/>
-                        </IconButton>
-                    </AppBar>
+            <div>
+
+                {/* Application Bar with tools */}
+
+                <div className='row'>
+                    <div className='col-xs-12 col-sm-12 col-md-12 col-lg-12'>
+                        <AppBar title='Sketch Tool' showMenuIconButton={false}>
+                            <IconButton
+                                onTouchTap={this._undo}
+                                iconStyle={styles.iconButton}>
+                                <UndoIcon />
+                            </IconButton>
+                            <IconButton
+                                onTouchTap={this._redo}
+                                iconStyle={styles.iconButton}
+                                disabled={!this.state.canRedo}>
+                                <RedoIcon/>
+                            </IconButton>
+                            &nbsp;
+                            &nbsp;
+                            &nbsp;
+                            <IconButton
+                                onTouchTap={this._clear}
+                                iconStyle={styles.iconButton}>
+                                <ClearIcon />
+                            </IconButton>
+                            <IconButton
+                                onTouchTap={this._save}
+                                iconStyle={styles.iconButton}>
+                                <SaveIcon />
+                            </IconButton>
+                        </AppBar>
+                    </div>
                 </div>
-                <div className='col-xs-7 col-sm-7 col-md-9 col-lg-9'>
-                    {/* Sketch area */}
-                    <SketchField name='sketch'
-                                 height='660px'
-                                 style={{position:'relative'}}
-                                 onChange={(c,d) => this.setState({canUndo: this._sketch.canUndo()})}
-                                 className='canvas-area'
-                                 tool={this.state.tool}
-                                 color={this.state.color}
-                                 ref={(c) => this._sketch = c}
-                                 lineWidth={this.state.lineWidth}
-                                 fill={this.state.fillWithColor ? this.state.fill : 'transparent'}/>
+
+                {/*Sketch Area with tools*/}
+
+                <div className='row'>
+                    <div className='col-xs-7 col-sm-7 col-md-9 col-lg-9'>
+
+                        {/* Sketch area */}
+                        <div style={{padding:'3px'}}>
+                            <SketchField
+                                name='sketch'
+                                className='canvas-area'
+                                ref={(c) => this._sketch = c}
+                                lineColor={this.state.lineColor}
+                                lineWidth={this.state.lineWidth}
+                                fillColor={this.state.fillWithColor ? this.state.fillColor : 'transparent'}
+                                scaleOnResize={true}
+                                height={660}
+
+
+                                onChange={(c,d) => this.setState({canUndo: this._sketch.canUndo()})}
+
+                                tool={this.state.tool}
+
+                            />
+                        </div>
+                    </div>
+                    <div className='col-xs-5 col-sm-5 col-md-3 col-lg-3'>
+                        {/*<Card style={{margin:'5px 10px 5px 0'}}>
+                         <CardTitle title='Options'/>
+                         <CardText>
+                         <Toggle label="Edit" onToggle={this._toggleEdit}/>
+                         </CardText>
+                         </Card>*/}
+
+                        <Card style={{margin:'10px 10px 5px 0'}}>
+                            <CardTitle title='Tools'/>
+                            <CardText>
+                                <label htmlFor='tool'>Canvas Tool</label><br/>
+                                <SelectField ref='tool' value={this.state.tool} onChange={this._selectTool}>
+                                    <MenuItem value={Tools.Select} primaryText="Select"/>
+                                    <MenuItem value={Tools.Pencil} primaryText="Pencil"/>
+                                    <MenuItem value={Tools.Line} primaryText="Line"/>
+                                    <MenuItem value={Tools.Rectangle} primaryText="Rectangle"/>
+                                    <MenuItem value={Tools.Circle} primaryText="Circle"/>
+                                </SelectField>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <label htmlFor='slider'>Line Weight</label>
+                                <Slider ref='slider' step={0.1}
+                                        defaultValue={this.state.lineWidth/100}
+                                        onChange={(e, v) => this.setState({lineWidth:v*100})}/>
+                            </CardText>
+                        </Card>
+                        <Card style={{margin:'5px 10px 5px 0'}}>
+                            <CardTitle title='Colors'/>
+                            <CardText>
+                                <label htmlFor='lineColor'>Line</label>
+                                <ColorPicker ref='lineColor' type='compact' color={this.state.lineColor}
+                                             onChange={(color) => this.setState({lineColor:'#'+color.hex})}/>
+                                <br/>
+                                <br/>
+                                <Toggle label="Fill"
+                                        defaultToggled={this.state.fillWithColor}
+                                        onToggle={(e) => this.setState({fillWithColor:!this.state.fillWithColor})}/>
+                                <ColorPicker type="compact"
+                                             color={this.state.fillColor}
+                                             onChange={(color) => this.setState({fillColor:'#'+color.hex})}/>
+                            </CardText>
+                        </Card>
+                    </div>
                 </div>
-                <div className='col-xs-5 col-sm-5 col-md-3 col-lg-3'>
-                    <Card style={{margin:'5px 10px 5px 0'}}>
-                        <CardTitle title='Select Tool'/>
-                        <CardText>
-                            <label htmlFor='tool'>Canvas Tool</label><br/>
-                            <SelectField ref='tool' value={this.state.tool} onChange={this._selectTool}>
-                                <MenuItem value={Tools.Pencil} primaryText="Pencil"/>
-                                <MenuItem value={Tools.Line} primaryText="Line"/>
-                                <MenuItem value={Tools.Rectangle} primaryText="Rectangle"/>
-                                <MenuItem value={Tools.Circle} primaryText="Circle"/>
-                            </SelectField>
-                            <br/>
-                            <br/>
-                            <br/>
-                            <label htmlFor='slider'>Line Weight</label>
-                            <Slider ref='slider' step={0.1}
-                                    defaultValue={this.state.lineWidth/10}
-                                    onChange={(e, v) => this.setState({lineWidth:v*10})}/>
-                        </CardText>
-                    </Card>
-                    <Card style={{margin:'5px 10px 5px 0'}}>
-                        <CardTitle title='Select Colors'/>
-                        <CardText>
-                            <label htmlFor='lineColor'>Line Color</label>
-                            <ColorPicker ref='lineColor' type='compact' color={this.state.color}
-                                         onChange={(color) => this.setState({color:'#'+color.hex})}/>
-                            <br/>
-                            <br/>
-                            <Toggle label="Fill Color"
-                                    defaultToggled={this.state.fillWithColor}
-                                    onToggle={(e) => this.setState({fillWithColor:!this.state.fillWithColor})}/>
-                            <ColorPicker type="compact"
-                                         color={this.state.fill}
-                                         onChange={(color) => this.setState({fill:'#'+color.hex})}/>
-                        </CardText>
-                    </Card>
-                </div>
-                <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <div className="box" style={styles.root}>
-                        <GridList
-                            cols={5}
-                            cellHeight={200}
-                            padding={1} style={styles.gridList}>
-                            {this.state.drawings.map(this._renderTile)}
-                        </GridList>
+
+                {/*Saved Paintings*/}
+
+                <div className='row'>
+                    <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div className="box" style={styles.root}>
+                            <GridList
+                                cols={5}
+                                cellHeight={200}
+                                padding={1} style={styles.gridList}>
+                                {this.state.drawings.map(this._renderTile)}
+                            </GridList>
+                        </div>
                     </div>
                 </div>
             </div>

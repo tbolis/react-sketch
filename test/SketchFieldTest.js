@@ -19,9 +19,4 @@ describe('SketchField', () => {
         expect(TestUtils.findRenderedDOMComponentWithTag(sketch, 'canvas')).to.exist;
     });
 
-    //it('Contains input tag', () => {
-    //    let sketch = TestUtils.renderIntoDocument(<SketchField />);
-    //    expect(TestUtils.findRenderedDOMComponentWithTag(sketch, 'input')).to.exist;
-    //});
-
 });
