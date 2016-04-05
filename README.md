@@ -5,7 +5,7 @@
 [![NPM downloads][downloads-image]][downloads-url]
 [![Build status][travis-image]][travis-url]
 
-A Sketch tool for React based applications, backed-up by [fabricjs](http://fabricjs.com/)
+A Sketch tool for React based applications, backed-up by [FabricJS](http://fabricjs.com/)
 
 ## Installation
 
@@ -68,6 +68,8 @@ npm start
 
 and navigate to http://localhost:9999
 
+You can as well check the live showcase here: http://tbolis.github.io/showcase/react-sketch/
+                                         
 ## Issues
 
 See https://github.com/tbolis/react-sketch/issues

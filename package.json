@@ -6,7 +6,7 @@
     "react",
     "canvas",
     "sketch",
-    "fabric",
+    "fabricjs",
     "fabric.js"
   ],
   "author": {
