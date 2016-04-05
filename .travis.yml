@@ -1,4 +1,8 @@
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libcairo2-dev libjpeg-dev libgif-dev
+  - sudo npm install -g canvas
+
 language: node_js
-sudo: false
 node_js:
   - '0.12'
