@@ -236,12 +236,12 @@ class SketchField extends React.Component {
             obj.top = tempTop;
             obj.setCoords();
         }
-        canvas.renderAll();
-        canvas.calcOffset();
         this.setState({
             parentWidth: width,
             parentHeight: height
         });
+        canvas.renderAll();
+        canvas.calcOffset();
     }
 
     /**
@@ -368,7 +368,7 @@ class SketchField extends React.Component {
      * Clear the content of the canvas, this will also keep the last version of it to history
      */
     clear() {
-        this._fc.clear()
+        this._fc.clear();
     }
 
     render() {

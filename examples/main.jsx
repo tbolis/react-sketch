@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: 0*/
 'use strict';
 
 import React from 'react';
@@ -10,7 +11,8 @@ import {
     Card,CardText,CardTitle,
     AppBar,GridList,GridTile,
     Slider, Toggle, MenuItem,
-    SelectField, IconButton
+    SelectField, IconButton,
+    ToolbarSeparator
 } from 'material-ui';
 
 import UndoIcon from 'material-ui/lib/svg-icons/content/undo';
@@ -18,6 +20,7 @@ import RedoIcon from 'material-ui/lib/svg-icons/content/redo';
 import ClearIcon from 'material-ui/lib/svg-icons/action/delete';
 import SaveIcon from 'material-ui/lib/svg-icons/content/save';
 import RemoveIcon from 'material-ui/lib/svg-icons/content/clear';
+import DownloadIcon from 'material-ui/lib/svg-icons/file/file-download';
 
 import dataJson from './data.json'
 import dataUrl from './data.url'
@@ -30,31 +33,53 @@ const styles = {
         padding: '3px',
         display: 'flex',
         flexWrap: 'wrap',
+        margin: '10px 10px 5px 10px',
         justifyContent: 'space-around'
     },
     gridList: {
         width: '100%',
-        height: 400,
         overflowY: 'auto',
         marginBottom: 24
     },
     gridTile: {
         backgroundColor: '#fcfcfc'
+    },
+    appBar: {
+        backgroundColor: '#333'
+    },
+    separator: {
+        height: '42px',
+        backgroundColor: 'white'
+    },
+    iconButton: {
+        fill: 'white',
+        width: '42px',
+        height: '42px'
     }
 };
+
+function eventFire(el, etype) {
+    if (el.fireEvent) {
+        el.fireEvent('on' + etype);
+    } else {
+        var evObj = document.createEvent('Events');
+        evObj.initEvent(etype, true, false);
+        el.dispatchEvent(evObj);
+    }
+}
 
 class SketchFieldDemo extends React.Component {
     constructor(params) {
         super(params);
 
         this._save = this._save.bind(this);
-        this._selectTool = this._selectTool.bind(this);
-        this._renderTile = this._renderTile.bind(this);
-        this._removeMe = this._removeMe.bind(this);
         this._undo = this._undo.bind(this);
         this._redo = this._redo.bind(this);
         this._clear = this._clear.bind(this);
-        this._toggleEdit = this._toggleEdit.bind(this);
+        this._removeMe = this._removeMe.bind(this);
+        this._download = this._download.bind(this);
+        this._renderTile = this._renderTile.bind(this);
+        this._selectTool = this._selectTool.bind(this);
 
         this.state = {
             lineColor: 'black',
@@ -70,33 +95,34 @@ class SketchFieldDemo extends React.Component {
         };
     }
 
+
     componentDidMount() {
+
+        /*eslint-disable no-console*/
+
         (function (console) {
-
             console.save = function (data, filename) {
-
                 if (!data) {
-                    console.error('Console.save: No data')
+                    console.error('Console.save: No data');
                     return;
                 }
-
-                if (!filename) filename = 'console.json'
-
-                if (typeof data === "object") {
+                if (!filename) filename = 'console.json';
+                if (typeof data === 'object') {
                     data = JSON.stringify(data, undefined, 4)
                 }
-
                 var blob = new Blob([data], {type: 'text/json'}),
                     e = document.createEvent('MouseEvents'),
-                    a = document.createElement('a')
-
-                a.download = filename
-                a.href = window.URL.createObjectURL(blob)
-                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':')
-                e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+                    a = document.createElement('a');
+                a.download = filename;
+                a.href = window.URL.createObjectURL(blob);
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+                e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
                 a.dispatchEvent(e)
             }
-        })(console)
+        })(console);
+
+        /*eslint-enable no-console*/
+
     }
 
     _selectTool(event, index, value) {
@@ -106,9 +132,25 @@ class SketchFieldDemo extends React.Component {
     }
 
     _save() {
-        //let drawings = this.state.drawings;
-        //drawings.push(this._sketch.getContent());
-        //this.setState({drawings: drawings});
+        let drawings = this.state.drawings;
+        drawings.push(this._sketch.toDataURL());
+        this.setState({drawings: drawings});
+    }
+
+    _download() {
+        /*eslint-disable no-console*/
+
+        console.save(this._sketch.toDataURL(), 'toDataURL.txt');
+        console.save(JSON.stringify(this._sketch.toJSON()), 'toDataJSON.txt');
+
+        /*eslint-enable no-console*/
+
+        let {imgDown} = this.refs;
+        let event = new Event('click', {});
+
+        imgDown.href = this._sketch.toDataURL();
+        imgDown.download = 'toPNG.png';
+        imgDown.dispatchEvent(event);
     }
 
     _renderTile(drawing, index) {
@@ -150,27 +192,9 @@ class SketchFieldDemo extends React.Component {
 
     _clear() {
         this._sketch.clear();
-        this.setState({
-            canUndo: this._sketch.canUndo(),
-            canRedo: this._sketch.canRedo()
-        })
     }
 
-    _toggleEdit = (event, toggled) => {
-        this.setState({
-            drawingMode: !toggled
-        });
-    };
-
     render() {
-
-        let styles = {
-            iconButton: {
-                width: '42px',
-                height: '42px'
-            }
-        };
-
         return (
             <div>
 
@@ -178,7 +202,7 @@ class SketchFieldDemo extends React.Component {
 
                 <div className='row'>
                     <div className='col-xs-12 col-sm-12 col-md-12 col-lg-12'>
-                        <AppBar title='Sketch Tool' showMenuIconButton={false}>
+                        <AppBar title='Sketch Tool' showMenuIconButton={false} style={styles.appBar}>
                             <IconButton
                                 onTouchTap={this._undo}
                                 iconStyle={styles.iconButton}>
@@ -190,18 +214,23 @@ class SketchFieldDemo extends React.Component {
                                 disabled={!this.state.canRedo}>
                                 <RedoIcon/>
                             </IconButton>
-                            &nbsp;
-                            &nbsp;
-                            &nbsp;
-                            <IconButton
-                                onTouchTap={this._clear}
-                                iconStyle={styles.iconButton}>
-                                <ClearIcon />
-                            </IconButton>
+                            <ToolbarSeparator style={styles.separator}/>
                             <IconButton
                                 onTouchTap={this._save}
                                 iconStyle={styles.iconButton}>
                                 <SaveIcon />
+                            </IconButton>
+                            <IconButton
+                                onTouchTap={this._download}
+                                iconStyle={styles.iconButton}>
+                                <DownloadIcon />
+                            </IconButton>
+                            <a ref='imgDown'/>
+                            <ToolbarSeparator style={styles.separator}/>
+                            <IconButton
+                                onTouchTap={this._clear}
+                                iconStyle={styles.iconButton}>
+                                <ClearIcon />
                             </IconButton>
                         </AppBar>
                     </div>
@@ -233,13 +262,6 @@ class SketchFieldDemo extends React.Component {
                         </div>
                     </div>
                     <div className='col-xs-5 col-sm-5 col-md-3 col-lg-3'>
-                        {/*<Card style={{margin:'5px 10px 5px 0'}}>
-                         <CardTitle title='Options'/>
-                         <CardText>
-                         <Toggle label="Edit" onToggle={this._toggleEdit}/>
-                         </CardText>
-                         </Card>*/}
-
                         <Card style={{margin:'10px 10px 5px 0'}}>
                             <CardTitle title='Tools'/>
                             <CardText>
