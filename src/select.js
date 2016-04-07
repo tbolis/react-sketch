@@ -1,5 +1,7 @@
+/*eslint no-unused-vars: 0*/
+'use strict';
+
 import FabricCanvasTool from './fabrictool'
-import {pointerPosition} from './utils';
 
 class Select extends FabricCanvasTool {
 

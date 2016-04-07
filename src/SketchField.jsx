@@ -1,6 +1,9 @@
+/*eslint no-unused-vars: 0*/
 'use strict';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import History from './history';
 import {uuid4} from './utils';
 
@@ -34,7 +37,11 @@ class SketchField extends React.Component {
         // image format when calling toDataURL
         imageFormat: React.PropTypes.string,
         // Scale the drawing when we resize the canvas
-        scaleOnResize: React.PropTypes.bool
+        scaleOnResize: React.PropTypes.bool,
+        // Default initial data
+        defaultData: React.PropTypes.object,
+        // Type of initial data
+        defaultDataType: React.PropTypes.oneOf(['json', 'url'])
     };
 
     static defaultProps = {
@@ -44,7 +51,8 @@ class SketchField extends React.Component {
         opacity: 1.0,
         undoSteps: 15,
         scaleOnResize: true,
-        tool: Tool.Pencil
+        tool: Tool.Pencil,
+        defaultDataType: 'json'
     };
 
     constructor(props, context) {
@@ -65,18 +73,23 @@ class SketchField extends React.Component {
     }
 
     componentDidMount() {
+        let {tool,
+            undoSteps,
+            defaultData,
+            defaultDataType} = this.props;
+
         let canvas = this._fc = new fabric.Canvas(this._canvas.id);
         this._initTools(canvas);
 
-        let tool = this._tools[this.props.tool];
-        tool.configureCanvas(this.props);
+        let selectedTool = this._tools[tool];
+        selectedTool.configureCanvas(this.props);
 
         // Control resize
         window.addEventListener('resize', this._resize, false);
         this._resize(null);
 
         // Initialize History, with maximum number of undo steps
-        this._history = new History(this.props.undoSteps);
+        this._history = new History(undoSteps);
 
         // Events binding
         canvas.on('object:added', this._onObjectAdded);
@@ -86,6 +99,18 @@ class SketchField extends React.Component {
         canvas.on('mouse:move', this._onMouseMove);
         canvas.on('mouse:up', this._onMouseUp);
         canvas.on('mouse:out', this._onMouseOut);
+
+        // initialize canvas with default data
+        setTimeout(() => {
+            if (defaultData) {
+                if ('json' === defaultDataType) {
+                    this.fromJson(defaultData);
+                }
+                if ('url' === defaultDataType) {
+                    this.fromDataURL(defaultData);
+                }
+            }
+        }, 100)
     }
 
     _initTools(fabricCanvas) {
@@ -102,11 +127,8 @@ class SketchField extends React.Component {
     }
 
     componentWillReceiveProps(props) {
-        //if (this.props.tool !== props.tool) {
-        // tool has changed
         let tool = this._tools[props.tool] || this._tools['pencil'];
         tool.configureCanvas(props);
-        //}
     }
 
     _onObjectAdded(e) {
@@ -154,16 +176,18 @@ class SketchField extends React.Component {
         if (tool) {
             tool.doMouseUp(e);
         }
-        //// there is no direct on change event
-        //if (this.props.onChange) {
-        //    this.props.onChange(event.e, this._fc.toDataURL('png'));
-        //}
+        if (this.props.onChange) {
+            this.props.onChange(event.e);
+        }
     }
 
     _onMouseOut(e) {
         let tool = this._tools[this.props.tool];
         if (tool) {
             tool.doMouseOut(e);
+        }
+        if (this.props.onChange) {
+            this.props.onChange(event.e);
         }
     }
 
@@ -244,6 +268,7 @@ class SketchField extends React.Component {
         let history = this._history;
         if (history.canRedo()) {
             let canvas = this._fc;
+            //noinspection Eslint
             let [obj,prevState,currState] = history.redo();
             if (obj.version === 0) {
                 this.setState({action: false}, () => {
@@ -278,12 +303,65 @@ class SketchField extends React.Component {
     }
 
     /**
-     * Get the current content from Canvas
+     * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
      *
-     * @returns {null} the data of the canvas
+     * Available Options are
+     * <table style="width:100%">
+     *
+     * <tr><td><b>Name</b></td><td><b>Type</b></td><td><b>Argument</b></td><td><b>Default</b></td><td><b>Description</b></td></tr>
+     * <tr><td>format</td> <td>String</td> <td><optional></td><td>png</td><td>The format of the output image. Either "jpeg" or "png"</td></tr>
+     * <tr><td>quality</td><td>Number</td><td><optional></td><td>1</td><td>Quality level (0..1). Only used for jpeg.</td></tr>
+     * <tr><td>multiplier</td><td>Number</td><td><optional></td><td>1</td><td>Multiplier to scale by</td></tr>
+     * <tr><td>left</td><td>Number</td><td><optional></td><td></td><td>Cropping left offset. Introduced in v1.2.14</td></tr>
+     * <tr><td>top</td><td>Number</td><td><optional></td><td></td><td>Cropping top offset. Introduced in v1.2.14</td></tr>
+     * <tr><td>width</td><td>Number</td><td><optional></td><td></td><td>Cropping width. Introduced in v1.2.14</td></tr>
+     * <tr><td>height</td><td>Number</td><td><optional></td><td></td><td>Cropping height. Introduced in v1.2.14</td></tr>
+     *
+     * </table>
+     *
+     * @returns {String} URL containing a representation of the object in the format specified by options.format
      */
-    getContent() {
-        return this.state.content;
+    toDataURL(options) {
+        return this._fc.toDataURL(options);
+    }
+
+    /**
+     * Returns JSON representation of canvas
+     *
+     * @param propertiesToInclude Array    <optional>
+     Any properties that you might want to additionally include in the output
+     * @returns {string} JSON string
+     */
+    toJSON(propertiesToInclude) {
+        return this._fc.toJSON(propertiesToInclude);
+    }
+
+    /**
+     * Populates canvas with data from the specified JSON.
+     *
+     * JSON format must conform to the one of fabric.Canvas#toDatalessJSON
+     *
+     * @param json JSON string or object
+     * @param callback Callback, invoked when json is parsed and corresponding objects (e.g: fabric.Image) are initialized
+     * @param reviver Method for further parsing of JSON elements, called after each fabric object created.
+
+     */
+    fromJson(json) {
+        let canvas = this._fc;
+        canvas.loadFromJSON(json, () => canvas.renderAll());
+    }
+
+    /**
+     * This method will create an image and load the given url data
+     *
+     * @param data URL data to load as image
+     * @param options options to be applied to image <optional>
+     */
+    fromDataURL(data, options = {}) {
+        let canvas = this._fc;
+        let img = new Image();
+        img.src = data;
+        img.onload = () => canvas.add(new fabric.Image(img, options));
     }
 
     /**
@@ -304,7 +382,7 @@ class SketchField extends React.Component {
             ...other
             } = this.props;
         return (
-            <div className={className} style={style} ref={(c) => this._canvasWrapper = c}>
+            <div className={className} style={style}>
                 <canvas
                     id={uuid4()}
                     height={height || 512}

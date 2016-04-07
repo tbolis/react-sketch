@@ -1,5 +1,7 @@
+/*eslint no-unused-vars: 0*/
+'use strict';
+
 import FabricCanvasTool from './fabrictool'
-import {pointerPosition} from './utils';
 
 const fabric = require('fabric').fabric;
 
@@ -39,11 +41,11 @@ class Line extends FabricCanvasTool {
         canvas.renderAll();
     }
 
-    doMouseUp(event) {
+    doMouseUp(o) {
         this.isDown = false;
     }
 
-    doMouseOut(event) {
+    doMouseOut(o) {
         this.isDown = false;
     }
 }

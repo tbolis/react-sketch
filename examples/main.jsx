@@ -19,6 +19,9 @@ import ClearIcon from 'material-ui/lib/svg-icons/action/delete';
 import SaveIcon from 'material-ui/lib/svg-icons/content/save';
 import RemoveIcon from 'material-ui/lib/svg-icons/content/clear';
 
+import dataJson from './data.json'
+import dataUrl from './data.url'
+
 import Tools from '../src/tools';
 import SketchField from '../src/SketchField';
 
@@ -67,6 +70,35 @@ class SketchFieldDemo extends React.Component {
         };
     }
 
+    componentDidMount() {
+        (function (console) {
+
+            console.save = function (data, filename) {
+
+                if (!data) {
+                    console.error('Console.save: No data')
+                    return;
+                }
+
+                if (!filename) filename = 'console.json'
+
+                if (typeof data === "object") {
+                    data = JSON.stringify(data, undefined, 4)
+                }
+
+                var blob = new Blob([data], {type: 'text/json'}),
+                    e = document.createEvent('MouseEvents'),
+                    a = document.createElement('a')
+
+                a.download = filename
+                a.href = window.URL.createObjectURL(blob)
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':')
+                e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+                a.dispatchEvent(e)
+            }
+        })(console)
+    }
+
     _selectTool(event, index, value) {
         this.setState({
             tool: value
@@ -74,9 +106,9 @@ class SketchFieldDemo extends React.Component {
     }
 
     _save() {
-        let drawings = this.state.drawings;
-        drawings.push(this._sketch.getContent());
-        this.setState({drawings: drawings});
+        //let drawings = this.state.drawings;
+        //drawings.push(this._sketch.getContent());
+        //this.setState({drawings: drawings});
     }
 
     _renderTile(drawing, index) {
@@ -191,12 +223,12 @@ class SketchFieldDemo extends React.Component {
                                 fillColor={this.state.fillWithColor ? this.state.fillColor : 'transparent'}
                                 scaleOnResize={true}
                                 height={660}
-
-
-                                onChange={(c,d) => this.setState({canUndo: this._sketch.canUndo()})}
-
+                                defaultData={dataJson}
+                                defaultDataType="json"
+                                onChange={(e) => {
+                                    this.setState({canUndo: this._sketch.canUndo()})
+                                }}
                                 tool={this.state.tool}
-
                             />
                         </div>
                     </div>
