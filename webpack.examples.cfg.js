@@ -52,13 +52,13 @@ var config = {
         new HotModuleReplacementPlugin(),
         new NoErrorsPlugin(),
         new HtmlWebpackPlugin({
-            title: 'React-Back2Top Button',
-            description: 'React based back to top button',
-            keywords: ['React', 'back', 'top', 'scroll-up'],
+            title: 'React Sketch',
+            description: 'Sketch Element for React based applications, backed-up by fabricjs as its core',
+            keywords: ['react', 'canvas', 'sketch', 'fabricjs', 'fabric.js'],
             template: path.join(examplesPath, 'base.html'),
-            inject: 'body',
             filename: 'index.html',
-            chunks: ['examples']
+            chunks: ['examples'],
+            inject: 'body'
         })
     ]
 };

@@ -68,15 +68,15 @@ var config = {
         new HotModuleReplacementPlugin(),
         new NoErrorsPlugin(),
         new HtmlWebpackPlugin({
-            title: 'React-Material Form elements',
-            description: 'React-Material Form elements, build with formsy, material ui and others',
-            keywords: ['React', 'Material-UI', 'Forms'],
+            title: 'React Sketch',
+            description: 'Sketch Element for React based applications, backed-up by fabricjs as its core',
+            keywords: ['react', 'canvas', 'sketch', 'fabricjs', 'fabric.js'],
             template: path.join(examplesPath, 'base.html'),
             inject: 'body',
             filename: 'index.html',
             chunks: ['examples']
         }),
-        new OpenBrowserPlugin({url: 'http://localhost:' + port}),
+        new OpenBrowserPlugin({url: 'http://localhost:' + port})
     ]
 };
 
