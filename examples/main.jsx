@@ -25,8 +25,9 @@ import DownloadIcon from 'material-ui/lib/svg-icons/file/file-download';
 import dataJson from './data.json'
 import dataUrl from './data.url'
 
-import Tools from '../src/tools';
-import SketchField from '../src/SketchField';
+//import Tools from '../src/tools';
+//import SketchField from '../src/SketchField';
+import {SketchField, Tools} from '../lib';
 
 const styles = {
     root: {

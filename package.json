@@ -25,7 +25,8 @@
   "scripts": {
     "clean": "rimraf lib && rimraf build",
     "prebuild": "rimraf lib",
-    "build": "babel ./src --out-dir ./lib",
+    "build": "webpack --config webpack.library.cfg.js --display-modules",
+    "build:light": "babel ./src --out-dir ./lib",
     "build:examples": "webpack --config webpack.examples.cfg.js",
     "prepublish": "npm run test && npm run build",
     "lint": "eslint ./src",
@@ -50,8 +51,8 @@
     "eslint": "^1.2.1",
     "eslint-loader": "^1.0.0",
     "eslint-plugin-react": "^3.3.0",
+    "fabric": "^1.5.0",
     "flexboxgrid": "^6.3.0",
-    "formsy-react": ">=0.17.0 <1",
     "html-webpack-plugin": "^1.7.0",
     "karma": "^0.13.19",
     "karma-babel-preprocessor": "^6.0.1",
@@ -79,8 +80,5 @@
     "style-loader": "^0.13.0",
     "webpack": "^1.12.11",
     "webpack-dev-server": "^1.14.1"
-  },
-  "dependencies": {
-    "fabric": "^1.5.0"
   }
 }
