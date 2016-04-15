@@ -12,10 +12,8 @@ const OccurenceOrderPlugin = require('webpack/lib/optimize/OccurenceOrderPlugin'
 const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlugin');
 const AggressiveMergingPlugin = require('webpack/lib/optimize/AggressiveMergingPlugin');
 
-const port = 23000;
 
 var config = {
-    port: port,
     entry: {
         examples: path.join(examplesPath, 'run')
     },

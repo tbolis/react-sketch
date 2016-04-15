@@ -206,11 +206,11 @@ class SketchField extends React.Component {
         let canvas = this._fc;
         let domNode = ReactDOM.findDOMNode(this);
         let width = domNode.offsetWidth;
-        let height = domNode.offsetHeight;
+        let height = domNode.clientHeight;
         let prevWidth = canvas.getWidth();
         let prevHeight = canvas.getHeight();
-        let wfactor = width / prevWidth;
-        let hfactor = height / prevHeight;
+        let wfactor = (width / prevWidth).toFixed(2);
+        let hfactor = (height / prevHeight).toFixed(2);
         canvas.setWidth(width);
         canvas.setHeight(height);
         if (canvas.backgroundImage) {
@@ -237,8 +237,7 @@ class SketchField extends React.Component {
             obj.setCoords();
         }
         this.setState({
-            parentWidth: width,
-            parentHeight: height
+            parentWidth: width
         });
         canvas.renderAll();
         canvas.calcOffset();
@@ -258,6 +257,9 @@ class SketchField extends React.Component {
             obj.setCoords();
             obj.version -= 1;
             this._fc.renderAll();
+        }
+        if (this.props.onChange) {
+            this.props.onChange(event.e);
         }
     }
 
@@ -281,6 +283,9 @@ class SketchField extends React.Component {
             }
             obj.setCoords();
             canvas.renderAll();
+            if (this.props.onChange) {
+                this.props.onChange(event.e);
+            }
         }
     }
 
@@ -347,8 +352,12 @@ class SketchField extends React.Component {
 
      */
     fromJson(json) {
+        if (!json) return;
         let canvas = this._fc;
         canvas.loadFromJSON(json, () => canvas.renderAll());
+        if (this.props.onChange) {
+            this.props.onChange(null);
+        }
     }
 
     /**
@@ -358,10 +367,14 @@ class SketchField extends React.Component {
      * @param options options to be applied to image <optional>
      */
     fromDataURL(data, options = {}) {
+        if (!data) return;
         let canvas = this._fc;
         let img = new Image();
         img.src = data;
         img.onload = () => canvas.add(new fabric.Image(img, options));
+        if (this.props.onChange) {
+            this.props.onChange(null);
+        }
     }
 
     /**

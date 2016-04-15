@@ -15,7 +15,7 @@ const examplesPath = path.join(__dirname, 'examples');
 
 const OpenBrowserPlugin = require('open-browser-webpack-plugin');
 
-const port = 9999;
+const port = 23000;
 
 var config = {
     port: port,
