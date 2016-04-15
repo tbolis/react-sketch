@@ -58,6 +58,20 @@ class SketchFieldDemo extends React.Component {
 }
 
 ```
+Configuration Options
+
+| Option  	        | Type                  | Default 	    | Description  	                                                    |    
+|---                |---    	            |---	        |---                                                                |
+| tool              | Enumeration (string)  | pencil        | The tool to use, can be select,pencil,circle, rectangle,circle    |
+| lineColor         | String                | black         | The color of the line   	                                        |
+| lineWidth         | Number                | 1             | The width of the line                                             | 
+| fillColor         | String                | transparent   | The fill color of the shape when applicable (e.g. circle)         |
+| undoSteps         | Number                | 15            | number of undo/redo steps to maintain                             |
+| imageFormat       | String                | png           | image format when calling toDataURL                               | 
+| scaleOnResize     | boolean               | false         | Scale the drawing when we resize the canvas                       |         
+| defaultData       | JSON or data URL      |               | Default initial data, can be json or URL data accroding to configuration option below, in the case of data URL the initial drawing will be improted as an image |
+| defaultDataType   | Enumeration (string)  | json          | The Type of initial data, can be either json or url               | 
+
 
 ## Examples
 
