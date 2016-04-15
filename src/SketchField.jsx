@@ -104,7 +104,7 @@ class SketchField extends React.Component {
         setTimeout(() => {
             if (defaultData) {
                 if ('json' === defaultDataType) {
-                    this.fromJson(defaultData);
+                    this.fromJSON(defaultData);
                 }
                 if ('url' === defaultDataType) {
                     this.fromDataURL(defaultData);
@@ -351,7 +351,7 @@ class SketchField extends React.Component {
      * @param reviver Method for further parsing of JSON elements, called after each fabric object created.
 
      */
-    fromJson(json) {
+    fromJSON(json) {
         if (!json) return;
         let canvas = this._fc;
         canvas.loadFromJSON(json, () => canvas.renderAll());
