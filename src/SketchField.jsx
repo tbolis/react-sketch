@@ -101,16 +101,14 @@ class SketchField extends React.Component {
         canvas.on('mouse:out', this._onMouseOut);
 
         // initialize canvas with default data
-        setTimeout(() => {
-            if (defaultData) {
-                if ('json' === defaultDataType) {
-                    this.fromJSON(defaultData);
-                }
-                if ('url' === defaultDataType) {
-                    this.fromDataURL(defaultData);
-                }
+        if (defaultData) {
+            if ('json' === defaultDataType) {
+                this.fromJSON(defaultData);
             }
-        }, 100)
+            if ('url' === defaultDataType) {
+                this.fromDataURL(defaultData);
+            }
+        }
     }
 
     _initTools(fabricCanvas) {
@@ -347,17 +345,18 @@ class SketchField extends React.Component {
      * JSON format must conform to the one of fabric.Canvas#toDatalessJSON
      *
      * @param json JSON string or object
-     * @param callback Callback, invoked when json is parsed and corresponding objects (e.g: fabric.Image) are initialized
-     * @param reviver Method for further parsing of JSON elements, called after each fabric object created.
-
      */
     fromJSON(json) {
         if (!json) return;
         let canvas = this._fc;
-        canvas.loadFromJSON(json, () => canvas.renderAll());
-        if (this.props.onChange) {
-            this.props.onChange(null);
-        }
+        setTimeout(() => {
+            canvas.loadFromJSON(json, () => {
+                canvas.renderAll();
+                if (this.props.onChange) {
+                    this.props.onChange(null);
+                }
+            });
+        }, 100);
     }
 
     /**
@@ -371,7 +370,10 @@ class SketchField extends React.Component {
         let canvas = this._fc;
         let img = new Image();
         img.src = data;
-        img.onload = () => canvas.add(new fabric.Image(img, options));
+        img.onload = () => {
+            canvas.add(new fabric.Image(img, options));
+            canvas.renderAll();
+        };
         if (this.props.onChange) {
             this.props.onChange(null);
         }
