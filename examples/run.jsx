@@ -1,9 +1,11 @@
+'use strict';
+
 (function () {
     let React = require('react');
     let ReactDOM = require('react-dom');
     let injectTapEventPlugin = require('react-tap-event-plugin');
 
-    let Demo = require('./main');
+    let Demo = require('./main').default;
 
     // Needed for React Developer Tools (Chrome Extension)
     window.React = React;
