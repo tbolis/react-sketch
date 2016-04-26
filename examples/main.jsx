@@ -2,7 +2,7 @@
 'use strict';
 
 import React from 'react';
-import ColorPicker from 'react-color';
+import {CompactPicker} from 'react-color';
 
 import 'flexboxgrid';
 import './main.css';
@@ -40,7 +40,7 @@ const styles = {
     gridList: {
         width: '100%',
         overflowY: 'auto',
-        marginBottom: 24
+        marginBottom: '24px'
     },
     gridTile: {
         backgroundColor: '#fcfcfc'
@@ -287,16 +287,17 @@ class SketchFieldDemo extends React.Component {
                             <CardTitle title='Colors'/>
                             <CardText>
                                 <label htmlFor='lineColor'>Line</label>
-                                <ColorPicker ref='lineColor' type='compact' color={this.state.lineColor}
-                                             onChange={(color) => this.setState({lineColor:'#'+color.hex})}/>
+                                <CompactPicker
+                                    id='lineColor' color={this.state.lineColor}
+                                    onChange={(color) => this.setState({lineColor:'#'+color.hex})}/>
                                 <br/>
                                 <br/>
                                 <Toggle label="Fill"
                                         defaultToggled={this.state.fillWithColor}
                                         onToggle={(e) => this.setState({fillWithColor:!this.state.fillWithColor})}/>
-                                <ColorPicker type="compact"
-                                             color={this.state.fillColor}
-                                             onChange={(color) => this.setState({fillColor:'#'+color.hex})}/>
+                                <CompactPicker
+                                    color={this.state.fillColor}
+                                    onChange={(color) => this.setState({fillColor:'#'+color.hex})}/>
                             </CardText>
                         </Card>
                     </div>

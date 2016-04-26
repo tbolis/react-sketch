@@ -400,9 +400,9 @@ class SketchField extends React.Component {
             <div className={className} style={style}>
                 <canvas
                     id={uuid4()}
-                    height={height || 512}
+                    height={(height || 512) + 'px'}
                     ref={(c) => this._canvas = c}
-                    width={width || this.state.parentWidth}>
+                    width={(width || this.state.parentWidth) + 'px'}>
                     Sorry, Canvas HTML5 element is not supported by your browser :(
                 </canvas>
             </div>
