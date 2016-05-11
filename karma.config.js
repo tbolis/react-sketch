@@ -2,10 +2,9 @@
 
 'use strict';
 
-const path = require('path');
-
-const srcPath = path.join(__dirname, 'src');
-const testPath = path.join(__dirname, 'test');
+var path = require('path');
+var srcPath = path.join(__dirname, 'src');
+var testPath = path.join(__dirname, 'test');
 
 // Set environment to testing
 process.env.NODE_ENV = 'testing';
