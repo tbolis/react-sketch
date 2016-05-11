@@ -15,12 +15,15 @@ import {
     ToolbarSeparator
 } from 'material-ui';
 
-import UndoIcon from 'material-ui/lib/svg-icons/content/undo';
-import RedoIcon from 'material-ui/lib/svg-icons/content/redo';
-import ClearIcon from 'material-ui/lib/svg-icons/action/delete';
-import SaveIcon from 'material-ui/lib/svg-icons/content/save';
-import RemoveIcon from 'material-ui/lib/svg-icons/content/clear';
-import DownloadIcon from 'material-ui/lib/svg-icons/file/file-download';
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+
+import UndoIcon from 'material-ui/svg-icons/content/undo';
+import RedoIcon from 'material-ui/svg-icons/content/redo';
+import ClearIcon from 'material-ui/svg-icons/action/delete';
+import SaveIcon from 'material-ui/svg-icons/content/save';
+import RemoveIcon from 'material-ui/svg-icons/content/clear';
+import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 
 import dataJson from './data.json'
 import dataUrl from './data.url'
@@ -197,127 +200,129 @@ class SketchFieldDemo extends React.Component {
 
     render() {
         return (
-            <div>
+            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                <div>
 
-                {/* Application Bar with tools */}
+                    {/* Application Bar with tools */}
 
-                <div className='row'>
-                    <div className='col-xs-12 col-sm-12 col-md-12 col-lg-12'>
-                        <AppBar title='Sketch Tool' showMenuIconButton={false} style={styles.appBar}>
-                            <IconButton
-                                onTouchTap={this._undo}
-                                iconStyle={styles.iconButton}>
-                                <UndoIcon />
-                            </IconButton>
-                            <IconButton
-                                onTouchTap={this._redo}
-                                iconStyle={styles.iconButton}
-                                disabled={!this.state.canRedo}>
-                                <RedoIcon/>
-                            </IconButton>
-                            <ToolbarSeparator style={styles.separator}/>
-                            <IconButton
-                                onTouchTap={this._save}
-                                iconStyle={styles.iconButton}>
-                                <SaveIcon />
-                            </IconButton>
-                            <IconButton
-                                onTouchTap={this._download}
-                                iconStyle={styles.iconButton}>
-                                <DownloadIcon />
-                            </IconButton>
-                            <a ref='imgDown'/>
-                            <ToolbarSeparator style={styles.separator}/>
-                            <IconButton
-                                onTouchTap={this._clear}
-                                iconStyle={styles.iconButton}>
-                                <ClearIcon />
-                            </IconButton>
-                        </AppBar>
+                    <div className='row'>
+                        <div className='col-xs-12 col-sm-12 col-md-12 col-lg-12'>
+                            <AppBar title='Sketch Tool' showMenuIconButton={false} style={styles.appBar}>
+                                <IconButton
+                                    onTouchTap={this._undo}
+                                    iconStyle={styles.iconButton}>
+                                    <UndoIcon />
+                                </IconButton>
+                                <IconButton
+                                    onTouchTap={this._redo}
+                                    iconStyle={styles.iconButton}
+                                    disabled={!this.state.canRedo}>
+                                    <RedoIcon/>
+                                </IconButton>
+                                <ToolbarSeparator style={styles.separator}/>
+                                <IconButton
+                                    onTouchTap={this._save}
+                                    iconStyle={styles.iconButton}>
+                                    <SaveIcon />
+                                </IconButton>
+                                <IconButton
+                                    onTouchTap={this._download}
+                                    iconStyle={styles.iconButton}>
+                                    <DownloadIcon />
+                                </IconButton>
+                                <a ref='imgDown'/>
+                                <ToolbarSeparator style={styles.separator}/>
+                                <IconButton
+                                    onTouchTap={this._clear}
+                                    iconStyle={styles.iconButton}>
+                                    <ClearIcon />
+                                </IconButton>
+                            </AppBar>
+                        </div>
                     </div>
-                </div>
 
-                {/*Sketch Area with tools*/}
+                    {/*Sketch Area with tools*/}
 
-                <div className='row'>
-                    <div className='col-xs-7 col-sm-7 col-md-9 col-lg-9'>
+                    <div className='row'>
+                        <div className='col-xs-7 col-sm-7 col-md-9 col-lg-9'>
 
-                        {/* Sketch area */}
-                        <div style={{padding:'3px'}}>
-                            <SketchField
-                                name='sketch'
-                                className='canvas-area'
-                                ref={(c) => this._sketch = c}
-                                lineColor={this.state.lineColor}
-                                lineWidth={this.state.lineWidth}
-                                fillColor={this.state.fillWithColor ? this.state.fillColor : 'transparent'}
-                                scaleOnResize={true}
-                                height={660}
-                                defaultData={dataJson}
-                                defaultDataType="json"
-                                onChange={(e) => {
+                            {/* Sketch area */}
+                            <div style={{padding:'3px'}}>
+                                <SketchField
+                                    name='sketch'
+                                    className='canvas-area'
+                                    ref={(c) => this._sketch = c}
+                                    lineColor={this.state.lineColor}
+                                    lineWidth={this.state.lineWidth}
+                                    fillColor={this.state.fillWithColor ? this.state.fillColor : 'transparent'}
+                                    scaleOnResize={true}
+                                    height={660}
+                                    defaultData={dataJson}
+                                    defaultDataType="json"
+                                    onChange={(e) => {
                                     this.setState({canUndo: this._sketch.canUndo()})
                                 }}
-                                tool={this.state.tool}
-                            />
+                                    tool={this.state.tool}
+                                />
+                            </div>
+                        </div>
+                        <div className='col-xs-5 col-sm-5 col-md-3 col-lg-3'>
+                            <Card style={{margin:'10px 10px 5px 0'}}>
+                                <CardTitle title='Tools'/>
+                                <CardText>
+                                    <label htmlFor='tool'>Canvas Tool</label><br/>
+                                    <SelectField ref='tool' value={this.state.tool} onChange={this._selectTool}>
+                                        <MenuItem value={Tools.Select} primaryText="Select"/>
+                                        <MenuItem value={Tools.Pencil} primaryText="Pencil"/>
+                                        <MenuItem value={Tools.Line} primaryText="Line"/>
+                                        <MenuItem value={Tools.Rectangle} primaryText="Rectangle"/>
+                                        <MenuItem value={Tools.Circle} primaryText="Circle"/>
+                                    </SelectField>
+                                    <br/>
+                                    <br/>
+                                    <br/>
+                                    <label htmlFor='slider'>Line Weight</label>
+                                    <Slider ref='slider' step={0.1}
+                                            defaultValue={this.state.lineWidth/100}
+                                            onChange={(e, v) => this.setState({lineWidth:v*100})}/>
+                                </CardText>
+                            </Card>
+                            <Card style={{margin:'5px 10px 5px 0'}}>
+                                <CardTitle title='Colors'/>
+                                <CardText>
+                                    <label htmlFor='lineColor'>Line</label>
+                                    <CompactPicker
+                                        id='lineColor' color={this.state.lineColor}
+                                        onChange={(color) => this.setState({lineColor:'#'+color.hex})}/>
+                                    <br/>
+                                    <br/>
+                                    <Toggle label="Fill"
+                                            defaultToggled={this.state.fillWithColor}
+                                            onToggle={(e) => this.setState({fillWithColor:!this.state.fillWithColor})}/>
+                                    <CompactPicker
+                                        color={this.state.fillColor}
+                                        onChange={(color) => this.setState({fillColor:'#'+color.hex})}/>
+                                </CardText>
+                            </Card>
                         </div>
                     </div>
-                    <div className='col-xs-5 col-sm-5 col-md-3 col-lg-3'>
-                        <Card style={{margin:'10px 10px 5px 0'}}>
-                            <CardTitle title='Tools'/>
-                            <CardText>
-                                <label htmlFor='tool'>Canvas Tool</label><br/>
-                                <SelectField ref='tool' value={this.state.tool} onChange={this._selectTool}>
-                                    <MenuItem value={Tools.Select} primaryText="Select"/>
-                                    <MenuItem value={Tools.Pencil} primaryText="Pencil"/>
-                                    <MenuItem value={Tools.Line} primaryText="Line"/>
-                                    <MenuItem value={Tools.Rectangle} primaryText="Rectangle"/>
-                                    <MenuItem value={Tools.Circle} primaryText="Circle"/>
-                                </SelectField>
-                                <br/>
-                                <br/>
-                                <br/>
-                                <label htmlFor='slider'>Line Weight</label>
-                                <Slider ref='slider' step={0.1}
-                                        defaultValue={this.state.lineWidth/100}
-                                        onChange={(e, v) => this.setState({lineWidth:v*100})}/>
-                            </CardText>
-                        </Card>
-                        <Card style={{margin:'5px 10px 5px 0'}}>
-                            <CardTitle title='Colors'/>
-                            <CardText>
-                                <label htmlFor='lineColor'>Line</label>
-                                <CompactPicker
-                                    id='lineColor' color={this.state.lineColor}
-                                    onChange={(color) => this.setState({lineColor:'#'+color.hex})}/>
-                                <br/>
-                                <br/>
-                                <Toggle label="Fill"
-                                        defaultToggled={this.state.fillWithColor}
-                                        onToggle={(e) => this.setState({fillWithColor:!this.state.fillWithColor})}/>
-                                <CompactPicker
-                                    color={this.state.fillColor}
-                                    onChange={(color) => this.setState({fillColor:'#'+color.hex})}/>
-                            </CardText>
-                        </Card>
-                    </div>
-                </div>
 
-                {/*Saved Paintings*/}
+                    {/*Saved Paintings*/}
 
-                <div className='row'>
-                    <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                        <div className="box" style={styles.root}>
-                            <GridList
-                                cols={5}
-                                cellHeight={200}
-                                padding={1} style={styles.gridList}>
-                                {this.state.drawings.map(this._renderTile)}
-                            </GridList>
+                    <div className='row'>
+                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                            <div className="box" style={styles.root}>
+                                <GridList
+                                    cols={5}
+                                    cellHeight={200}
+                                    padding={1} style={styles.gridList}>
+                                    {this.state.drawings.map(this._renderTile)}
+                                </GridList>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </MuiThemeProvider>
         )
     }
 }
