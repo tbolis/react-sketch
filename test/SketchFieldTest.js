@@ -1,4 +1,4 @@
-/* global expect */
+/* global expect, describe,it */
 /* eslint no-console: 0 */
 /* eslint-env node, mocha */
 'use strict';
