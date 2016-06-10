@@ -70,6 +70,8 @@ function eventFire(el, etype) {
     }
 }
 
+import PureRenderMixin from 'react-addons-pure-render-mixin';
+
 class SketchFieldDemo extends React.Component {
     constructor(params) {
         super(params);
@@ -83,20 +85,22 @@ class SketchFieldDemo extends React.Component {
         this._renderTile = this._renderTile.bind(this);
         this._selectTool = this._selectTool.bind(this);
 
-        this.state = {
-            lineColor: 'black',
-            lineWidth: 10,
-            fillColor: '#68CCCA',
-            shadowWidth: 0,
-            shadowOffset: 0,
-            tool: Tools.Pencil,
-            fillWithColor: false,
-            drawings: [],
-            canUndo: false,
-            canRedo: false
-        };
+        this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+
     }
 
+    state = {
+        lineColor: 'black',
+        lineWidth: 10,
+        fillColor: '#68CCCA',
+        shadowWidth: 0,
+        shadowOffset: 0,
+        tool: Tools.Pencil,
+        fillWithColor: false,
+        drawings: [],
+        canUndo: false,
+        canRedo: false
+    };
 
     componentDidMount() {
 
@@ -257,9 +261,13 @@ class SketchFieldDemo extends React.Component {
                                     height={660}
                                     defaultData={dataJson}
                                     defaultDataType="json"
-                                    onChange={(e) => {
-                                    this.setState({canUndo: this._sketch.canUndo()})
-                                }}
+                                    onChange={() => {
+                                        let prev = this.state.canUndo;
+                                        let now = this._sketch.canUndo();
+                                        if(prev !== now){
+                                            this.setState({canUndo: now});
+                                        }
+                                    }}
                                     tool={this.state.tool}
                                 />
                             </div>

@@ -215,20 +215,20 @@ class SketchField extends Component {
 
     _onMouseUp(e) {
         this._selectedTool.doMouseUp(e);
-        let onChange = this.props.onChange;
-        if (onChange) {
-            setTimeout(()=> {
-                onChange(event.e);
+        if (this.props.onChange) {
+            let onChange = this.props.onChange;
+            setTimeout(() => {
+                onChange(e.e);
             }, 10);
         }
     }
 
     _onMouseOut(e) {
         this._selectedTool.doMouseOut(e);
-        let onChange = this.props.onChange;
-        if (onChange) {
-            setTimeout(()=> {
-                onChange(event.e);
+        if (this.props.onChange) {
+            let onChange = this.props.onChange;
+            setTimeout(() => {
+                onChange(e.e);
             }, 10);
         }
     }
@@ -300,7 +300,7 @@ class SketchField extends Component {
             this._fc.renderAll();
         }
         if (this.props.onChange) {
-            this.props.onChange(event.e);
+            this.props.onChange();
         }
     }
 
@@ -325,7 +325,7 @@ class SketchField extends Component {
             obj.setCoords();
             canvas.renderAll();
             if (this.props.onChange) {
-                this.props.onChange(event.e);
+                this.props.onChange();
             }
         }
     }
@@ -396,7 +396,7 @@ class SketchField extends Component {
             canvas.loadFromJSON(json, () => {
                 canvas.renderAll();
                 if (this.props.onChange) {
-                    this.props.onChange(null);
+                    this.props.onChange();
                 }
             });
         }, 100);
@@ -418,7 +418,7 @@ class SketchField extends Component {
             canvas.renderAll();
         };
         if (this.props.onChange) {
-            this.props.onChange(null);
+            this.props.onChange();
         }
     }
 

@@ -94,7 +94,7 @@
   },
   "dependencies": {
     "react": "^15.1.0",
-    "react-dom": "^15.1.0",
-    "react-addons-pure-render-mixin": "^15.1.0"
+    "react-addons-pure-render-mixin": "^15.1.0",
+    "react-dom": "^15.1.0"
   }
 }
