@@ -38,9 +38,7 @@ module.exports = function (config) {
             resolve: {
                 extensions: ['', '.js', '.jsx'],
                 alias: {
-                    Utils: path.join(srcPath, 'utils'),
-                    History: path.join(srcPath, 'history'),
-                    SketchField: path.join(srcPath, 'SketchField')
+                    'react-sketch': srcPath
                 }
             },
             module: {

@@ -1,8 +1,9 @@
 /*eslint no-unused-vars: 0*/
 'use strict';
 
-import React from 'react';
 import ReactDOM from 'react-dom';
+import React, {Component,PropTypes} from 'react';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import History from './history';
 import {uuid4} from './utils';
@@ -19,34 +20,34 @@ const fabric = require('fabric').fabric;
 /**
  * Sketch Tool based on FabricJS for React Applications
  */
-class SketchField extends React.Component {
+class SketchField extends Component {
 
     static propTypes = {
         // the color of the line
-        lineColor: React.PropTypes.string,
+        lineColor: PropTypes.string,
         // The width of the line
-        lineWidth: React.PropTypes.number,
+        lineWidth: PropTypes.number,
         // the fill color of the shape when applicable
-        fillColor: React.PropTypes.string,
+        fillColor: PropTypes.string,
         // the opacity of the object
-        opacity: React.PropTypes.number,
+        opacity: PropTypes.number,
         // number of undo/redo steps to maintain
-        undoSteps: React.PropTypes.number,
+        undoSteps: PropTypes.number,
         // The tool to use, can be pencil, rectangle, circle, brush;
-        tool: React.PropTypes.string,
+        tool: PropTypes.string,
         // image format when calling toDataURL
-        imageFormat: React.PropTypes.string,
+        imageFormat: PropTypes.string,
         // Scale the drawing when we resize the canvas
-        scaleOnResize: React.PropTypes.bool,
+        scaleOnResize: PropTypes.bool,
         // Default initial data
-        defaultData: React.PropTypes.object,
+        defaultData: PropTypes.object,
         // Type of initial data
-        defaultDataType: React.PropTypes.oneOf(['json', 'url'])
+        defaultDataType: PropTypes.oneOf(['json', 'url'])
     };
 
     static defaultProps = {
         lineColor: 'black',
-        lineWidth: 1,
+        lineWidth: 10,
         fillColor: 'transparent',
         opacity: 1.0,
         undoSteps: 15,
@@ -59,18 +60,28 @@ class SketchField extends React.Component {
         super(props, context);
         this._resize = this._resize.bind(this);
         this._initTools = this._initTools.bind(this);
+        this.enableTouchScroll = this.enableTouchScroll.bind(this);
+        this.disableTouchScroll = this.disableTouchScroll.bind(this);
+
         this._onMouseUp = this._onMouseUp.bind(this);
         this._onMouseOut = this._onMouseOut.bind(this);
         this._onMouseDown = this._onMouseDown.bind(this);
         this._onMouseMove = this._onMouseMove.bind(this);
+
         this._onObjectAdded = this._onObjectAdded.bind(this);
+        this._onObjectMoving = this._onObjectMoving.bind(this);
         this._onObjectRemoved = this._onObjectRemoved.bind(this);
+        this._onObjectScaling = this._onObjectScaling.bind(this);
         this._onObjectModified = this._onObjectModified.bind(this);
-        this.state = {
-            parentWidth: 10,
-            action: true
-        };
+        this._onObjectRotating = this._onObjectRotating.bind(this);
+
+        this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
     }
+
+    state = {
+        parentWidth: 550,
+        action: true
+    };
 
     componentDidMount() {
         let {tool,
@@ -83,10 +94,10 @@ class SketchField extends React.Component {
 
         let selectedTool = this._tools[tool];
         selectedTool.configureCanvas(this.props);
+        this._selectedTool = selectedTool;
 
         // Control resize
         window.addEventListener('resize', this._resize, false);
-        this._resize(null);
 
         // Initialize History, with maximum number of undo steps
         this._history = new History(undoSteps);
@@ -99,6 +110,12 @@ class SketchField extends React.Component {
         canvas.on('mouse:move', this._onMouseMove);
         canvas.on('mouse:up', this._onMouseUp);
         canvas.on('mouse:out', this._onMouseOut);
+        canvas.on('object:moving', this._onObjectMoving);
+        canvas.on('object:scaling', this._onObjectScaling);
+        canvas.on('object:rotating', this._onObjectRotating);
+
+        this.disableTouchScroll();
+        this._resize();
 
         // initialize canvas with default data
         if (defaultData) {
@@ -124,9 +141,30 @@ class SketchField extends React.Component {
         window.removeEventListener('resize', this._resize);
     }
 
-    componentWillReceiveProps(props) {
-        let tool = this._tools[props.tool] || this._tools['pencil'];
-        tool.configureCanvas(props);
+    componentWillUpdate(nextProps, nextState) {
+        if (this.state.parentWidth !== nextState.parentWidth) {
+            this._resize();
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props.tool !== nextProps.tool) {
+            this._selectedTool = this._tools[nextProps.tool] || this._tools[Tool.Pencil];
+        }
+        this._selectedTool.configureCanvas(nextProps);
+    }
+
+    enableTouchScroll() {
+        let canvas = this._fc;
+        if (canvas.allowTouchScrolling) return;
+        canvas.allowTouchScrolling = true;
+    }
+
+    disableTouchScroll() {
+        let canvas = this._fc;
+        if (canvas.allowTouchScrolling) {
+            canvas.allowTouchScrolling = false;
+        }
     }
 
     _onObjectAdded(e) {
@@ -150,42 +188,48 @@ class SketchField extends React.Component {
         this._history.keep([obj, prevState, currState]);
     }
 
+    _onObjectMoving(e) {
+
+    }
+
+    _onObjectScaling(e) {
+
+    }
+
+    _onObjectRotating(e) {
+
+    }
+
     _onObjectRemoved(e) {
         let obj = e.target;
         obj.version = 0;
     }
 
     _onMouseDown(e) {
-        let tool = this._tools[this.props.tool];
-        if (tool) {
-            tool.doMouseDown(e);
-        }
+        this._selectedTool.doMouseDown(e);
     }
 
     _onMouseMove(e) {
-        let tool = this._tools[this.props.tool];
-        if (tool) {
-            tool.doMouseMove(e);
-        }
+        this._selectedTool.doMouseMove(e);
     }
 
     _onMouseUp(e) {
-        let tool = this._tools[this.props.tool];
-        if (tool) {
-            tool.doMouseUp(e);
-        }
-        if (this.props.onChange) {
-            this.props.onChange(event.e);
+        this._selectedTool.doMouseUp(e);
+        let onChange = this.props.onChange;
+        if (onChange) {
+            setTimeout(()=> {
+                onChange(event.e);
+            }, 10);
         }
     }
 
     _onMouseOut(e) {
-        let tool = this._tools[this.props.tool];
-        if (tool) {
-            tool.doMouseOut(e);
-        }
-        if (this.props.onChange) {
-            this.props.onChange(event.e);
+        this._selectedTool.doMouseOut(e);
+        let onChange = this.props.onChange;
+        if (onChange) {
+            setTimeout(()=> {
+                onChange(event.e);
+            }, 10);
         }
     }
 
@@ -203,14 +247,13 @@ class SketchField extends React.Component {
         if (!this.props.scaleOnResize) return;
         let canvas = this._fc;
         let domNode = ReactDOM.findDOMNode(this);
-        let width = domNode.offsetWidth;
-        let height = domNode.clientHeight;
+        let {offsetWidth,clientHeight} = domNode;
         let prevWidth = canvas.getWidth();
         let prevHeight = canvas.getHeight();
-        let wfactor = (width / prevWidth).toFixed(2);
-        let hfactor = (height / prevHeight).toFixed(2);
-        canvas.setWidth(width);
-        canvas.setHeight(height);
+        let wfactor = (offsetWidth / prevWidth).toFixed(2);
+        let hfactor = (clientHeight / prevHeight).toFixed(2);
+        canvas.setWidth(offsetWidth);
+        canvas.setHeight(clientHeight);
         if (canvas.backgroundImage) {
             // Need to scale background images as well
             let bi = canvas.backgroundImage;
@@ -235,7 +278,7 @@ class SketchField extends React.Component {
             obj.setCoords();
         }
         this.setState({
-            parentWidth: width
+            parentWidth: offsetWidth
         });
         canvas.renderAll();
         canvas.calcOffset();
@@ -400,9 +443,9 @@ class SketchField extends React.Component {
             <div className={className} style={style}>
                 <canvas
                     id={uuid4()}
-                    height={(height || 512) + 'px'}
+                    height={height || 512}
                     ref={(c) => this._canvas = c}
-                    width={(width || this.state.parentWidth) + 'px'}>
+                    width={width || 512}>
                     Sorry, Canvas HTML5 element is not supported by your browser :(
                 </canvas>
             </div>

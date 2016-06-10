@@ -6,7 +6,7 @@
 import React from 'react';
 import TestUtils from 'react-addons-test-utils';
 
-import SketchField from 'SketchField';
+import {SketchField} from 'react-sketch';
 
 describe('SketchField', () => {
 

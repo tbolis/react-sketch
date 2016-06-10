@@ -1,3 +1,5 @@
+/*global __dirname, module*/
+
 var path = require('path');
 
 const IgnorePlugin = require('webpack/lib/IgnorePlugin');
@@ -56,18 +58,17 @@ module.exports = {
         ]
     },
     plugins: [
-        // minify on production
         new DedupePlugin(),
         new UglifyJsPlugin({
             compress: {
                 warnings: false
             }
         }),
+        new NoErrorsPlugin(),
         new OccurenceOrderPlugin(),
         new AggressiveMergingPlugin(),
-        new IgnorePlugin(new RegExp('^(fs|ipc)$')),
-        new DefinePlugin({'process.env.NODE_ENV': '"production"'}),
         new HotModuleReplacementPlugin(),
-        new NoErrorsPlugin()
+        new IgnorePlugin(new RegExp('^(fs|ipc)$')),
+        new DefinePlugin({'process.env.NODE_ENV': '"production"'})
     ]
 };

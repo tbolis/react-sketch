@@ -4,7 +4,7 @@
 
 'use strict';
 
-import History from 'History';
+import History from '../src/history';
 
 describe('History', () => {
 

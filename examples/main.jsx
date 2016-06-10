@@ -28,9 +28,7 @@ import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 import dataJson from './data.json'
 import dataUrl from './data.url'
 
-//import Tools from '../src/tools';
-//import SketchField from '../src/SketchField';
-import {SketchField, Tools} from '../lib';
+import {SketchField, Tools} from '../src';
 
 const styles = {
     root: {
@@ -87,7 +85,7 @@ class SketchFieldDemo extends React.Component {
 
         this.state = {
             lineColor: 'black',
-            lineWidth: 2,
+            lineWidth: 10,
             fillColor: '#68CCCA',
             shadowWidth: 0,
             shadowOffset: 0,
@@ -256,7 +254,6 @@ class SketchFieldDemo extends React.Component {
                                     lineWidth={this.state.lineWidth}
                                     fillColor={this.state.fillWithColor ? this.state.fillColor : 'transparent'}
                                     scaleOnResize={true}
-                                    height={660}
                                     defaultData={dataJson}
                                     defaultDataType="json"
                                     onChange={(e) => {
@@ -293,7 +290,7 @@ class SketchFieldDemo extends React.Component {
                                     <label htmlFor='lineColor'>Line</label>
                                     <CompactPicker
                                         id='lineColor' color={this.state.lineColor}
-                                        onChange={(color) => this.setState({lineColor:'#'+color.hex})}/>
+                                        onChange={(color) => this.setState({lineColor:color.hex})}/>
                                     <br/>
                                     <br/>
                                     <Toggle label="Fill"
@@ -301,7 +298,7 @@ class SketchFieldDemo extends React.Component {
                                             onToggle={(e) => this.setState({fillWithColor:!this.state.fillWithColor})}/>
                                     <CompactPicker
                                         color={this.state.fillColor}
-                                        onChange={(color) => this.setState({fillColor:'#'+color.hex})}/>
+                                        onChange={(color) => this.setState({fillColor:color.hex})}/>
                                 </CardText>
                             </Card>
                         </div>

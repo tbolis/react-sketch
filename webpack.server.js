@@ -1,3 +1,4 @@
+/*global __dirname*/
 /*eslint no-console:0 */
 
 require('core-js/fn/object/assign');
@@ -5,7 +6,7 @@ require('core-js/fn/object/assign');
 const path = require('path');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
-
+const myLocalIP = require('my-local-ip');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const NoErrorsPlugin = require('webpack/lib/NoErrorsPlugin');
 const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlugin');
@@ -16,14 +17,14 @@ const examplesPath = path.join(__dirname, 'examples');
 const OpenBrowserPlugin = require('open-browser-webpack-plugin');
 
 const port = 23000;
-
+const host = myLocalIP();
 var config = {
     port: port,
     entry: {
         examples: [
-            'webpack-dev-server/client?http://localhost:' + port,
+            'webpack-dev-server/client?http://' + host + ':' + port,
             'webpack/hot/only-dev-server',
-            path.join(examplesPath, 'run')
+            './examples/run'
         ]
     },
     output: {
@@ -81,7 +82,7 @@ var config = {
 };
 
 new WebpackDevServer(webpack(config), config.devServer)
-    .listen(config.port, 'localhost', function (err) {
+    .listen(config.port, '0.0.0.0', function (err) {
             if (err) {
                 console.log(err);
             }
