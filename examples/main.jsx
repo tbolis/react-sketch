@@ -254,6 +254,7 @@ class SketchFieldDemo extends React.Component {
                                     lineWidth={this.state.lineWidth}
                                     fillColor={this.state.fillWithColor ? this.state.fillColor : 'transparent'}
                                     scaleOnResize={true}
+                                    height={660}
                                     defaultData={dataJson}
                                     defaultDataType="json"
                                     onChange={(e) => {
