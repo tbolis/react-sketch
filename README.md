@@ -6,23 +6,13 @@
 
 A Sketch tool for React based applications, backed-up by [FabricJS](http://fabricjs.com/)
 
-![warning-image] _Please note that this module is still in early development!_
+![warning-image] _Please note that this module is still in development!_
 
 
 ## Installation
 
-Note that react and react-dom have been declared as peer dependencies and **should** exist in your project when using 
-react-sketch as a library, if not do the following:
-
 ```sh
-npm install react --save
-npm install react-dom --save
 npm install react-sketch --save
-```
-
-or in one command
-```sh
-npm install --save react  react-dom react-sketch
 ```
 
 ### Source installation

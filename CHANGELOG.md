@@ -1,12 +1,12 @@
 ## Changelog
 
-* **0.2.4** Upgrading to latest libraries and bug fixes
+* **0.2.5** Upgrading to latest libraries and bug fixes
     - Major
         - React 15.1.0
         - Fabric 1.6.2
     - Bug fixes and performance improvements
-    - exposing disable/enable Scroll for tablets and touch devices 
-
+    - exposing disable/enable Scroll for tablets and touch devices
+* **0.2.4** Maintenance Release 
 * **0.2.3** Upgrading to latest libraries
     - Major
         - React 15.0.1

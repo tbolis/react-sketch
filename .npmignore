@@ -1,5 +1,7 @@
 examples/
 test/
+src/
+docs/
 .travis.yml
 
 
