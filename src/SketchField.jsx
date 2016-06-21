@@ -58,23 +58,25 @@ class SketchField extends Component {
 
     constructor(props, context) {
         super(props, context);
+        // Internal functions
         this._resize = this._resize.bind(this);
         this._initTools = this._initTools.bind(this);
+        // exposed
+        this.zoom = this.zoom.bind(this);
         this.enableTouchScroll = this.enableTouchScroll.bind(this);
         this.disableTouchScroll = this.disableTouchScroll.bind(this);
-
+        //events
         this._onMouseUp = this._onMouseUp.bind(this);
         this._onMouseOut = this._onMouseOut.bind(this);
         this._onMouseDown = this._onMouseDown.bind(this);
         this._onMouseMove = this._onMouseMove.bind(this);
-
         this._onObjectAdded = this._onObjectAdded.bind(this);
         this._onObjectMoving = this._onObjectMoving.bind(this);
         this._onObjectRemoved = this._onObjectRemoved.bind(this);
         this._onObjectScaling = this._onObjectScaling.bind(this);
         this._onObjectModified = this._onObjectModified.bind(this);
         this._onObjectRotating = this._onObjectRotating.bind(this);
-
+        // pure render
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
     }
 
@@ -154,12 +156,18 @@ class SketchField extends Component {
         this._selectedTool.configureCanvas(nextProps);
     }
 
+    /**
+     * Enable touch Scrolling on Canvas
+     */
     enableTouchScroll() {
         let canvas = this._fc;
         if (canvas.allowTouchScrolling) return;
         canvas.allowTouchScrolling = true;
     }
 
+    /**
+     * Disable touch Scrolling on Canvas
+     */
     disableTouchScroll() {
         let canvas = this._fc;
         if (canvas.allowTouchScrolling) {
@@ -283,6 +291,29 @@ class SketchField extends Component {
         canvas.renderAll();
         canvas.calcOffset();
     }
+
+    /**
+     * Zoom the drawing by the factor specified
+     *
+     * The zoom factor is a percentage with regards the original, for example if factor is set to 2
+     * it will double the size whereas if it is set to 0.5 it will half the size
+     *
+     * @param factor the zoom factor
+     */
+    zoom(factor) {
+        let canvas = this._fc;
+        let objects = canvas.getObjects();
+        for (let i in objects) {
+            objects[i].scaleX = objects[i].scaleX * factor;
+            objects[i].scaleY = objects[i].scaleY * factor;
+            objects[i].left = objects[i].left * factor;
+            objects[i].top = objects[i].top * factor;
+            objects[i].setCoords();
+        }
+        canvas.renderAll();
+        canvas.calcOffset();
+    }
+
 
     /**
      * Perform an undo operation on canvas, if it cannot undo it will leave the canvas intact

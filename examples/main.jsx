@@ -9,6 +9,7 @@ import './main.css';
 
 import {
     Card,CardText,CardTitle,
+    Drawer,
     AppBar,GridList,GridTile,
     Slider, Toggle, MenuItem,
     SelectField, IconButton,
@@ -24,6 +25,8 @@ import ClearIcon from 'material-ui/svg-icons/action/delete';
 import SaveIcon from 'material-ui/svg-icons/content/save';
 import RemoveIcon from 'material-ui/svg-icons/content/clear';
 import DownloadIcon from 'material-ui/svg-icons/file/file-download';
+import ZoomInIcon from 'material-ui/svg-icons/action/zoom-in';
+import ZoomOutIcon from 'material-ui/svg-icons/action/zoom-out';
 
 import dataJson from './data.json'
 import dataUrl from './data.url'
@@ -291,6 +294,20 @@ class SketchFieldDemo extends React.Component {
                                     <Slider ref='slider' step={0.1}
                                             defaultValue={this.state.lineWidth/100}
                                             onChange={(e, v) => this.setState({lineWidth:v*100})}/>
+                                    <br/>
+                                    <label htmlFor='zoom'>Zoom</label>
+                                    <div>
+                                        <IconButton
+                                            ref='zoom'
+                                            onTouchTap={(e) => this._sketch.zoom(1.25)}>
+                                            <ZoomInIcon />
+                                        </IconButton>
+                                        <IconButton
+                                            ref='zoom1'
+                                            onTouchTap={(e) => this._sketch.zoom(0.8)}>
+                                            <ZoomOutIcon />
+                                        </IconButton>
+                                    </div>
                                 </CardText>
                             </Card>
                             <Card style={{margin:'5px 10px 5px 0'}}>
