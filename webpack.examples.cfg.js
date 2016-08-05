@@ -1,3 +1,5 @@
+/*global __dirname,module*/
+
 const path = require('path');
 const srcPath = path.join(__dirname, 'src');
 const examplesPath = path.join(__dirname, 'examples');

@@ -87,6 +87,7 @@ class SketchFieldDemo extends React.Component {
         this._download = this._download.bind(this);
         this._renderTile = this._renderTile.bind(this);
         this._selectTool = this._selectTool.bind(this);
+        this._onSketchChange = this._onSketchChange.bind(this);
 
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
@@ -203,9 +204,19 @@ class SketchFieldDemo extends React.Component {
         this._sketch.clear();
     }
 
+    _onSketchChange() {
+        let prev = this.state.canUndo;
+        let now = this._sketch.canUndo();
+        if (prev !== now) {
+            this.setState({canUndo: now});
+        }
+    }
+
     render() {
         return (
+
             <MuiThemeProvider muiTheme={getMuiTheme()}>
+
                 <div>
 
                     {/* Application Bar with tools */}
@@ -261,16 +272,10 @@ class SketchFieldDemo extends React.Component {
                                     lineWidth={this.state.lineWidth}
                                     fillColor={this.state.fillWithColor ? this.state.fillColor : 'transparent'}
                                     scaleOnResize={true}
-                                    height={660}
+                                    height={760}
                                     defaultData={dataJson}
                                     defaultDataType="json"
-                                    onChange={() => {
-                                        let prev = this.state.canUndo;
-                                        let now = this._sketch.canUndo();
-                                        if(prev !== now){
-                                            this.setState({canUndo: now});
-                                        }
-                                    }}
+                                    onChange={this._onSketchChange}
                                     tool={this.state.tool}
                                 />
                             </div>
