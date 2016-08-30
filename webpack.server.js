@@ -12,6 +12,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const NoErrorsPlugin = require('webpack/lib/NoErrorsPlugin');
 const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlugin');
 
+
+const IgnorePlugin = require('webpack/lib/IgnorePlugin');
+const DedupePlugin = require('webpack/lib/optimize/DedupePlugin');
+const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
+const OccurenceOrderPlugin = require('webpack/lib/optimize/OccurenceOrderPlugin');
+const AggressiveMergingPlugin = require('webpack/lib/optimize/AggressiveMergingPlugin');
+
+
 const srcPath = path.join(__dirname, 'src');
 const examplesPath = path.join(__dirname, 'examples');
 
@@ -38,7 +46,6 @@ var config = {
     },
     debug: true,
     cache: true,
-    devtool: 'eval',
     devServer: {
         historyApiFallback: true,
         stats: {colors: true},
