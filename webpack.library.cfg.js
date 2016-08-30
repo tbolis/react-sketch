@@ -8,7 +8,6 @@ const NoErrorsPlugin = require('webpack/lib/NoErrorsPlugin');
 const DedupePlugin = require('webpack/lib/optimize/DedupePlugin');
 const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
 const OccurenceOrderPlugin = require('webpack/lib/optimize/OccurenceOrderPlugin');
-const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlugin');
 const AggressiveMergingPlugin = require('webpack/lib/optimize/AggressiveMergingPlugin');
 
 const srcPath = path.join(__dirname, 'src');
@@ -67,7 +66,6 @@ module.exports = {
         new NoErrorsPlugin(),
         new OccurenceOrderPlugin(),
         new AggressiveMergingPlugin(),
-        new HotModuleReplacementPlugin(),
         new IgnorePlugin(new RegExp('^(fs|ipc)$')),
         new DefinePlugin({'process.env.NODE_ENV': '"production"'})
     ]
