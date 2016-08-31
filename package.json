@@ -63,7 +63,6 @@
     "fabric": "1.6.3",
     "flexboxgrid": "^6.3.1",
     "html-webpack-plugin": "^2.22.0",
-    "jsdom": "^9.4.2",
     "karma": "^1.2.0",
     "karma-babel-preprocessor": "^6.0.1",
     "karma-chai": "^0.1.0",
@@ -88,8 +87,7 @@
     "style-loader": "^0.13.1",
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.15.0",
-    "weinre": "^2.0.0-pre-I0Z7U9OV",
-    "xmldom": "^0.1.22"
+    "weinre": "^2.0.0-pre-I0Z7U9OV"
   },
   "dependencies": {
     "react": "15.3.1",
