@@ -6,7 +6,7 @@
 
 A Sketch tool for React based applications, backed-up by [FabricJS](http://fabricjs.com/)
 
-![warning-image] _Please note that this module is still in development!_
+![warning-image] _Please note that this module is still in development! Feel free to send me enhancements and ideas :)_
 
 
 ## Installation
