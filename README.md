@@ -20,7 +20,7 @@ npm install react-sketch --save
 
 In order to build from source, read the [relevant instructions](http://fabricjs.com/fabric-intro-part-4#node) first. 
 
-On an ubuntu machine perform the following steps to install, node version should be >=0.4.0 && <1.0.0, tested with 0.12.12. 
+On an ubuntu machine perform the following steps to install, node version should be >=4 , tested with versions 4,5,6 (see travis-ci). 
 This is only for installation (npm install) we can then change back to a newer stable node version
 
 ```sh
