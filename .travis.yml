@@ -1,8 +1,9 @@
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y libcairo2-dev libjpeg-dev libgif-dev npm nodejs libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++
+  - sudo apt-get install -y libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++
+  - sudo apt-get install -y npm nodejs
   - if [[ `npm -v` != 3* ]]; then npm i -g npm@3; fi
 
 language: node_js
 node_js:
-  - '4.4.1'
+  - '6.2.2'
