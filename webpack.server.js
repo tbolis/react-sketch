@@ -7,27 +7,20 @@ const path = require('path');
 const webpack = require('webpack');
 const myLocalIP = require('my-local-ip');
 const WebpackDevServer = require('webpack-dev-server');
+
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const NoErrorsPlugin = require('webpack/lib/NoErrorsPlugin');
+const OpenBrowserPlugin = require('open-browser-webpack-plugin');
 const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlugin');
-
-
-const IgnorePlugin = require('webpack/lib/IgnorePlugin');
-const DedupePlugin = require('webpack/lib/optimize/DedupePlugin');
-const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
-const OccurenceOrderPlugin = require('webpack/lib/optimize/OccurenceOrderPlugin');
-const AggressiveMergingPlugin = require('webpack/lib/optimize/AggressiveMergingPlugin');
-
 
 const srcPath = path.join(__dirname, 'src');
 const examplesPath = path.join(__dirname, 'examples');
 
-const OpenBrowserPlugin = require('open-browser-webpack-plugin');
-
 const port = 23000;
 const host = myLocalIP();
-var config = {
+
+const config = {
     port: port,
     entry: {
         examples: [

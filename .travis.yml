@@ -5,4 +5,4 @@ before_install:
 
 language: node_js
 node_js:
-  - '6.2.2'
+  - '4.4.1'
