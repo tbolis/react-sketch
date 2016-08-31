@@ -48,7 +48,11 @@ var config = {
         new OccurenceOrderPlugin(),
         new AggressiveMergingPlugin(),
         new IgnorePlugin(new RegExp('^(fs|ipc)$')),
-        new DefinePlugin({'process.env.NODE_ENV': '"production"'}),
+        new DefinePlugin({
+            'process.env': {
+                'NODE_ENV': '"production"'
+            }
+        }),
         new HotModuleReplacementPlugin(),
         new NoErrorsPlugin(),
         new HtmlWebpackPlugin({

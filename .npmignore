@@ -3,6 +3,11 @@ test/
 src/
 docs/
 .travis.yml
+.babelrc
+.eslint
+.gitignore
+.karma.config.js
+webpack.*
 
 
 ### Linux template

@@ -67,6 +67,10 @@ module.exports = {
         new OccurenceOrderPlugin(),
         new AggressiveMergingPlugin(),
         new IgnorePlugin(new RegExp('^(fs|ipc)$')),
-        new DefinePlugin({'process.env.NODE_ENV': '"production"'})
+        new DefinePlugin({
+            'process.env': {
+                'NODE_ENV': '"production"'
+            }
+        })
     ]
 };

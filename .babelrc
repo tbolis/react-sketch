@@ -4,13 +4,6 @@
 		"react",
 		"stage-0"
 	],
-	"env": {
-		"development": {
-			"presets": [
-				"react-hmre"
-			]
-		}
-	},
 	"plugins": [
         "transform-runtime",
         "transform-object-assign",

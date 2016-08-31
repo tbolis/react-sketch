@@ -63,7 +63,7 @@ const config = {
                 test: /\.(js|jsx)$/,
                 include: [srcPath, examplesPath],
                 exclude: /(node_modules|bower_components|lib)/,
-                loaders: ['babel']
+                loaders: ['react-hot', 'babel']
             }
         ]
     },
@@ -79,7 +79,11 @@ const config = {
             filename: 'index.html',
             chunks: ['examples']
         }),
-        new DefinePlugin({'process.env.NODE_ENV': '"development"'}),
+        new DefinePlugin({
+            'process.env': {
+                'NODE_ENV': '"development"'
+            }
+        }),
         new OpenBrowserPlugin({url: 'http://' + host + ':' + port})
     ]
 };
