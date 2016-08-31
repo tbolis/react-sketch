@@ -3,7 +3,7 @@ before_install:
   - sudo apt-get install -y npm nodejs
   - if [[ `npm -v` != 3* ]]; then npm i -g npm@3; fi
   - sudo apt-get install -y libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++
-  - sudo npm install canvas
+  - npm install canvas
 
 language: node_js
 node_js:
