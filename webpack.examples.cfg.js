@@ -29,7 +29,7 @@ var config = {
     },
     debug: false,
     cache: true,
-    devtool: 'sourcemap',
+    devtool: 'inline-source-map',
     module: {
         loaders: [
             {test: /\.html$/, loader: 'html-loader', include: [examplesPath], exclude: /base\.html$/},

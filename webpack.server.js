@@ -39,6 +39,7 @@ const config = {
     },
     debug: true,
     cache: true,
+    devtool: 'inline-source-map',
     devServer: {
         historyApiFallback: true,
         stats: {colors: true},

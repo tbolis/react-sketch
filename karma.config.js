@@ -51,6 +51,7 @@ module.exports = function (config) {
                 ]
             },
             debug: false,
+            devtool: 'inline-source-map',
             stats: {
                 colors: true,
                 reasons: true
