@@ -34,7 +34,6 @@ module.exports = function (config) {
             modulesDirectories: [
                 'node_modules'
             ],
-            devtool: 'inline-source-map',
             resolve: {
                 extensions: ['', '.js', '.jsx'],
                 alias: {
