@@ -1,6 +1,7 @@
 # react-sketch
 
 [![GitHub release][github-image]][github-url]
+[![NPM release][npm-image]][npm-url]
 [![NPM downloads][downloads-image]][downloads-url]
 [![Build status][travis-image]][travis-url]
 
@@ -92,9 +93,9 @@ MIT, do remember to add a reference if you find it useful :)
 [warning-image]: /docs/img/warning.png
 [github-image]: https://img.shields.io/github/release/tbolis/react-sketch.svg
 [github-url]: https://github.com/tbolis/react-sketch/releases
-[npm-image]: https://img.shields.io/npm/v/react-sketch.svg?style=flat
+[npm-image]: https://img.shields.io/npm/v/react-sketch.svg
 [npm-url]: https://www.npmjs.com/package/react-sketch
-[downloads-image]: https://img.shields.io/npm/dm/react-sketch.svg?style=flat
+[downloads-image]: https://img.shields.io/npm/dm/react-sketch.svg
 [downloads-url]: https://www.npmjs.com/package/react-sketch
-[travis-image]: https://img.shields.io/travis/tbolis/react-sketch.svg?style=flat
+[travis-image]: https://img.shields.io/travis/tbolis/react-sketch.svg
 [travis-url]: https://travis-ci.org/tbolis/react-sketch
