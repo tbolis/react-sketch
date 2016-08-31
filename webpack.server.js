@@ -5,20 +5,22 @@ require('core-js/fn/object/assign');
 
 const path = require('path');
 const webpack = require('webpack');
-const WebpackDevServer = require('webpack-dev-server');
 const myLocalIP = require('my-local-ip');
+const WebpackDevServer = require('webpack-dev-server');
+
+const DefinePlugin = require('webpack/lib/DefinePlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const NoErrorsPlugin = require('webpack/lib/NoErrorsPlugin');
+const OpenBrowserPlugin = require('open-browser-webpack-plugin');
 const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlugin');
 
 const srcPath = path.join(__dirname, 'src');
 const examplesPath = path.join(__dirname, 'examples');
 
-const OpenBrowserPlugin = require('open-browser-webpack-plugin');
-
 const port = 23000;
 const host = myLocalIP();
-var config = {
+
+const config = {
     port: port,
     entry: {
         examples: [
@@ -37,7 +39,7 @@ var config = {
     },
     debug: true,
     cache: true,
-    devtool: 'eval',
+    devtool: 'inline-source-map',
     devServer: {
         historyApiFallback: true,
         stats: {colors: true},
@@ -51,7 +53,7 @@ var config = {
             {
                 test: /\.(js|jsx)$/,
                 include: [srcPath],
-                exclude: /(node_modules|bower_components)/,
+                exclude: /(node_modules|bower_components|lib)/,
                 loader: 'eslint-loader'
             }
         ],
@@ -60,8 +62,8 @@ var config = {
             {
                 test: /\.(js|jsx)$/,
                 include: [srcPath, examplesPath],
-                exclude: /(node_modules|bower_components)/,
-                loaders: ['react-hot', 'babel']
+                exclude: /(node_modules|bower_components|lib)/,
+                loaders: ['babel']
             }
         ]
     },
@@ -77,15 +79,16 @@ var config = {
             filename: 'index.html',
             chunks: ['examples']
         }),
-        new OpenBrowserPlugin({url: 'http://localhost:' + port})
+        new DefinePlugin({'process.env.NODE_ENV': '"development"'}),
+        new OpenBrowserPlugin({url: 'http://' + host + ':' + port})
     ]
 };
 
 new WebpackDevServer(webpack(config), config.devServer)
-    .listen(config.port, '0.0.0.0', function (err) {
+    .listen(config.port, host, function (err) {
             if (err) {
                 console.log(err);
             }
-            console.log('Serving from http://localhost:' + config.port);
+        console.log('Serving from http://' + host + ':' + port);
         }
     );

@@ -34,7 +34,6 @@ module.exports = function (config) {
             modulesDirectories: [
                 'node_modules'
             ],
-            devtool: 'inline-source-map',
             resolve: {
                 extensions: ['', '.js', '.jsx'],
                 alias: {
@@ -52,6 +51,7 @@ module.exports = function (config) {
                 ]
             },
             debug: false,
+            devtool: 'inline-source-map',
             stats: {
                 colors: true,
                 reasons: true

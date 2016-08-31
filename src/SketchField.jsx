@@ -91,7 +91,12 @@ class SketchField extends Component {
             defaultData,
             defaultDataType} = this.props;
 
-        let canvas = this._fc = new fabric.Canvas(this._canvas.id);
+        let canvas = this._fc = new fabric.Canvas(this._canvas.id/*, {
+            preserveObjectStacking: false,
+            renderOnAddRemove: false,
+            skipTargetFind: true
+        }*/);
+
         this._initTools(canvas);
 
         let selectedTool = this._tools[tool];
