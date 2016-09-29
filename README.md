@@ -60,7 +60,7 @@ Configuration Options
 | undoSteps         | Number                | 15            | number of undo/redo steps to maintain                             |
 | imageFormat       | String                | png           | image format when calling toDataURL, can be png or jpeg           | 
 | width             | Number                | No Value(null)| Set/control the canvas width, if left empty the sketch will scale to parent element |
-| height            | Number                | No Value(null)| Set/control the canvas height, if left empty the sketch will scale to parent element |
+| height            | Number                | 512 | Set/control the canvas height, if left empty the sketch will take a reasonable default height |
 | defaultData       | JSON or data URL      |               | Default initial data, can be json or URL data accroding to configuration option below, in the case of data URL the initial drawing will be improted as an image |
 | defaultDataType   | Enumeration (string)  | json          | The Type of initial data, can be either json or url               | 
 
