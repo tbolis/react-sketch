@@ -8,7 +8,7 @@ import 'flexboxgrid';
 import './main.css';
 
 import {
-    Card,CardText,CardTitle,
+    Card,CardText,CardTitle,CardHeader,
     Drawer,
     AppBar,GridList,GridTile,
     Slider, Toggle, MenuItem,
@@ -89,7 +89,7 @@ class SketchFieldDemo extends React.Component {
         this._selectTool = this._selectTool.bind(this);
         this._onSketchChange = this._onSketchChange.bind(this);
 
-        this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+        //this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
 
     }
 
@@ -103,7 +103,11 @@ class SketchFieldDemo extends React.Component {
         fillWithColor: false,
         drawings: [],
         canUndo: false,
-        canRedo: false
+        canRedo: false,
+        controlledSize: false,
+        sketchWidth: 600,
+        sketchHeight: 600,
+        defaultSketchHeight: 760
     };
 
     componentDidMount() {
@@ -271,8 +275,8 @@ class SketchFieldDemo extends React.Component {
                                     lineColor={this.state.lineColor}
                                     lineWidth={this.state.lineWidth}
                                     fillColor={this.state.fillWithColor ? this.state.fillColor : 'transparent'}
-                                    scaleOnResize={true}
-                                    height={760}
+                                    width={this.state.controlledSize?this.state.sketchWidth:null}
+                                    height={this.state.controlledSize?this.state.sketchHeight:this.state.defaultSketchHeight}
                                     defaultData={dataJson}
                                     defaultDataType="json"
                                     onChange={this._onSketchChange}
@@ -282,8 +286,8 @@ class SketchFieldDemo extends React.Component {
                         </div>
                         <div className='col-xs-5 col-sm-5 col-md-3 col-lg-3'>
                             <Card style={{margin:'10px 10px 5px 0'}}>
-                                <CardTitle title='Tools'/>
-                                <CardText>
+                                <CardHeader title='Tools' actAsExpander={true} showExpandableButton={true}/>
+                                <CardText expandable={true}>
                                     <label htmlFor='tool'>Canvas Tool</label><br/>
                                     <SelectField ref='tool' value={this.state.tool} onChange={this._selectTool}>
                                         <MenuItem value={Tools.Select} primaryText="Select"/>
@@ -312,12 +316,30 @@ class SketchFieldDemo extends React.Component {
                                             onTouchTap={(e) => this._sketch.zoom(0.8)}>
                                             <ZoomOutIcon />
                                         </IconButton>
+                                        <br/>
+                                        <br/>
+                                        <Toggle label="Control size"
+                                                defaultToggled={this.state.controlledSize}
+                                                onToggle={(e) => this.setState({controlledSize:!this.state.controlledSize})}/>
+                                        <br/>
+                                        <label htmlFor='xSize'>Change Canvas Width</label>
+                                        <Slider ref='xSize' step={1}
+                                                min={10} max={1000}
+                                                defaultValue={this.state.sketchWidth}
+                                                onChange={(e, v) => this.setState({sketchWidth:v})}/>
+                                        <br/>
+                                        <label htmlFor='ySize'>Change Canvas Height</label>
+                                        <Slider ref='ySize' step={1}
+                                                min={10} max={1000}
+                                                defaultValue={this.state.sketchHeight}
+                                                onChange={(e, v) => this.setState({sketchHeight:v})}/>
+                                        <br/>
                                     </div>
                                 </CardText>
                             </Card>
-                            <Card style={{margin:'5px 10px 5px 0'}}>
-                                <CardTitle title='Colors'/>
-                                <CardText>
+                            <Card initiallyExpanded={true} style={{margin:'5px 10px 5px 0'}}>
+                                <CardHeader title='Colors' actAsExpander={true} showExpandableButton={true}/>
+                                <CardText expandable={true}>
                                     <label htmlFor='lineColor'>Line</label>
                                     <CompactPicker
                                         id='lineColor' color={this.state.lineColor}
