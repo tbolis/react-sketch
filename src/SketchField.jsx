@@ -37,8 +37,6 @@ class SketchField extends Component {
         tool: PropTypes.string,
         // image format when calling toDataURL
         imageFormat: PropTypes.string,
-        // Scale the drawing when we resize the canvas
-        scaleOnResize: PropTypes.bool,
         // Default initial data
         defaultData: PropTypes.object,
         // Type of initial data
@@ -50,8 +48,7 @@ class SketchField extends Component {
         lineWidth: 10,
         fillColor: 'transparent',
         opacity: 1.0,
-        undoSteps: 15,
-        scaleOnResize: true,
+        undoSteps: 25,
         tool: Tool.Pencil,
         defaultDataType: 'json'
     };
@@ -86,16 +83,18 @@ class SketchField extends Component {
     };
 
     componentDidMount() {
+        this._domNode = ReactDOM.findDOMNode(this);
+
         let {tool,
             undoSteps,
             defaultData,
             defaultDataType} = this.props;
 
         let canvas = this._fc = new fabric.Canvas(this._canvas.id/*, {
-            preserveObjectStacking: false,
-            renderOnAddRemove: false,
-            skipTargetFind: true
-        }*/);
+         preserveObjectStacking: false,
+         renderOnAddRemove: false,
+         skipTargetFind: true
+         }*/);
 
         this._initTools(canvas);
 
@@ -148,8 +147,11 @@ class SketchField extends Component {
         window.removeEventListener('resize', this._resize);
     }
 
-    componentWillUpdate(nextProps, nextState) {
-        if (this.state.parentWidth !== nextState.parentWidth) {
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.parentWidth !== prevState.parentWidth
+            || this.props.width !== prevProps.width
+            || this.props.height !== prevProps.height) {
+
             this._resize();
         }
     }
@@ -253,13 +255,9 @@ class SketchField extends Component {
      * @private
      */
     _resize(e) {
-        if (e) {
-            e.preventDefault()
-        }
-        // if disabled then do not perform the resize
-        if (!this.props.scaleOnResize) return;
+        if (e) e.preventDefault();
         let canvas = this._fc;
-        let domNode = ReactDOM.findDOMNode(this);
+        let domNode = this._domNode;
         let {offsetWidth,clientHeight} = domNode;
         let prevWidth = canvas.getWidth();
         let prevHeight = canvas.getHeight();
@@ -475,13 +473,16 @@ class SketchField extends Component {
             height,
             ...other
             } = this.props;
+
+        let canvasDivStyle = Object.assign({}, style ? style : {}, width ? {width: width} : {}, height ? {height: height} : {height: 512});
+
         return (
-            <div className={className} style={style}>
+            <div
+                className={className}
+                style={canvasDivStyle}>
                 <canvas
                     id={uuid4()}
-                    height={height || 512}
-                    ref={(c) => this._canvas = c}
-                    width={width || 512}>
+                    ref={(c) => this._canvas = c}>
                     Sorry, Canvas HTML5 element is not supported by your browser :(
                 </canvas>
             </div>
