@@ -63,7 +63,7 @@ const config = {
                 test: /\.(js|jsx)$/,
                 include: [srcPath, examplesPath],
                 exclude: /(node_modules|bower_components|lib)/,
-                loaders: ['react-hot', 'babel']
+                loaders: ['babel']
             }
         ]
     },

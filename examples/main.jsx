@@ -106,8 +106,7 @@ class SketchFieldDemo extends React.Component {
         canRedo: false,
         controlledSize: false,
         sketchWidth: 600,
-        sketchHeight: 600,
-        defaultSketchHeight: 760
+        sketchHeight: 600
     };
 
     componentDidMount() {
@@ -267,22 +266,20 @@ class SketchFieldDemo extends React.Component {
                         <div className='col-xs-7 col-sm-7 col-md-9 col-lg-9'>
 
                             {/* Sketch area */}
-                            <div style={{padding:'3px'}}>
-                                <SketchField
-                                    name='sketch'
-                                    className='canvas-area'
-                                    ref={(c) => this._sketch = c}
-                                    lineColor={this.state.lineColor}
-                                    lineWidth={this.state.lineWidth}
-                                    fillColor={this.state.fillWithColor ? this.state.fillColor : 'transparent'}
-                                    width={this.state.controlledSize?this.state.sketchWidth:null}
-                                    height={this.state.controlledSize?this.state.sketchHeight:this.state.defaultSketchHeight}
-                                    defaultData={dataJson}
-                                    defaultDataType="json"
-                                    onChange={this._onSketchChange}
-                                    tool={this.state.tool}
-                                />
-                            </div>
+                            <SketchField
+                                name='sketch'
+                                className='canvas-area'
+                                ref={(c) => this._sketch = c}
+                                lineColor={this.state.lineColor}
+                                lineWidth={this.state.lineWidth}
+                                fillColor={this.state.fillWithColor ? this.state.fillColor : 'transparent'}
+                                width={this.state.controlledSize?this.state.sketchWidth:null}
+                                height={this.state.controlledSize?this.state.sketchHeight:null}
+                                defaultData={dataJson}
+                                defaultDataType="json"
+                                onChange={this._onSketchChange}
+                                tool={this.state.tool}
+                            />
                         </div>
                         <div className='col-xs-5 col-sm-5 col-md-3 col-lg-3'>
                             <Card style={{margin:'10px 10px 5px 0'}}>
