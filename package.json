@@ -1,6 +1,6 @@
 {
   "name": "react-sketch",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "description": "Sketch Element for React based applications, backed-up by fabricjs as its core",
   "keywords": [
     "react",

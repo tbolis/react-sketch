@@ -83,8 +83,6 @@ class SketchField extends Component {
     };
 
     componentDidMount() {
-        this._domNode = ReactDOM.findDOMNode(this);
-
         let {tool,
             undoSteps,
             defaultData,
@@ -257,7 +255,7 @@ class SketchField extends Component {
     _resize(e) {
         if (e) e.preventDefault();
         let canvas = this._fc;
-        let domNode = this._domNode;
+        let domNode = ReactDOM.findDOMNode(this);
         let {offsetWidth,clientHeight} = domNode;
         let prevWidth = canvas.getWidth();
         let prevHeight = canvas.getHeight();
