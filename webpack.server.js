@@ -10,8 +10,8 @@ const WebpackDevServer = require('webpack-dev-server');
 
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const NoErrorsPlugin = require('webpack/lib/NoErrorsPlugin');
 const OpenBrowserPlugin = require('open-browser-webpack-plugin');
+const NoEmitOnErrorsPlugin = require('webpack/lib/NoEmitOnErrorsPlugin');
 const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlugin');
 
 const srcPath = path.join(__dirname, 'src');
@@ -21,7 +21,6 @@ const port = 23000;
 const host = myLocalIP();
 
 const config = {
-    port: port,
     entry: {
         examples: [
             'webpack-dev-server/client?http://' + host + ':' + port,
@@ -35,9 +34,8 @@ const config = {
         publicPath: '/'
     },
     resolve: {
-        extensions: ['', '.js', '.jsx']
+        extensions: ['.js', '.jsx']
     },
-    debug: true,
     cache: true,
     devtool: 'inline-source-map',
     devServer: {
@@ -49,27 +47,19 @@ const config = {
         hot: true
     },
     module: {
-        preLoaders: [
-            {
-                test: /\.(js|jsx)$/,
-                include: [srcPath],
-                exclude: /(node_modules|bower_components|lib)/,
-                loader: 'eslint-loader'
-            }
-        ],
         loaders: [
             {test: /\.css$/, loader: 'style-loader!css-loader'},
             {
                 test: /\.(js|jsx)$/,
                 include: [srcPath, examplesPath],
                 exclude: /(node_modules|bower_components|lib)/,
-                loaders: ['babel']
+                loaders: ['babel-loader']
             }
         ]
     },
     plugins: [
         new HotModuleReplacementPlugin(),
-        new NoErrorsPlugin(),
+        new NoEmitOnErrorsPlugin(),
         new HtmlWebpackPlugin({
             title: 'React Sketch',
             description: 'Sketch Element for React based applications, backed-up by fabricjs as its core',
@@ -89,7 +79,7 @@ const config = {
 };
 
 new WebpackDevServer(webpack(config), config.devServer)
-    .listen(config.port, host, function (err) {
+    .listen(port, host, function (err) {
             if (err) {
                 console.log(err);
             }

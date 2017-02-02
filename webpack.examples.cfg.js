@@ -7,10 +7,9 @@ const examplesPath = path.join(__dirname, 'examples');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const IgnorePlugin = require('webpack/lib/IgnorePlugin');
 const DefinePlugin = require('webpack/lib/DefinePlugin');
-const NoErrorsPlugin = require('webpack/lib/NoErrorsPlugin');
-const DedupePlugin = require('webpack/lib/optimize/DedupePlugin');
 const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
-const OccurenceOrderPlugin = require('webpack/lib/optimize/OccurenceOrderPlugin');
+const NoEmitOnErrorsPlugin = require('webpack/lib/NoEmitOnErrorsPlugin');
+const OccurrenceOrderPlugin = require('webpack/lib/optimize/OccurrenceOrderPlugin');
 const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlugin');
 const AggressiveMergingPlugin = require('webpack/lib/optimize/AggressiveMergingPlugin');
 
@@ -25,9 +24,8 @@ var config = {
         publicPath: ''
     },
     resolve: {
-        extensions: ['', '.js', '.jsx']
+        extensions: ['.js', '.jsx']
     },
-    debug: false,
     cache: true,
     devtool: 'source-map',
     module: {
@@ -38,14 +36,13 @@ var config = {
                 test: /\.(js|jsx)$/,
                 include: [srcPath, examplesPath],
                 exclude: /(node_modules|bower_components|lib)/,
-                loaders: ['babel']
+                loaders: ['babel-loader']
             }
         ]
     },
     plugins: [
-        new DedupePlugin(),
         new UglifyJsPlugin(),
-        new OccurenceOrderPlugin(),
+        new OccurrenceOrderPlugin(),
         new AggressiveMergingPlugin(),
         new IgnorePlugin(new RegExp('^(fs|ipc)$')),
         new DefinePlugin({
@@ -54,7 +51,7 @@ var config = {
             }
         }),
         new HotModuleReplacementPlugin(),
-        new NoErrorsPlugin(),
+        new NoEmitOnErrorsPlugin(),
         new HtmlWebpackPlugin({
             title: 'React Sketch',
             description: 'Sketch Element for React based applications, backed-up by fabricjs as its core',

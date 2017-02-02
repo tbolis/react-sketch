@@ -4,10 +4,9 @@ var path = require('path');
 
 const IgnorePlugin = require('webpack/lib/IgnorePlugin');
 const DefinePlugin = require('webpack/lib/DefinePlugin');
-const NoErrorsPlugin = require('webpack/lib/NoErrorsPlugin');
-const DedupePlugin = require('webpack/lib/optimize/DedupePlugin');
 const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
-const OccurenceOrderPlugin = require('webpack/lib/optimize/OccurenceOrderPlugin');
+const NoEmitOnErrorsPlugin = require('webpack/lib/NoEmitOnErrorsPlugin');
+const OccurrenceOrderPlugin = require('webpack/lib/optimize/OccurrenceOrderPlugin');
 const AggressiveMergingPlugin = require('webpack/lib/optimize/AggressiveMergingPlugin');
 
 const srcPath = path.join(__dirname, 'src');
@@ -42,9 +41,8 @@ module.exports = {
     //externals: [/^(?!fabric|canvas|base64-js|ieee754|isarray|jsdom|xmldom)[a-z\-0-9]+$/],
     externals: explicitExternals.concat(externals),
     resolve: {
-        extensions: ['', '.js', '.jsx']
+        extensions: ['.js', '.jsx']
     },
-    debug: false,
     cache: true,
     module: {
         loaders: [
@@ -52,19 +50,18 @@ module.exports = {
                 test: /\.(js|jsx)$/,
                 include: [srcPath],
                 exclude: /(node_modules|bower_components|lib)/,
-                loaders: ['babel']
+                loaders: ['babel-loader']
             }
         ]
     },
     plugins: [
-        new DedupePlugin(),
         new UglifyJsPlugin({
             compress: {
                 warnings: false
             }
         }),
-        new NoErrorsPlugin(),
-        new OccurenceOrderPlugin(),
+        new NoEmitOnErrorsPlugin(),
+        new OccurrenceOrderPlugin(),
         new AggressiveMergingPlugin(),
         new IgnorePlugin(new RegExp('^(fs|ipc)$')),
         new DefinePlugin({
