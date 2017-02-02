@@ -1,9 +1,11 @@
 ## Changelog
 
+* **0.2.13** Maintenance release
+    - Upgrading packages
+    - performing required changes for webpack v2.x
 * **0.2.7** New Functionality and bug fixes
     - Zoom In/Out functionality of drawing
     - Upgrading to latest package versions
-    
 * **0.2.6** Bug fixes and performance improvements
 * **0.2.5** Upgrading to latest libraries and bug fixes
     - Major

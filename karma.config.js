@@ -31,11 +31,8 @@ module.exports = function (config) {
             node: {
                 fs: 'empty'
             },
-            modulesDirectories: [
-                'node_modules'
-            ],
             resolve: {
-                extensions: ['', '.js', '.jsx'],
+                extensions: ['.js', '.jsx'],
                 alias: {
                     'react-sketch': srcPath
                 }
@@ -46,17 +43,15 @@ module.exports = function (config) {
                         test: /\.(js|jsx)$/,
                         include: [srcPath, testPath],
                         exclude: /(node_modules|bower_components|examples)/,
-                        loaders: ['babel']
+                        loaders: ['babel-loader']
                     }
                 ]
             },
-            debug: false,
             devtool: 'inline-source-map',
             stats: {
                 colors: true,
                 reasons: true
-            },
-            progress: true
+            }
         },
         webpackServer: {
             noInfo: true
