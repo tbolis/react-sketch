@@ -23,7 +23,7 @@ describe('History', () => {
         let instance = new History();
         expect(instance.canUndo()).to.be.false;
         instance.keep('1');
-        expect(instance.canUndo()).to.be.false;
+        expect(instance.canUndo()).to.be.true;
         instance.keep('2');
         expect(instance.canUndo()).to.be.true;
     });
