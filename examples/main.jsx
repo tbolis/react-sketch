@@ -3,22 +3,24 @@
 
 import React from 'react';
 import {CompactPicker} from 'react-color';
-
 import 'flexboxgrid';
 import './main.css';
-
 import {
-    Card,CardText,CardTitle,CardHeader,
-    Drawer,
-    AppBar,GridList,GridTile,
-    Slider, Toggle, MenuItem,
-    SelectField, IconButton,
+    AppBar,
+    Card,
+    CardText,
+    CardHeader,
+    IconButton,
+    GridList,
+    GridTile,
+    MenuItem,
+    Slider,
+    SelectField,
+    Toggle,
     ToolbarSeparator
 } from 'material-ui';
-
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-
 import UndoIcon from 'material-ui/svg-icons/content/undo';
 import RedoIcon from 'material-ui/svg-icons/content/redo';
 import ClearIcon from 'material-ui/svg-icons/action/delete';
@@ -27,10 +29,7 @@ import RemoveIcon from 'material-ui/svg-icons/content/clear';
 import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 import ZoomInIcon from 'material-ui/svg-icons/action/zoom-in';
 import ZoomOutIcon from 'material-ui/svg-icons/action/zoom-out';
-
-import dataJson from './data.json'
-import dataUrl from './data.url'
-
+import dataJson from './data.json';
 import {SketchField, Tools} from '../src';
 
 const styles = {
@@ -52,6 +51,10 @@ const styles = {
     appBar: {
         backgroundColor: '#333'
     },
+    radioButton: {
+        marginTop: '3px',
+        marginBottom: '3px'
+    },
     separator: {
         height: '42px',
         backgroundColor: 'white'
@@ -72,8 +75,6 @@ function eventFire(el, etype) {
         el.dispatchEvent(evObj);
     }
 }
-
-import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 class SketchFieldDemo extends React.Component {
     constructor(params) {
@@ -97,10 +98,12 @@ class SketchFieldDemo extends React.Component {
         lineColor: 'black',
         lineWidth: 10,
         fillColor: '#68CCCA',
+        backgroundColor: 'transparent',
         shadowWidth: 0,
         shadowOffset: 0,
         tool: Tools.Pencil,
         fillWithColor: false,
+        fillWithBackgroundColor: false,
         drawings: [],
         canUndo: false,
         canRedo: false,
@@ -175,7 +178,8 @@ class SketchFieldDemo extends React.Component {
                 titlePosition="top"
                 titleBackground="linear-gradient(to bottom, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
                 cols={1} rows={1} style={styles.gridTile}
-                actionIcon={<IconButton onTouchTap={(c) => this._removeMe(index)}><RemoveIcon color="white"/></IconButton>}>
+                actionIcon={<IconButton onTouchTap={(c) => this._removeMe(index)}><RemoveIcon
+                    color="white"/></IconButton>}>
                 <img src={drawing}/>
             </GridTile>
         );
@@ -217,9 +221,7 @@ class SketchFieldDemo extends React.Component {
 
     render() {
         return (
-
             <MuiThemeProvider muiTheme={getMuiTheme()}>
-
                 <div>
 
                     {/* Application Bar with tools */}
@@ -273,8 +275,9 @@ class SketchFieldDemo extends React.Component {
                                 lineColor={this.state.lineColor}
                                 lineWidth={this.state.lineWidth}
                                 fillColor={this.state.fillWithColor ? this.state.fillColor : 'transparent'}
-                                width={this.state.controlledSize?this.state.sketchWidth:null}
-                                height={this.state.controlledSize?this.state.sketchHeight:null}
+                                backgroundColor={this.state.fillWithBackgroundColor ? this.state.backgroundColor : 'transparent'}
+                                width={this.state.controlledSize ? this.state.sketchWidth : null}
+                                height={this.state.controlledSize ? this.state.sketchHeight : null}
                                 defaultData={dataJson}
                                 defaultDataType="json"
                                 onChange={this._onSketchChange}
@@ -282,7 +285,7 @@ class SketchFieldDemo extends React.Component {
                             />
                         </div>
                         <div className='col-xs-5 col-sm-5 col-md-3 col-lg-3'>
-                            <Card style={{margin:'10px 10px 5px 0'}}>
+                            <Card style={{margin: '10px 10px 5px 0'}}>
                                 <CardHeader title='Tools' actAsExpander={true} showExpandableButton={true}/>
                                 <CardText expandable={true}>
                                     <label htmlFor='tool'>Canvas Tool</label><br/>
@@ -298,8 +301,8 @@ class SketchFieldDemo extends React.Component {
                                     <br/>
                                     <label htmlFor='slider'>Line Weight</label>
                                     <Slider ref='slider' step={0.1}
-                                            defaultValue={this.state.lineWidth/100}
-                                            onChange={(e, v) => this.setState({lineWidth:v*100})}/>
+                                            defaultValue={this.state.lineWidth / 100}
+                                            onChange={(e, v) => this.setState({lineWidth: v * 100})}/>
                                     <br/>
                                     <label htmlFor='zoom'>Zoom</label>
                                     <div>
@@ -317,38 +320,49 @@ class SketchFieldDemo extends React.Component {
                                         <br/>
                                         <Toggle label="Control size"
                                                 defaultToggled={this.state.controlledSize}
-                                                onToggle={(e) => this.setState({controlledSize:!this.state.controlledSize})}/>
+                                                onToggle={(e) => this.setState({controlledSize: !this.state.controlledSize})}/>
                                         <br/>
                                         <label htmlFor='xSize'>Change Canvas Width</label>
                                         <Slider ref='xSize' step={1}
                                                 min={10} max={1000}
                                                 defaultValue={this.state.sketchWidth}
-                                                onChange={(e, v) => this.setState({sketchWidth:v})}/>
+                                                onChange={(e, v) => this.setState({sketchWidth: v})}/>
                                         <br/>
                                         <label htmlFor='ySize'>Change Canvas Height</label>
                                         <Slider ref='ySize' step={1}
                                                 min={10} max={1000}
                                                 defaultValue={this.state.sketchHeight}
-                                                onChange={(e, v) => this.setState({sketchHeight:v})}/>
+                                                onChange={(e, v) => this.setState({sketchHeight: v})}/>
                                         <br/>
                                     </div>
                                 </CardText>
                             </Card>
-                            <Card initiallyExpanded={true} style={{margin:'5px 10px 5px 0'}}>
+                            <Card style={{margin: '5px 10px 5px 0'}}>
                                 <CardHeader title='Colors' actAsExpander={true} showExpandableButton={true}/>
                                 <CardText expandable={true}>
                                     <label htmlFor='lineColor'>Line</label>
                                     <CompactPicker
                                         id='lineColor' color={this.state.lineColor}
-                                        onChange={(color) => this.setState({lineColor:color.hex})}/>
+                                        onChange={(color) => this.setState({lineColor: color.hex})}/>
                                     <br/>
                                     <br/>
                                     <Toggle label="Fill"
                                             defaultToggled={this.state.fillWithColor}
-                                            onToggle={(e) => this.setState({fillWithColor:!this.state.fillWithColor})}/>
+                                            onToggle={(e) => this.setState({fillWithColor: !this.state.fillWithColor})}/>
                                     <CompactPicker
                                         color={this.state.fillColor}
-                                        onChange={(color) => this.setState({fillColor:color.hex})}/>
+                                        onChange={(color) => this.setState({fillColor: color.hex})}/>
+                                </CardText>
+                            </Card>
+                            <Card style={{margin: '5px 10px 5px 0'}}>
+                                <CardHeader title='Background' actAsExpander={true} showExpandableButton={true}/>
+                                <CardText expandable={true}>
+                                    <Toggle label="Background Color"
+                                            defaultToggled={this.state.fillWithBackgroundColor}
+                                            onToggle={(e) => this.setState({fillWithBackgroundColor: !this.state.fillWithBackgroundColor})}/>
+                                    <CompactPicker
+                                        color={this.state.backgroundColor}
+                                        onChange={(color) => this.setState({backgroundColor: color.hex})}/>
                                 </CardText>
                             </Card>
                         </div>

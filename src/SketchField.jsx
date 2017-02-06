@@ -2,18 +2,16 @@
 'use strict';
 
 import ReactDOM from 'react-dom';
-import React, {Component,PropTypes} from 'react';
+import React, {Component, PropTypes} from 'react';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-
 import History from './history';
 import {uuid4} from './utils';
-
-import Select from './select'
-import Pencil from './pencil'
-import Line from './line'
-import Rectangle from './rectangle'
-import Circle from './circle'
-import Tool from './tools'
+import Select from './select';
+import Pencil from './pencil';
+import Line from './line';
+import Rectangle from './rectangle';
+import Circle from './circle';
+import Tool from './tools';
 
 const fabric = require('fabric').fabric;
 
@@ -29,6 +27,8 @@ class SketchField extends Component {
         lineWidth: PropTypes.number,
         // the fill color of the shape when applicable
         fillColor: PropTypes.string,
+        // the background color of the sketch
+        backgroundColor: PropTypes.string,
         // the opacity of the object
         opacity: PropTypes.number,
         // number of undo/redo steps to maintain
@@ -47,6 +47,7 @@ class SketchField extends Component {
         lineColor: 'black',
         lineWidth: 10,
         fillColor: 'transparent',
+        backgroundColor: 'transparent',
         opacity: 1.0,
         undoSteps: 25,
         tool: Tool.Pencil,
@@ -55,14 +56,15 @@ class SketchField extends Component {
 
     constructor(props, context) {
         super(props, context);
-        // Internal functions
+        // internal functions
         this._resize = this._resize.bind(this);
         this._initTools = this._initTools.bind(this);
+        this._backgroundColor = this._backgroundColor.bind(this);
         // exposed
         this.zoom = this.zoom.bind(this);
         this.enableTouchScroll = this.enableTouchScroll.bind(this);
         this.disableTouchScroll = this.disableTouchScroll.bind(this);
-        //events
+        // events
         this._onMouseUp = this._onMouseUp.bind(this);
         this._onMouseOut = this._onMouseOut.bind(this);
         this._onMouseDown = this._onMouseDown.bind(this);
@@ -83,10 +85,12 @@ class SketchField extends Component {
     };
 
     componentDidMount() {
-        let {tool,
+        let {
+            tool,
             undoSteps,
             defaultData,
-            defaultDataType} = this.props;
+            defaultDataType
+        } = this.props;
 
         let canvas = this._fc = new fabric.Canvas(this._canvas.id/*, {
          preserveObjectStacking: false,
@@ -159,6 +163,9 @@ class SketchField extends Component {
             this._selectedTool = this._tools[nextProps.tool] || this._tools[Tool.Pencil];
         }
         this._selectedTool.configureCanvas(nextProps);
+        if (this.props.backgroundColor !== nextProps.backgroundColor) {
+            this._backgroundColor(nextProps.backgroundColor)
+        }
     }
 
     /**
@@ -256,7 +263,7 @@ class SketchField extends Component {
         if (e) e.preventDefault();
         let canvas = this._fc;
         let domNode = ReactDOM.findDOMNode(this);
-        let {offsetWidth,clientHeight} = domNode;
+        let {offsetWidth, clientHeight} = domNode;
         let prevWidth = canvas.getWidth();
         let prevHeight = canvas.getHeight();
         let wfactor = (offsetWidth / prevWidth).toFixed(2);
@@ -292,6 +299,17 @@ class SketchField extends Component {
         canvas.renderAll();
         canvas.calcOffset();
     }
+
+    /**
+     * Sets the background color for this sketch
+     * @param color in rgba or hex format
+     */
+    _backgroundColor(color) {
+        if (!color) return;
+        let canvas = this._fc;
+        canvas.setBackgroundColor(color, () => canvas.renderAll());
+    }
+
 
     /**
      * Zoom the drawing by the factor specified
@@ -435,26 +453,6 @@ class SketchField extends Component {
     }
 
     /**
-     * This method will create an image and load the given url data
-     *
-     * @param data URL data to load as image
-     * @param options options to be applied to image <optional>
-     */
-    fromDataURL(data, options = {}) {
-        if (!data) return;
-        let canvas = this._fc;
-        let img = new Image();
-        img.src = data;
-        img.onload = () => {
-            canvas.add(new fabric.Image(img, options));
-            canvas.renderAll();
-        };
-        if (this.props.onChange) {
-            this.props.onChange();
-        }
-    }
-
-    /**
      * Clear the content of the canvas, this will also keep the last version of it to history
      */
     clear() {
@@ -470,7 +468,7 @@ class SketchField extends Component {
             width,
             height,
             ...other
-            } = this.props;
+        } = this.props;
 
         let canvasDivStyle = Object.assign({}, style ? style : {}, width ? {width: width} : {}, height ? {height: height} : {height: 512});
 

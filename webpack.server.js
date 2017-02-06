@@ -1,16 +1,14 @@
 /*global __dirname*/
 /*eslint no-console:0 */
 
-require('core-js/fn/object/assign');
-
 const path = require('path');
 const webpack = require('webpack');
 const myLocalIP = require('my-local-ip');
 const WebpackDevServer = require('webpack-dev-server');
-
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const OpenBrowserPlugin = require('open-browser-webpack-plugin');
+const NamedModulesPlugin = require('webpack/lib/NamedModulesPlugin');
 const NoEmitOnErrorsPlugin = require('webpack/lib/NoEmitOnErrorsPlugin');
 const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlugin');
 
@@ -18,14 +16,14 @@ const srcPath = path.join(__dirname, 'src');
 const examplesPath = path.join(__dirname, 'examples');
 
 const port = 23000;
-const host = myLocalIP();
+
 
 const config = {
     entry: {
         examples: [
-            'webpack-dev-server/client?http://' + host + ':' + port,
+            'webpack-dev-server/client?http://localhost:' + port,
             'webpack/hot/only-dev-server',
-            './examples/run'
+            path.join(examplesPath, 'run')
         ]
     },
     output: {
@@ -36,13 +34,13 @@ const config = {
     resolve: {
         extensions: ['.js', '.jsx']
     },
-    cache: true,
     devtool: 'inline-source-map',
     devServer: {
         historyApiFallback: true,
         stats: {colors: true},
         publicPath: '/',
         noInfo: false,
+        lazy: false,
         port: port,
         hot: true
     },
@@ -59,6 +57,7 @@ const config = {
     },
     plugins: [
         new HotModuleReplacementPlugin(),
+        new NamedModulesPlugin(),
         new NoEmitOnErrorsPlugin(),
         new HtmlWebpackPlugin({
             title: 'React Sketch',
@@ -71,18 +70,16 @@ const config = {
         }),
         new DefinePlugin({
             'process.env': {
-                'NODE_ENV': '"development"'
+                'NODE_ENV': JSON.stringify('development')
             }
         }),
-        new OpenBrowserPlugin({url: 'http://' + host + ':' + port})
+        new OpenBrowserPlugin({url: 'http://localhost:' + port})
     ]
 };
 
 new WebpackDevServer(webpack(config), config.devServer)
-    .listen(port, host, function (err) {
-            if (err) {
-                console.log(err);
-            }
-        console.log('Serving from http://' + host + ':' + port);
+    .listen(port, '0.0.0.0', function (err) {
+        err && console.log(err);
+        console.log('Serving from http://' + myLocalIP() + ':' + port);
         }
     );
