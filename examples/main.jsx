@@ -31,6 +31,7 @@ import ZoomInIcon from 'material-ui/svg-icons/action/zoom-in';
 import ZoomOutIcon from 'material-ui/svg-icons/action/zoom-out';
 import dataJson from './data.json';
 import {SketchField, Tools} from '../src';
+import DropZone from 'react-dropzone';
 
 const styles = {
     root: {
@@ -63,9 +64,33 @@ const styles = {
         fill: 'white',
         width: '42px',
         height: '42px'
+    },
+    dropArea: {
+        width: '100%',
+        height: '64px',
+        border: '2px dashed rgb(102, 102, 102)',
+        borderStyle: 'dashed',
+        borderRadius: '5px',
+        textAlign: 'center',
+        paddingTop: '20px'
+    },
+    activeStyle: {
+        borderStyle: 'solid',
+        backgroundColor: '#eee'
+    },
+    rejectStyle: {
+        borderStyle: 'solid',
+        backgroundColor: '#ffdddd'
     }
 };
 
+
+/**
+ * Helper function to manually fire an event
+ *
+ * @param el the element
+ * @param etype the event type
+ */
 function eventFire(el, etype) {
     if (el.fireEvent) {
         el.fireEvent('on' + etype);
@@ -89,8 +114,7 @@ class SketchFieldDemo extends React.Component {
         this._renderTile = this._renderTile.bind(this);
         this._selectTool = this._selectTool.bind(this);
         this._onSketchChange = this._onSketchChange.bind(this);
-
-        //this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+        this._onBackgroundImageDrop = this._onBackgroundImageDrop.bind(this);
 
     }
 
@@ -109,7 +133,12 @@ class SketchFieldDemo extends React.Component {
         canRedo: false,
         controlledSize: false,
         sketchWidth: 600,
-        sketchHeight: 600
+        sketchHeight: 600,
+        stretched: true,
+        stretchedX: false,
+        stretchedY: false,
+        originX: 'left',
+        originY: 'top'
     };
 
     componentDidMount() {
@@ -209,6 +238,13 @@ class SketchFieldDemo extends React.Component {
 
     _clear() {
         this._sketch.clear();
+        this._sketch.setBackgroundFromDataUrl('');
+        this.setState({
+            backgroundColor: 'transparent',
+            fillWithBackgroundColor: false,
+            canUndo: this._sketch.canUndo(),
+            canRedo: this._sketch.canRedo()
+        })
     }
 
     _onSketchChange() {
@@ -216,6 +252,22 @@ class SketchFieldDemo extends React.Component {
         let now = this._sketch.canUndo();
         if (prev !== now) {
             this.setState({canUndo: now});
+        }
+    }
+
+    _onBackgroundImageDrop(accepted/*, rejected*/) {
+        if (accepted && accepted.length > 0) {
+            let sketch = this._sketch;
+            let reader = new FileReader();
+            let {stretched, stretchedX, stretchedY, originX, originY} = this.state;
+            reader.addEventListener('load', () => sketch.setBackgroundFromDataUrl(reader.result, {
+                stretched: stretched,
+                stretchedX: stretchedX,
+                stretchedY: stretchedY,
+                originX: originX,
+                originY: originY
+            }), false);
+            reader.readAsDataURL(accepted[0]);
         }
     }
 
@@ -231,7 +283,8 @@ class SketchFieldDemo extends React.Component {
                             <AppBar title='Sketch Tool' showMenuIconButton={false} style={styles.appBar}>
                                 <IconButton
                                     onTouchTap={this._undo}
-                                    iconStyle={styles.iconButton}>
+                                    iconStyle={styles.iconButton}
+                                    disabled={!this.state.canUndo}>
                                     <UndoIcon />
                                 </IconButton>
                                 <IconButton
@@ -363,6 +416,38 @@ class SketchFieldDemo extends React.Component {
                                     <CompactPicker
                                         color={this.state.backgroundColor}
                                         onChange={(color) => this.setState({backgroundColor: color.hex})}/>
+
+                                    <br/>
+                                    <br/>
+                                    <label htmlFor='lineColor'>Set Image Background</label>
+                                    <br/>
+
+                                    <Toggle label="Fit canvas (X,Y)"
+                                            defaultToggled={this.state.stretched}
+                                            onToggle={(e) => this.setState({stretched: !this.state.stretched})}/>
+
+                                    <Toggle label="Fit canvas (X)"
+                                            defaultToggled={this.state.stretchedX}
+                                            onToggle={(e) => this.setState({stretchedX: !this.state.stretchedX})}/>
+
+                                    <Toggle label="Fit canvas (Y)"
+                                            defaultToggled={this.state.stretchedY}
+                                            onToggle={(e) => this.setState({stretchedY: !this.state.stretchedY})}/>
+
+                                    <div>
+                                        <DropZone
+                                            ref="dropzone"
+                                            accept='image/*'
+                                            multiple={false}
+                                            style={styles.dropArea}
+                                            activeStyle={styles.activeStyle}
+                                            rejectStyle={styles.rejectStyle}
+                                            onDrop={this._onBackgroundImageDrop}>
+                                            Try dropping an image here,<br/>
+                                            or click<br/>
+                                            to select image as background.
+                                        </DropZone>
+                                    </div>
                                 </CardText>
                             </Card>
                         </div>

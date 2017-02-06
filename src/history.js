@@ -107,7 +107,7 @@ class History {
      * @returns {boolean}
      */
     canUndo() {
-        return this.undoList.length > 0;
+        return this.undoList.length > 0 || this.current != null;
     }
 
     /**
@@ -117,6 +117,7 @@ class History {
         this.undoList = [];
         this.redoList = [];
         this.current = null;
+        this.print();
     }
 
     print() {

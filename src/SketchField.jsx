@@ -424,8 +424,7 @@ class SketchField extends Component {
     /**
      * Returns JSON representation of canvas
      *
-     * @param propertiesToInclude Array    <optional>
-     Any properties that you might want to additionally include in the output
+     * @param propertiesToInclude Array <optional> Any properties that you might want to additionally include in the output
      * @returns {string} JSON string
      */
     toJSON(propertiesToInclude) {
@@ -453,10 +452,43 @@ class SketchField extends Component {
     }
 
     /**
-     * Clear the content of the canvas, this will also keep the last version of it to history
+     * Clear the content of the canvas, this will also clear history but will return the canvas content as JSON to be
+     * used as needed in order to undo the clear if possible
+     *
+     * @param propertiesToInclude Array <optional> Any properties that you might want to additionally include in the output
+     * @returns {string} JSON string of the canvas just cleared
      */
-    clear() {
+    clear(propertiesToInclude) {
+        let discarded = this.toJSON(propertiesToInclude);
         this._fc.clear();
+        this._history.clear();
+        return discarded;
+    }
+
+    setBackgroundFromDataUrl(dataUrl, options = {}) {
+        let canvas = this._fc;
+        if (options.stretched) {
+            delete options.stretched;
+            Object.assign(options, {
+                width: canvas.width,
+                height: canvas.height
+            })
+        }
+        if (options.stretchedX) {
+            delete options.stretchedX;
+            Object.assign(options, {
+                width: canvas.width
+            })
+        }
+        if (options.stretchedY) {
+            delete options.stretchedY;
+            Object.assign(options, {
+                height: canvas.height
+            })
+        }
+        let img = new Image();
+        img.onload = () => canvas.setBackgroundImage(new fabric.Image(img), () => canvas.renderAll(), options);
+        img.src = dataUrl;
     }
 
     render() {
