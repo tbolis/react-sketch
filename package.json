@@ -27,7 +27,7 @@
     "prebuild": "rimraf lib",
     "build": "webpack --config webpack.library.cfg.js --display-modules",
     "build:light": "babel ./src --out-dir ./lib",
-    "build:examples": "webpack --config webpack.examples.cfg.js",
+    "build:examples": "NODE_ENV=production webpack --config webpack.examples.cfg.js",
     "prepublish": "npm run test && npm run build",
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",
