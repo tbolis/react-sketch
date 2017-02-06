@@ -3,6 +3,8 @@
 * **0.3.0** New Features and fixes
     - HOT Deploy fixed
     - Added selection of background Color
+    - Added selection of a  background image
+    - Fixing canUndo button
 * **0.2.13** Maintenance release
     - Upgrading packages
     - performing required changes for webpack v2.x
