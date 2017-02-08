@@ -40,7 +40,11 @@ class SketchField extends Component {
         // Default initial data
         defaultData: PropTypes.object,
         // Type of initial data
-        defaultDataType: PropTypes.oneOf(['json', 'url'])
+        defaultDataType: PropTypes.oneOf(['json', 'url']),
+        // Specify some width correction which will be applied on auto resize
+        widthCorrection: PropTypes.number,
+        // Specify some height correction which will be applied on auto resize
+        heightCorrection: PropTypes.number
     };
 
     static defaultProps = {
@@ -51,7 +55,9 @@ class SketchField extends Component {
         opacity: 1.0,
         undoSteps: 25,
         tool: Tool.Pencil,
-        defaultDataType: 'json'
+        defaultDataType: 'json',
+        widthCorrection: 2,
+        heightCorrection: 0
     };
 
     constructor(props, context) {
@@ -261,15 +267,16 @@ class SketchField extends Component {
      */
     _resize(e) {
         if (e) e.preventDefault();
+        let {widthCorrection, heightCorrection} = this.props;
         let canvas = this._fc;
         let domNode = ReactDOM.findDOMNode(this);
         let {offsetWidth, clientHeight} = domNode;
         let prevWidth = canvas.getWidth();
         let prevHeight = canvas.getHeight();
-        let wfactor = (offsetWidth / prevWidth).toFixed(2);
-        let hfactor = (clientHeight / prevHeight).toFixed(2);
-        canvas.setWidth(offsetWidth);
-        canvas.setHeight(clientHeight);
+        let wfactor = ((offsetWidth - widthCorrection) / prevWidth).toFixed(2);
+        let hfactor = ((clientHeight - heightCorrection) / prevHeight).toFixed(2);
+        canvas.setWidth(offsetWidth - widthCorrection);
+        canvas.setHeight(clientHeight - heightCorrection);
         if (canvas.backgroundImage) {
             // Need to scale background images as well
             let bi = canvas.backgroundImage;

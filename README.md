@@ -56,13 +56,16 @@ Configuration Options
 | tool              | Enumeration (string)  | pencil        | The tool to use, can be select,pencil,circle, rectangle,circle    |
 | lineColor         | String                | black         | The color of the line   	                                        |
 | lineWidth         | Number                | 1             | The width of the line                                             | 
-| fillColor         | String                | transparent   | The fill color of the shape when applicable (e.g. circle)         |
+| fillColor         | String                | transparent   | The fill color (hex format) of the shape when applicable (e.g. circle) |
+| backgroundColor   | String                | transparent   | The the background color of the sketch in hex or rgba             |
 | undoSteps         | Number                | 15            | number of undo/redo steps to maintain                             |
 | imageFormat       | String                | png           | image format when calling toDataURL, can be png or jpeg           | 
 | width             | Number                | No Value(null)| Set/control the canvas width, if left empty the sketch will scale to parent element |
 | height            | Number                | 512 | Set/control the canvas height, if left empty the sketch will take a reasonable default height |
-| defaultData       | JSON or data URL      |               | Default initial data, can be json or URL data accroding to configuration option below, in the case of data URL the initial drawing will be improted as an image |
+| defaultData       | JSON or data URL      |               | Default initial data, can be json or URL data accroding to configuration option below, in the case of data URL the initial drawing will be imported as an image |
 | defaultDataType   | Enumeration (string)  | json          | The Type of initial data, can be either json or url               | 
+| widthCorrection   | Number                | 2             | Specify some width correction which will be applied on resize of canvas, this will help to correct some possible border on the canvas style | 
+| heightCorrection  | Number                | 0             | Specify some height correction which will be applied on resize of canvas, this will help to correct some possible border on the canvas style | 
 
 
 ## Examples
