@@ -1,6 +1,6 @@
 {
   "name": "react-sketch",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Sketch Element for React based applications, backed-up by fabricjs as its core",
   "keywords": [
     "react",
@@ -25,7 +25,7 @@
   "scripts": {
     "clean": "rimraf lib && rimraf build",
     "prebuild": "rimraf lib",
-    "build": "webpack --config webpack.library.cfg.js --display-modules",
+    "build": "NODE_ENV=production webpack --config webpack.library.cfg.js --display-modules",
     "build:light": "babel ./src --out-dir ./lib",
     "build:examples": "NODE_ENV=production webpack --config webpack.examples.cfg.js",
     "prepublish": "npm run test && npm run build",

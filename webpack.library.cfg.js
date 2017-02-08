@@ -2,7 +2,6 @@
 
 var path = require('path');
 
-const IgnorePlugin = require('webpack/lib/IgnorePlugin');
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
 const NoEmitOnErrorsPlugin = require('webpack/lib/NoEmitOnErrorsPlugin');
@@ -63,10 +62,9 @@ module.exports = {
         new NoEmitOnErrorsPlugin(),
         new OccurrenceOrderPlugin(),
         new AggressiveMergingPlugin(),
-        new IgnorePlugin(new RegExp('^(fs|ipc)$')),
         new DefinePlugin({
             'process.env': {
-                'NODE_ENV': '"production"'
+                'NODE_ENV': JSON.stringify('production')
             }
         })
     ]
