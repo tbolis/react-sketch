@@ -8,6 +8,7 @@ var testPath = path.join(__dirname, 'test');
 
 // Set environment to testing
 process.env.NODE_ENV = 'testing';
+process.env.PHANTOMJS_BIN = './node_modules/.bin/phantomjs'
 
 module.exports = function (config) {
     config.set({

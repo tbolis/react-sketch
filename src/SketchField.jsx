@@ -11,6 +11,7 @@ import Pencil from './pencil';
 import Line from './line';
 import Rectangle from './rectangle';
 import Circle from './circle';
+import Pan from './pan';
 import Tool from './tools';
 
 const fabric = require('fabric').fabric;
@@ -149,6 +150,7 @@ class SketchField extends Component {
         this._tools[Tool.Line] = new Line(fabricCanvas);
         this._tools[Tool.Rectangle] = new Rectangle(fabricCanvas);
         this._tools[Tool.Circle] = new Circle(fabricCanvas);
+        this._tools[Tool.Pan] = new Pan(fabricCanvas);
     }
 
     componentWillUnmount() {
@@ -168,10 +170,15 @@ class SketchField extends Component {
         if (this.props.tool !== nextProps.tool) {
             this._selectedTool = this._tools[nextProps.tool] || this._tools[Tool.Pencil];
         }
+        
+        //Bring the cursor back to default if it is changed by a tool
+        this._fc.defaultCursor = 'default';
+
         this._selectedTool.configureCanvas(nextProps);
         if (this.props.backgroundColor !== nextProps.backgroundColor) {
             this._backgroundColor(nextProps.backgroundColor)
         }
+
     }
 
     /**
