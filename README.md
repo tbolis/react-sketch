@@ -53,7 +53,7 @@ Configuration Options
 
 | Option  	        | Type                  | Default 	    | Description  	                                                    |
 |---                |---    	            |---	        |---                                                                |
-| tool              | Enumeration (string)  | pencil        | The tool to use, can be select,pencil,circle, rectangle,circle    |
+| tool              | Enumeration (string)  | pencil        | The tool to use, can be select, pencil, circle, rectangle, pan    |
 | lineColor         | String                | black         | The color of the line   	                                        |
 | lineWidth         | Number                | 1             | The width of the line                                             | 
 | fillColor         | String                | transparent   | The fill color (hex format) of the shape when applicable (e.g. circle) |
@@ -66,6 +66,19 @@ Configuration Options
 | defaultDataType   | Enumeration (string)  | json          | The Type of initial data, can be either json or url               | 
 | widthCorrection   | Number                | 2             | Specify some width correction which will be applied on resize of canvas, this will help to correct some possible border on the canvas style | 
 | heightCorrection  | Number                | 0             | Specify some height correction which will be applied on resize of canvas, this will help to correct some possible border on the canvas style | 
+
+
+Available tools
+
+| Tool              | Description |
+|---                |---          |
+| Pencil            | Free drawing pencil |
+| Line              | Gives you the ability to draw lines |
+| Circle            | Create circles |
+| Rectangle         | Create Rectangles |
+| Select            | Disables drawing and gives you the ability to modify existing elements in the canvas |
+| Pan               | Disables drawing and gives you the ability to move the complete canvas at will, useful to adjust 
+the canvas when zooming in or out (thank you [wmaillard](https://github.com/wmaillard)) |
 
 
 ## Examples
