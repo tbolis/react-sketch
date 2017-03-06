@@ -77,8 +77,7 @@ Available tools
 | Circle            | Create circles |
 | Rectangle         | Create Rectangles |
 | Select            | Disables drawing and gives you the ability to modify existing elements in the canvas |
-| Pan               | Disables drawing and gives you the ability to move the complete canvas at will, useful to adjust 
-the canvas when zooming in or out (thank you [wmaillard](https://github.com/wmaillard)) |
+| Pan               | Disables drawing and gives you the ability to move the complete canvas at will, useful to adjust the canvas when zooming in or out (thank you [wmaillard](https://github.com/wmaillard)) |
 
 
 ## Examples
