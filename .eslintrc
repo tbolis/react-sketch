@@ -4,10 +4,6 @@
     "react",
     "eslint-plugin-react"
   ],
-  "ecmaFeatures": {
-    "jsx": true,
-    "modules": true
-  },
   "env": {
     "browser": true,
     "amd": true,

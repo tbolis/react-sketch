@@ -6,6 +6,7 @@
     let React = require('react');
     let ReactDOM = require('react-dom');
     let injectTapEventPlugin = require('react-tap-event-plugin');
+    let AppContainer = require('react-hot-loader').AppContainer;
 
     let Demo = require('./main').default;
 
@@ -18,5 +19,17 @@
     injectTapEventPlugin();
 
     // Render the main app react component into the app div
-    ReactDOM.render(<Demo />, document.getElementById('container'));
+    ReactDOM.render(<AppContainer><Demo /></AppContainer>, document.getElementById('container'));
+
+    if (module && module.hot) {
+        module.hot.accept('./main.jsx', () => {
+            const App = require('./main.jsx').default;
+            ReactDOM.render(
+                <AppContainer>
+                    <App/>
+                </AppContainer>,
+                document.getElementById('container')
+            );
+        });
+    }
 })();
