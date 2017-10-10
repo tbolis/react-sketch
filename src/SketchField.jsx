@@ -1,25 +1,24 @@
 /*eslint no-unused-vars: 0*/
-'use strict';
+'use strict'
 
-import ReactDOM from 'react-dom';
-import React, {Component, PropTypes} from 'react';
-import PureRenderMixin from 'react-addons-pure-render-mixin';
-import History from './history';
-import {uuid4} from './utils';
-import Select from './select';
-import Pencil from './pencil';
-import Line from './line';
-import Rectangle from './rectangle';
-import Circle from './circle';
-import Pan from './pan';
-import Tool from './tools';
+import React, { PureComponent } from 'react'
+import PropTypes from 'prop-types'
+import History from './history'
+import { uuid4 } from './utils'
+import Select from './select'
+import Pencil from './pencil'
+import Line from './line'
+import Rectangle from './rectangle'
+import Circle from './circle'
+import Pan from './pan'
+import Tool from './tools'
 
-const fabric = require('fabric').fabric;
+const fabric = require('fabric').fabric
 
 /**
  * Sketch Tool based on FabricJS for React Applications
  */
-class SketchField extends Component {
+class SketchField extends PureComponent {
 
     static propTypes = {
         // the color of the line
@@ -45,8 +44,8 @@ class SketchField extends Component {
         // Specify some width correction which will be applied on auto resize
         widthCorrection: PropTypes.number,
         // Specify some height correction which will be applied on auto resize
-        heightCorrection: PropTypes.number
-    };
+        heightCorrection: PropTypes.number,
+    }
 
     static defaultProps = {
         lineColor: 'black',
@@ -58,103 +57,78 @@ class SketchField extends Component {
         tool: Tool.Pencil,
         defaultDataType: 'json',
         widthCorrection: 2,
-        heightCorrection: 0
-    };
-
-    constructor(props, context) {
-        super(props, context);
-        // internal functions
-        this._resize = this._resize.bind(this);
-        this._initTools = this._initTools.bind(this);
-        this._backgroundColor = this._backgroundColor.bind(this);
-        // exposed
-        this.zoom = this.zoom.bind(this);
-        this.enableTouchScroll = this.enableTouchScroll.bind(this);
-        this.disableTouchScroll = this.disableTouchScroll.bind(this);
-        // events
-        this._onMouseUp = this._onMouseUp.bind(this);
-        this._onMouseOut = this._onMouseOut.bind(this);
-        this._onMouseDown = this._onMouseDown.bind(this);
-        this._onMouseMove = this._onMouseMove.bind(this);
-        this._onObjectAdded = this._onObjectAdded.bind(this);
-        this._onObjectMoving = this._onObjectMoving.bind(this);
-        this._onObjectRemoved = this._onObjectRemoved.bind(this);
-        this._onObjectScaling = this._onObjectScaling.bind(this);
-        this._onObjectModified = this._onObjectModified.bind(this);
-        this._onObjectRotating = this._onObjectRotating.bind(this);
-        // pure render
-        this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
+        heightCorrection: 0,
     }
 
     state = {
         parentWidth: 550,
-        action: true
-    };
+        action: true,
+    }
 
     componentDidMount() {
         let {
             tool,
             undoSteps,
             defaultData,
-            defaultDataType
-        } = this.props;
+            defaultDataType,
+        } = this.props
 
         let canvas = this._fc = new fabric.Canvas(this._canvas.id/*, {
          preserveObjectStacking: false,
          renderOnAddRemove: false,
          skipTargetFind: true
-         }*/);
+         }*/)
 
-        this._initTools(canvas);
+        this._initTools(canvas)
 
-        let selectedTool = this._tools[tool];
-        selectedTool.configureCanvas(this.props);
-        this._selectedTool = selectedTool;
+        let selectedTool = this._tools[tool]
+        selectedTool.configureCanvas(this.props)
+        this._selectedTool = selectedTool
 
         // Control resize
-        window.addEventListener('resize', this._resize, false);
+        window.addEventListener('resize', this._resize, false)
 
         // Initialize History, with maximum number of undo steps
-        this._history = new History(undoSteps);
+        this._history = new History(undoSteps)
 
         // Events binding
-        canvas.on('object:added', this._onObjectAdded);
-        canvas.on('object:modified', this._onObjectModified);
-        canvas.on('object:removed', this._onObjectRemoved);
-        canvas.on('mouse:down', this._onMouseDown);
-        canvas.on('mouse:move', this._onMouseMove);
-        canvas.on('mouse:up', this._onMouseUp);
-        canvas.on('mouse:out', this._onMouseOut);
-        canvas.on('object:moving', this._onObjectMoving);
-        canvas.on('object:scaling', this._onObjectScaling);
-        canvas.on('object:rotating', this._onObjectRotating);
+        canvas.on('object:added', this._onObjectAdded)
+        canvas.on('object:modified', this._onObjectModified)
+        canvas.on('object:removed', this._onObjectRemoved)
+        canvas.on('mouse:down', this._onMouseDown)
+        canvas.on('mouse:move', this._onMouseMove)
+        canvas.on('mouse:up', this._onMouseUp)
+        canvas.on('mouse:out', this._onMouseOut)
+        canvas.on('object:moving', this._onObjectMoving)
+        canvas.on('object:scaling', this._onObjectScaling)
+        canvas.on('object:rotating', this._onObjectRotating)
 
-        this.disableTouchScroll();
-        this._resize();
+        this.disableTouchScroll()
+        this._resize()
 
         // initialize canvas with default data
         if (defaultData) {
             if ('json' === defaultDataType) {
-                this.fromJSON(defaultData);
+                this.fromJSON(defaultData)
             }
             if ('url' === defaultDataType) {
-                this.fromDataURL(defaultData);
+                this.fromDataURL(defaultData)
             }
         }
     }
 
-    _initTools(fabricCanvas) {
-        this._tools = {};
-        this._tools[Tool.Select] = new Select(fabricCanvas);
-        this._tools[Tool.Pencil] = new Pencil(fabricCanvas);
-        this._tools[Tool.Line] = new Line(fabricCanvas);
-        this._tools[Tool.Rectangle] = new Rectangle(fabricCanvas);
-        this._tools[Tool.Circle] = new Circle(fabricCanvas);
-        this._tools[Tool.Pan] = new Pan(fabricCanvas);
+    _initTools = (fabricCanvas) => {
+        this._tools = {}
+        this._tools[Tool.Select] = new Select(fabricCanvas)
+        this._tools[Tool.Pencil] = new Pencil(fabricCanvas)
+        this._tools[Tool.Line] = new Line(fabricCanvas)
+        this._tools[Tool.Rectangle] = new Rectangle(fabricCanvas)
+        this._tools[Tool.Circle] = new Circle(fabricCanvas)
+        this._tools[Tool.Pan] = new Pan(fabricCanvas)
     }
 
     componentWillUnmount() {
-        window.removeEventListener('resize', this._resize);
+        window.removeEventListener('resize', this._resize)
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -162,19 +136,20 @@ class SketchField extends Component {
             || this.props.width !== prevProps.width
             || this.props.height !== prevProps.height) {
 
-            this._resize();
+            this._resize()
         }
     }
 
     componentWillReceiveProps(nextProps) {
         if (this.props.tool !== nextProps.tool) {
-            this._selectedTool = this._tools[nextProps.tool] || this._tools[Tool.Pencil];
+            this._selectedTool = this._tools[nextProps.tool] ||
+                this._tools[Tool.Pencil]
         }
-        
-        //Bring the cursor back to default if it is changed by a tool
-        this._fc.defaultCursor = 'default';
 
-        this._selectedTool.configureCanvas(nextProps);
+        //Bring the cursor back to default if it is changed by a tool
+        this._fc.defaultCursor = 'default'
+
+        this._selectedTool.configureCanvas(nextProps)
         if (this.props.backgroundColor !== nextProps.backgroundColor) {
             this._backgroundColor(nextProps.backgroundColor)
         }
@@ -184,85 +159,85 @@ class SketchField extends Component {
     /**
      * Enable touch Scrolling on Canvas
      */
-    enableTouchScroll() {
-        let canvas = this._fc;
-        if (canvas.allowTouchScrolling) return;
-        canvas.allowTouchScrolling = true;
+    enableTouchScroll = () => {
+        let canvas = this._fc
+        if (canvas.allowTouchScrolling) return
+        canvas.allowTouchScrolling = true
     }
 
     /**
      * Disable touch Scrolling on Canvas
      */
-    disableTouchScroll() {
-        let canvas = this._fc;
+    disableTouchScroll = () => {
+        let canvas = this._fc
         if (canvas.allowTouchScrolling) {
-            canvas.allowTouchScrolling = false;
+            canvas.allowTouchScrolling = false
         }
     }
 
-    _onObjectAdded(e) {
+    _onObjectAdded = (e) => {
         if (!this.state.action) {
-            this.setState({action: true});
-            return;
+            this.setState({ action: true })
+            return
         }
-        let obj = e.target;
-        obj.version = 1;
-        let state = JSON.stringify(obj.originalState);
+        let obj = e.target
+        obj.version = 1
+        let state = JSON.stringify(obj.originalState)
         // object, previous state, current state
-        this._history.keep([obj, state, state]);
+        this._history.keep([obj, state, state])
     }
 
-    _onObjectModified(e) {
-        let obj = e.target;
-        obj.version += 1;
-        let prevState = JSON.stringify(obj.originalState);
-        obj.saveState();
-        let currState = JSON.stringify(obj.originalState);
-        this._history.keep([obj, prevState, currState]);
+    _onObjectModified = (e) => {
+        let obj = e.target
+        obj.version += 1
+        let prevState = JSON.stringify(obj.originalState)
+        obj.saveState()
+        let currState = JSON.stringify(obj.originalState)
+        this._history.keep([obj, prevState, currState])
     }
 
-    _onObjectMoving(e) {
-
-    }
-
-    _onObjectScaling(e) {
+    _onObjectMoving = (e) => {
 
     }
 
-    _onObjectRotating(e) {
+    _onObjectScaling = (e) => {
 
     }
 
-    _onObjectRemoved(e) {
-        let obj = e.target;
-        obj.version = 0;
+    _onObjectRotating = (e) => {
+
     }
 
-    _onMouseDown(e) {
-        this._selectedTool.doMouseDown(e);
+    _onObjectRemoved = (e) => {
+        let obj = e.target
+        obj.version = 0
     }
 
-    _onMouseMove(e) {
-        this._selectedTool.doMouseMove(e);
+    _onMouseDown = (e) => {
+        this._selectedTool.doMouseDown(e)
     }
 
-    _onMouseUp(e) {
-        this._selectedTool.doMouseUp(e);
+    _onMouseMove = (e) => {
+        this._selectedTool.doMouseMove(e)
+    }
+
+    _onMouseUp = (e) => {
+        this._selectedTool.doMouseUp(e)
         if (this.props.onChange) {
-            let onChange = this.props.onChange;
+            let onChange = this.props.onChange
             setTimeout(() => {
-                onChange(e.e);
-            }, 10);
+                onChange(e.e)
+            }, 10)
         }
     }
 
-    _onMouseOut(e) {
-        this._selectedTool.doMouseOut(e);
+    _onMouseOut = (e) => {
+        this._selectedTool.doMouseOut(e)
         if (this.props.onChange) {
-            let onChange = this.props.onChange;
+            let onChange = this.props.onChange
             setTimeout(() => {
-                onChange(e.e);
-            }, 10);
+                onChange(e.e)
+            }, 10)
         }
     }
 
@@ -272,58 +247,57 @@ class SketchField extends Component {
      * @param e the resize event
      * @private
      */
-    _resize(e) {
-        if (e) e.preventDefault();
-        let {widthCorrection, heightCorrection} = this.props;
-        let canvas = this._fc;
-        let domNode = ReactDOM.findDOMNode(this);
-        let {offsetWidth, clientHeight} = domNode;
-        let prevWidth = canvas.getWidth();
-        let prevHeight = canvas.getHeight();
-        let wfactor = ((offsetWidth - widthCorrection) / prevWidth).toFixed(2);
-        let hfactor = ((clientHeight - heightCorrection) / prevHeight).toFixed(2);
-        canvas.setWidth(offsetWidth - widthCorrection);
-        canvas.setHeight(clientHeight - heightCorrection);
+    _resize = (e) => {
+        if (e) e.preventDefault()
+        let { widthCorrection, heightCorrection } = this.props
+        let canvas = this._fc
+        let { offsetWidth, clientHeight } = this._container
+        let prevWidth = canvas.getWidth()
+        let prevHeight = canvas.getHeight()
+        let wfactor = ((offsetWidth - widthCorrection) / prevWidth).toFixed(2)
+        let hfactor = ((clientHeight - heightCorrection) / prevHeight).toFixed(
+            2)
+        canvas.setWidth(offsetWidth - widthCorrection)
+        canvas.setHeight(clientHeight - heightCorrection)
         if (canvas.backgroundImage) {
             // Need to scale background images as well
-            let bi = canvas.backgroundImage;
-            bi.width = bi.width * wfactor;
-            bi.height = bi.height * hfactor;
+            let bi = canvas.backgroundImage
+            bi.width = bi.width * wfactor
+            bi.height = bi.height * hfactor
         }
-        let objects = canvas.getObjects();
+        let objects = canvas.getObjects()
         for (let i in objects) {
-            let obj = objects[i];
-            let scaleX = obj.scaleX;
-            let scaleY = obj.scaleY;
-            let left = obj.left;
-            let top = obj.top;
-            let tempScaleX = scaleX * wfactor;
-            let tempScaleY = scaleY * hfactor;
-            let tempLeft = left * wfactor;
-            let tempTop = top * hfactor;
-            obj.scaleX = tempScaleX;
-            obj.scaleY = tempScaleY;
-            obj.left = tempLeft;
-            obj.top = tempTop;
-            obj.setCoords();
+            let obj = objects[i]
+            let scaleX = obj.scaleX
+            let scaleY = obj.scaleY
+            let left = obj.left
+            let top = obj.top
+            let tempScaleX = scaleX * wfactor
+            let tempScaleY = scaleY * hfactor
+            let tempLeft = left * wfactor
+            let tempTop = top * hfactor
+            obj.scaleX = tempScaleX
+            obj.scaleY = tempScaleY
+            obj.left = tempLeft
+            obj.top = tempTop
+            obj.setCoords()
         }
         this.setState({
-            parentWidth: offsetWidth
-        });
-        canvas.renderAll();
-        canvas.calcOffset();
+            parentWidth: offsetWidth,
+        })
+        canvas.renderAll()
+        canvas.calcOffset()
     }
 
     /**
      * Sets the background color for this sketch
      * @param color in rgba or hex format
      */
-    _backgroundColor(color) {
-        if (!color) return;
-        let canvas = this._fc;
-        canvas.setBackgroundColor(color, () => canvas.renderAll());
+    _backgroundColor = (color) => {
+        if (!color) return
+        let canvas = this._fc
+        canvas.setBackgroundColor(color, () => canvas.renderAll())
     }
-
 
     /**
      * Zoom the drawing by the factor specified
@@ -333,63 +307,62 @@ class SketchField extends Component {
      *
      * @param factor the zoom factor
      */
-    zoom(factor) {
-        let canvas = this._fc;
-        let objects = canvas.getObjects();
+    zoom = (factor) => {
+        let canvas = this._fc
+        let objects = canvas.getObjects()
         for (let i in objects) {
-            objects[i].scaleX = objects[i].scaleX * factor;
-            objects[i].scaleY = objects[i].scaleY * factor;
-            objects[i].left = objects[i].left * factor;
-            objects[i].top = objects[i].top * factor;
-            objects[i].setCoords();
+            objects[i].scaleX = objects[i].scaleX * factor
+            objects[i].scaleY = objects[i].scaleY * factor
+            objects[i].left = objects[i].left * factor
+            objects[i].top = objects[i].top * factor
+            objects[i].setCoords()
         }
-        canvas.renderAll();
-        canvas.calcOffset();
+        canvas.renderAll()
+        canvas.calcOffset()
     }
-
 
     /**
      * Perform an undo operation on canvas, if it cannot undo it will leave the canvas intact
      */
-    undo() {
-        let history = this._history;
-        let [obj,prevState,currState] = history.getCurrent();
-        history.undo();
+    undo = () => {
+        let history = this._history
+        let [obj, prevState, currState] = history.getCurrent()
+        history.undo()
         if (obj.version === 1) {
-            obj.remove();
+            obj.remove()
         } else {
-            obj.setOptions(JSON.parse(prevState));
-            obj.setCoords();
-            obj.version -= 1;
-            this._fc.renderAll();
+            obj.setOptions(JSON.parse(prevState))
+            obj.setCoords()
+            obj.version -= 1
+            this._fc.renderAll()
         }
         if (this.props.onChange) {
-            this.props.onChange();
+            this.props.onChange()
         }
     }
 
     /**
      * Perform a redo operation on canvas, if it cannot redo it will leave the canvas intact
      */
-    redo() {
-        let history = this._history;
+    redo = () => {
+        let history = this._history
         if (history.canRedo()) {
-            let canvas = this._fc;
+            let canvas = this._fc
             //noinspection Eslint
-            let [obj,prevState,currState] = history.redo();
+            let [obj, prevState, currState] = history.redo()
             if (obj.version === 0) {
-                this.setState({action: false}, () => {
-                    canvas.add(obj);
-                    obj.version = 1;
-                });
+                this.setState({ action: false }, () => {
+                    canvas.add(obj)
+                    obj.version = 1
+                })
             } else {
-                obj.version += 1;
-                obj.setOptions(JSON.parse(currState));
+                obj.version += 1
+                obj.setOptions(JSON.parse(currState))
             }
-            obj.setCoords();
-            canvas.renderAll();
+            obj.setCoords()
+            canvas.renderAll()
             if (this.props.onChange) {
-                this.props.onChange();
+                this.props.onChange()
             }
         }
     }
@@ -399,8 +372,8 @@ class SketchField extends Component {
      *
      * @returns {*} true if we can undo otherwise false
      */
-    canUndo() {
-        return this._history.canUndo();
+    canUndo = () => {
+        return this._history.canUndo()
     }
 
     /**
@@ -408,8 +381,8 @@ class SketchField extends Component {
      *
      * @returns {*} true if we can redo otherwise false
      */
-    canRedo() {
-        return this._history.canRedo();
+    canRedo = () => {
+        return this._history.canRedo()
     }
 
     /**
@@ -431,8 +404,8 @@ class SketchField extends Component {
      *
      * @returns {String} URL containing a representation of the object in the format specified by options.format
      */
-    toDataURL(options) {
-        return this._fc.toDataURL(options);
+    toDataURL = (options) => {
+        return this._fc.toDataURL(options)
     }
 
     /**
@@ -441,8 +414,8 @@ class SketchField extends Component {
      * @param propertiesToInclude Array <optional> Any properties that you might want to additionally include in the output
      * @returns {string} JSON string
      */
-    toJSON(propertiesToInclude) {
-        return this._fc.toJSON(propertiesToInclude);
+    toJSON = (propertiesToInclude) => {
+        return this._fc.toJSON(propertiesToInclude)
     }
 
     /**
@@ -452,17 +425,17 @@ class SketchField extends Component {
      *
      * @param json JSON string or object
      */
-    fromJSON(json) {
-        if (!json) return;
-        let canvas = this._fc;
+    fromJSON = (json) => {
+        if (!json) return
+        let canvas = this._fc
         setTimeout(() => {
             canvas.loadFromJSON(json, () => {
-                canvas.renderAll();
+                canvas.renderAll()
                 if (this.props.onChange) {
-                    this.props.onChange();
+                    this.props.onChange()
                 }
-            });
-        }, 100);
+            })
+        }, 100)
     }
 
     /**
@@ -472,64 +445,66 @@ class SketchField extends Component {
      * @param propertiesToInclude Array <optional> Any properties that you might want to additionally include in the output
      * @returns {string} JSON string of the canvas just cleared
      */
-    clear(propertiesToInclude) {
-        let discarded = this.toJSON(propertiesToInclude);
-        this._fc.clear();
-        this._history.clear();
-        return discarded;
+    clear = (propertiesToInclude) => {
+        let discarded = this.toJSON(propertiesToInclude)
+        this._fc.clear()
+        this._history.clear()
+        return discarded
     }
 
-    setBackgroundFromDataUrl(dataUrl, options = {}) {
-        let canvas = this._fc;
+    setBackgroundFromDataUrl = (dataUrl, options = {}) => {
+        let canvas = this._fc
         if (options.stretched) {
-            delete options.stretched;
+            delete options.stretched
             Object.assign(options, {
                 width: canvas.width,
-                height: canvas.height
+                height: canvas.height,
             })
         }
         if (options.stretchedX) {
-            delete options.stretchedX;
+            delete options.stretchedX
             Object.assign(options, {
-                width: canvas.width
+                width: canvas.width,
             })
         }
         if (options.stretchedY) {
-            delete options.stretchedY;
+            delete options.stretchedY
             Object.assign(options, {
-                height: canvas.height
+                height: canvas.height,
             })
         }
-        let img = new Image();
-        img.onload = () => canvas.setBackgroundImage(new fabric.Image(img), () => canvas.renderAll(), options);
-        img.src = dataUrl;
+        let img = new Image()
+        img.onload = () => canvas.setBackgroundImage(new fabric.Image(img),
+            () => canvas.renderAll(), options)
+        img.src = dataUrl
     }
 
     render() {
         let {
             className,
-            disabled,
             style,
-            onChange,
             width,
             height,
-            ...other
-        } = this.props;
+        } = this.props
 
-        let canvasDivStyle = Object.assign({}, style ? style : {}, width ? {width: width} : {}, height ? {height: height} : {height: 512});
+        let canvasDivStyle = Object.assign({}, style ? style : {},
+            width ? { width: width } : {},
+            height ? { height: height } : { height: 512 })
 
         return (
             <div
                 className={className}
+                ref={(c) => this._container = c}
                 style={canvasDivStyle}>
                 <canvas
                     id={uuid4()}
                     ref={(c) => this._canvas = c}>
-                    Sorry, Canvas HTML5 element is not supported by your browser :(
+                    Sorry, Canvas HTML5 element is not supported by your browser
+                    :(
                 </canvas>
             </div>
         )
     }
 }
 
-export default SketchField;
+export default SketchField
