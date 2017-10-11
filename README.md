@@ -20,7 +20,7 @@ npm install react-sketch --save
 
 In order to build from source, read the [relevant instructions](http://fabricjs.com/fabric-intro-part-4#node) first. 
 
-Tested with versions 4,5,6,7,8.
+Tested with versions Node 4,5,6,7,8.
 
 ## Usage
 
