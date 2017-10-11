@@ -38,13 +38,16 @@ class SketchField extends PureComponent {
         // image format when calling toDataURL
         imageFormat: PropTypes.string,
         // Default initial data
-        defaultData: PropTypes.object,
+        defaultData: PropTypes.oneOfType([
+            PropTypes.string,
+            PropTypes.object
+        ]),
         // Type of initial data
         defaultDataType: PropTypes.oneOf(['json', 'url']),
         // Specify some width correction which will be applied on auto resize
         widthCorrection: PropTypes.number,
         // Specify some height correction which will be applied on auto resize
-        heightCorrection: PropTypes.number,
+        heightCorrection: PropTypes.number
     }
 
     static defaultProps = {
@@ -57,12 +60,12 @@ class SketchField extends PureComponent {
         tool: Tool.Pencil,
         defaultDataType: 'json',
         widthCorrection: 2,
-        heightCorrection: 0,
+        heightCorrection: 0
     }
 
     state = {
         parentWidth: 550,
-        action: true,
+        action: true
     }
 
     componentDidMount() {
@@ -70,7 +73,7 @@ class SketchField extends PureComponent {
             tool,
             undoSteps,
             defaultData,
-            defaultDataType,
+            defaultDataType
         } = this.props
 
         let canvas = this._fc = new fabric.Canvas(this._canvas.id/*, {
@@ -112,7 +115,7 @@ class SketchField extends PureComponent {
                 this.fromJSON(defaultData)
             }
             if ('url' === defaultDataType) {
-                this.fromDataURL(defaultData)
+                this.setBackgroundFromDataUrl(defaultData)
             }
         }
     }
@@ -283,7 +286,7 @@ class SketchField extends PureComponent {
             obj.setCoords()
         }
         this.setState({
-            parentWidth: offsetWidth,
+            parentWidth: offsetWidth
         })
         canvas.renderAll()
         canvas.calcOffset()
@@ -458,19 +461,19 @@ class SketchField extends PureComponent {
             delete options.stretched
             Object.assign(options, {
                 width: canvas.width,
-                height: canvas.height,
+                height: canvas.height
             })
         }
         if (options.stretchedX) {
             delete options.stretchedX
             Object.assign(options, {
-                width: canvas.width,
+                width: canvas.width
             })
         }
         if (options.stretchedY) {
             delete options.stretchedY
             Object.assign(options, {
-                height: canvas.height,
+                height: canvas.height
             })
         }
         let img = new Image()
@@ -484,7 +487,7 @@ class SketchField extends PureComponent {
             className,
             style,
             width,
-            height,
+            height
         } = this.props
 
         let canvasDivStyle = Object.assign({}, style ? style : {},

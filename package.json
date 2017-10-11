@@ -37,7 +37,7 @@
     "posttest": "npm run lint"
   },
   "engines": {
-    "node": ">=4.4.1 <7.0.0"
+    "node": ">=4.4.1"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -55,9 +55,10 @@
     "babel-preset-react-hmre": "^1.1.1",
     "babel-preset-stage-0": "^6.24.1",
     "babel-runtime": "^6.23.0",
-    "canvas": "1.6.5",
     "chai": "^4.0.2",
     "css-loader": "^0.28.4",
+    "enzyme": "^3.1.0",
+    "enzyme-adapter-react-16": "^1.0.1",
     "eslint": "^4.1.1",
     "eslint-loader": "^1.8.0",
     "eslint-plugin-react": "^7.1.0",
@@ -82,10 +83,10 @@
     "open-browser-webpack-plugin": "0.0.5",
     "phantomjs-prebuilt": "^2.1.14",
     "postcss-loader": "^2.0.6",
-    "react-addons-test-utils": "15.6.0",
     "react-color": "^2.13.0",
-    "react-hot-loader": "^3.0.0-beta.6",
-    "react-tap-event-plugin": "^2.0.1",
+    "react-hot-loader": "^3.0",
+    "react-tap-event-plugin": "^3.0.2",
+    "react-test-renderer": "^16.0.0",
     "react-transform-hmr": "^1.0.4",
     "rimraf": "^2.6.1",
     "style-loader": "^0.18.2",
