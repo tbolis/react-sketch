@@ -137,6 +137,7 @@ class SketchFieldDemo extends React.Component {
         stretched: true,
         stretchedX: false,
         stretchedY: false,
+        centerContained: false,
         originX: 'left',
         originY: 'top'
     };
@@ -259,13 +260,14 @@ class SketchFieldDemo extends React.Component {
         if (accepted && accepted.length > 0) {
             let sketch = this._sketch;
             let reader = new FileReader();
-            let {stretched, stretchedX, stretchedY, originX, originY} = this.state;
+            let {stretched, stretchedX, stretchedY, originX, originY, centerContained} = this.state;
             reader.addEventListener('load', () => sketch.setBackgroundFromDataUrl(reader.result, {
                 stretched: stretched,
                 stretchedX: stretchedX,
                 stretchedY: stretchedY,
                 originX: originX,
-                originY: originY
+                originY: originY,
+                centerContained: centerContained,
             }), false);
             reader.readAsDataURL(accepted[0]);
         }
@@ -434,6 +436,10 @@ class SketchFieldDemo extends React.Component {
                                     <Toggle label="Fit canvas (Y)"
                                             defaultToggled={this.state.stretchedY}
                                             onToggle={(e) => this.setState({stretchedY: !this.state.stretchedY})}/>
+
+                                    <Toggle label="Center contain"
+                                            defaultToggled={this.state.centerContained}
+                                            onToggle={(e) => this.setState({centerContained: !this.state.centerContained})}/>
 
                                     <div>
                                         <DropZone

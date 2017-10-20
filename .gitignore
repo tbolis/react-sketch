@@ -158,6 +158,8 @@ node_modules
 
 lib/
 build/
+pixman-0.30.0/
+pixman.tar.gz
 
 ### Windows template
 # Windows image file caches
