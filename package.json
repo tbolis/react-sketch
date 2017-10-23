@@ -55,7 +55,7 @@
     "babel-preset-react-hmre": "^1.1.1",
     "babel-preset-stage-0": "^6.24.1",
     "babel-runtime": "^6.23.0",
-    "canvas": "1.6.5",
+    "canvas": "^1.6.5",
     "chai": "^4.0.2",
     "css-loader": "^0.28.4",
     "eslint": "^4.1.1",
