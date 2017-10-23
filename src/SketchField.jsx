@@ -20,7 +20,6 @@ const fabric = require('fabric').fabric;
  * Sketch Tool based on FabricJS for React Applications
  */
 class SketchField extends Component {
-
     static propTypes = {
         // the color of the line
         lineColor: PropTypes.string,
@@ -60,6 +59,14 @@ class SketchField extends Component {
         widthCorrection: 2,
         heightCorrection: 0
     };
+
+    // Properties
+    get canvas() {
+        if (this._canvas != undefined) {
+            return this._canvas;
+        }
+        return undefined;
+    }
 
     constructor(props, context) {
         super(props, context);
@@ -170,7 +177,7 @@ class SketchField extends Component {
         if (this.props.tool !== nextProps.tool) {
             this._selectedTool = this._tools[nextProps.tool] || this._tools[Tool.Pencil];
         }
-        
+
         //Bring the cursor back to default if it is changed by a tool
         this._fc.defaultCursor = 'default';
 
@@ -500,9 +507,23 @@ class SketchField extends Component {
                 height: canvas.height
             })
         }
-        let img = new Image();
-        img.onload = () => canvas.setBackgroundImage(new fabric.Image(img), () => canvas.renderAll(), options);
-        img.src = dataUrl;
+        if (options.centerContained) {
+            let img = new Image();
+            img.onload = () => {
+                const sizeX = img.width <= img.height ? "auto" : "100%";
+                const sizeY = img.width > img.height ? "auto" : "100%";
+                this._canvas.style.background = `url(${dataUrl})`;
+                this._canvas.style.backgroundSize = `${sizeX} ${sizeY}`;
+                this._canvas.style.backgroundRepeat = "no-repeat";
+                this._canvas.style.backgroundPosition = "center";
+            };
+            img.src = dataUrl;
+        }
+        else {
+            let img = new Image();
+            img.onload = () => canvas.setBackgroundImage(new fabric.Image(img), () => canvas.renderAll(), options);
+            img.src = dataUrl;
+        }
     }
 
     render() {
