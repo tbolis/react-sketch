@@ -72,4 +72,33 @@ describe('SketchField', () => {
         // Check the rectangle dimension
         expect({ left: rect2.left, top: rect2.top, width: rect2.width, height: rect2.height }).eql(bounding);
     });
+
+    it('Undo/Redo for multiple rectangles add to canvas', () => {
+        const sketch = TestUtils.renderIntoDocument(<SketchField tool={'rectangle'} />);
+        const canvas = sketch._fc;
+        expect(canvas).to.exist;
+
+        const startPt = { x: 10, y: 10 };
+        const endPt = { x: 40, y: 50 };
+
+        canvas.renderOnAddRemove = false;
+        objectFromDrag(canvas, startPt, endPt, 'rect1');
+        objectFromDrag(canvas, startPt, endPt, 'rect2');
+        expect(canvas.getObjects().map(o => o.id)).eql(['rect1', 'rect2']);
+
+        sketch.undo();
+        expect(canvas.getObjects().map(o => o.id)).eql(['rect1']);
+
+        sketch.undo();
+        expect(canvas.getObjects().map(o => o.id)).eql([]);
+
+        sketch.redo();
+        expect(canvas.getObjects().map(o => o.id)).eql(['rect1']);
+
+        objectFromDrag(canvas, startPt, endPt, 'rect3');
+        expect(canvas.getObjects().map(o => o.id)).eql(['rect1', 'rect3']);
+
+        sketch.undo();
+        expect(canvas.getObjects().map(o => o.id)).eql(['rect1']);
+    });
 });
