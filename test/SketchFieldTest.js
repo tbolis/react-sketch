@@ -101,4 +101,66 @@ describe('SketchField', () => {
         sketch.undo();
         expect(canvas.getObjects().map(o => o.id)).eql(['rect1']);
     });
+
+    it('Undo/Redo for multiple modification for single rectangle', () => {
+        const sketch = TestUtils.renderIntoDocument(<SketchField tool={'rectangle'} />);
+        const canvas = sketch._fc;
+        expect(canvas).to.exist;
+
+        const startPt = { x: 10, y: 10 };
+        const endPt = { x: 40, y: 50 };
+
+        // [Action1] Add new rectange object and save its state
+        const stateStack = [];
+        const rect = objectFromDrag(canvas, startPt, endPt);
+        stateStack.push(rect.toJSON());
+
+        // [Action2] Change rectangle dimension and save its state
+        rect.set({ width: 50, height: 60 });
+        rect.setCoords();
+        canvas.trigger('object:modified', { target: rect });
+        stateStack.push(rect.toJSON());
+
+        // [Action3] Change the position and save its state
+        rect.set({ left: 20, top: 70 });
+        rect.setCoords();
+        canvas.trigger('object:modified', { target: rect });
+        stateStack.push(rect.toJSON());
+
+        // Undo Action3
+        sketch.undo();
+        void function() {
+            const obj = canvas.getObjects()[0];
+            expect(obj.toJSON()).eql(stateStack[1]);
+        }();
+
+        // Undo Action2
+        sketch.undo();
+        void function() {
+            const obj = canvas.getObjects()[0];
+            expect(obj.toJSON()).eql(stateStack[0]);
+        }();
+
+        // Undo Action1, and then redo Action1
+        sketch.undo();
+        sketch.redo();
+        void function() {
+            const obj = canvas.getObjects()[0];
+            expect(obj.toJSON()).eql(stateStack[0]);
+        }();
+
+        // redo Action2
+        sketch.redo();
+        void function() {
+            const obj = canvas.getObjects()[0];
+            expect(obj.toJSON()).eql(stateStack[1]);
+        }();
+
+        // redo Action3
+        sketch.redo();
+        void function() {
+            const obj = canvas.getObjects()[0];
+            expect(obj.toJSON()).eql(stateStack[2]);
+        }();
+    });
 });
