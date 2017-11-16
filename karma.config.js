@@ -20,7 +20,7 @@ module.exports = function (config) {
             'test/**/*Test.js': ['webpack', 'sourcemap']
         },
         captureTimeout: 60000,
-        frameworks: ['phantomjs-shim', 'mocha', 'chai'],
+        frameworks: ['es6-shim', 'phantomjs-shim', 'mocha', 'chai'],
         client: {
             mocha: {},
             captureConsole: false
