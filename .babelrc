@@ -1,34 +1,14 @@
 {
   "presets": [
-    "es2015",
+    [
+      "env",
+      {
+        "modules": false
+      }
+    ],
     "react",
     "stage-0"
   ],
-  "env": {
-    "development": {
-      "plugins": [
-        [
-          "react-transform",
-          {
-            "transforms": [
-              {
-                "transform": "react-transform-hmr",
-                "imports": [
-                  "react"
-                ],
-                "locals": [
-                  "module"
-                ]
-              }
-            ]
-          }
-        ]
-      ]
-    },
-    "test": {
-      "presets": ["airbnb"]
-    }
-  },
   "plugins": [
     "react-hot-loader/babel",
     "transform-object-assign",
