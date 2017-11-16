@@ -99,7 +99,7 @@ class SketchField extends Component {
             defaultDataType
         } = this.props;
 
-        let canvas = this._fc = new fabric.Canvas(this._canvas.id/*, {
+        let canvas = this._fc = new fabric.Canvas(this._canvas/*, {
          preserveObjectStacking: false,
          renderOnAddRemove: false,
          skipTargetFind: true
@@ -207,7 +207,10 @@ class SketchField extends Component {
         }
         let obj = e.target;
         obj.version = 1;
-        let state = JSON.stringify(obj.originalState);
+        // record current object state as json and save as originalState
+        let objState = obj.toJSON();
+        obj.originalState = objState;
+        let state = JSON.stringify(objState);
         // object, previous state, current state
         this._history.keep([obj, state, state]);
     }
@@ -216,8 +219,10 @@ class SketchField extends Component {
         let obj = e.target;
         obj.version += 1;
         let prevState = JSON.stringify(obj.originalState);
-        obj.saveState();
-        let currState = JSON.stringify(obj.originalState);
+        let objState = obj.toJSON();
+        // record current object state as json and update to originalState
+        obj.originalState = objState;
+        let currState = JSON.stringify(objState);
         this._history.keep([obj, prevState, currState]);
     }
 
@@ -248,6 +253,18 @@ class SketchField extends Component {
 
     _onMouseUp(e) {
         this._selectedTool.doMouseUp(e);
+        // Update the final state to new-generated object
+        // Ignore Path object since it would be created after mouseUp
+        // Assumed the last object in canvas.getObjects() in the newest object
+        if (this.props.tool !== Tool.Pencil) {
+            const canvas = this._fc;
+            const objects = canvas.getObjects();
+            const newObj = objects[objects.length - 1];
+            if (newObj && newObj.version === 1) {
+                let objState = newObj.toJSON();
+                newObj.originalState = objState;
+            }
+        }
         if (this.props.onChange) {
             let onChange = this.props.onChange;
             setTimeout(() => {
