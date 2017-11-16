@@ -1,10 +1,10 @@
 /*eslint no-unused-vars: 0*/
-'use strict'
+'use strict';
 
-import React, { PureComponent } from 'react'
+import React, {PureComponent} from 'react'
 import PropTypes from 'prop-types'
 import History from './history'
-import { uuid4 } from './utils'
+import {uuid4} from './utils'
 import Select from './select'
 import Pencil from './pencil'
 import Line from './line'
@@ -13,7 +13,7 @@ import Circle from './circle'
 import Pan from './pan'
 import Tool from './tools'
 
-const fabric = require('fabric').fabric
+const fabric = require('fabric').fabric;
 
 /**
  * Sketch Tool based on FabricJS for React Applications
@@ -48,7 +48,7 @@ class SketchField extends PureComponent {
         widthCorrection: PropTypes.number,
         // Specify some height correction which will be applied on auto resize
         heightCorrection: PropTypes.number
-    }
+    };
 
     static defaultProps = {
         lineColor: 'black',
@@ -61,188 +61,112 @@ class SketchField extends PureComponent {
         defaultDataType: 'json',
         widthCorrection: 2,
         heightCorrection: 0
-    }
+    };
 
     state = {
         parentWidth: 550,
         action: true
-    }
-
-    componentDidMount() {
-        let {
-            tool,
-            undoSteps,
-            defaultData,
-            defaultDataType
-        } = this.props
-
-        let canvas = this._fc = new fabric.Canvas(this._canvas.id/*, {
-         preserveObjectStacking: false,
-         renderOnAddRemove: false,
-         skipTargetFind: true
-         }*/)
-
-        this._initTools(canvas)
-
-        let selectedTool = this._tools[tool]
-        selectedTool.configureCanvas(this.props)
-        this._selectedTool = selectedTool
-
-        // Control resize
-        window.addEventListener('resize', this._resize, false)
-
-        // Initialize History, with maximum number of undo steps
-        this._history = new History(undoSteps)
-
-        // Events binding
-        canvas.on('object:added', this._onObjectAdded)
-        canvas.on('object:modified', this._onObjectModified)
-        canvas.on('object:removed', this._onObjectRemoved)
-        canvas.on('mouse:down', this._onMouseDown)
-        canvas.on('mouse:move', this._onMouseMove)
-        canvas.on('mouse:up', this._onMouseUp)
-        canvas.on('mouse:out', this._onMouseOut)
-        canvas.on('object:moving', this._onObjectMoving)
-        canvas.on('object:scaling', this._onObjectScaling)
-        canvas.on('object:rotating', this._onObjectRotating)
-
-        this.disableTouchScroll()
-        this._resize()
-
-        // initialize canvas with default data
-        if (defaultData) {
-            if ('json' === defaultDataType) {
-                this.fromJSON(defaultData)
-            }
-            if ('url' === defaultDataType) {
-                this.setBackgroundFromDataUrl(defaultData)
-            }
-        }
-    }
-
+    };
     _initTools = (fabricCanvas) => {
-        this._tools = {}
-        this._tools[Tool.Select] = new Select(fabricCanvas)
-        this._tools[Tool.Pencil] = new Pencil(fabricCanvas)
-        this._tools[Tool.Line] = new Line(fabricCanvas)
-        this._tools[Tool.Rectangle] = new Rectangle(fabricCanvas)
-        this._tools[Tool.Circle] = new Circle(fabricCanvas)
+        this._tools = {};
+        this._tools[Tool.Select] = new Select(fabricCanvas);
+        this._tools[Tool.Pencil] = new Pencil(fabricCanvas);
+        this._tools[Tool.Line] = new Line(fabricCanvas);
+        this._tools[Tool.Rectangle] = new Rectangle(fabricCanvas);
+        this._tools[Tool.Circle] = new Circle(fabricCanvas);
         this._tools[Tool.Pan] = new Pan(fabricCanvas)
-    }
-
-    componentWillUnmount() {
-        window.removeEventListener('resize', this._resize)
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if (this.state.parentWidth !== prevState.parentWidth
-            || this.props.width !== prevProps.width
-            || this.props.height !== prevProps.height) {
-
-            this._resize()
-        }
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (this.props.tool !== nextProps.tool) {
-            this._selectedTool = this._tools[nextProps.tool] ||
-                this._tools[Tool.Pencil]
-        }
-
-        //Bring the cursor back to default if it is changed by a tool
-        this._fc.defaultCursor = 'default'
-
-        this._selectedTool.configureCanvas(nextProps)
-        if (this.props.backgroundColor !== nextProps.backgroundColor) {
-            this._backgroundColor(nextProps.backgroundColor)
-        }
-
-    }
-
+    };
     /**
      * Enable touch Scrolling on Canvas
      */
     enableTouchScroll = () => {
-        let canvas = this._fc
-        if (canvas.allowTouchScrolling) return
+        let canvas = this._fc;
+        if (canvas.allowTouchScrolling) return;
         canvas.allowTouchScrolling = true
-    }
-
+    };
     /**
      * Disable touch Scrolling on Canvas
      */
     disableTouchScroll = () => {
-        let canvas = this._fc
+        let canvas = this._fc;
         if (canvas.allowTouchScrolling) {
             canvas.allowTouchScrolling = false
         }
-    }
+    };
 
+    /**
+     * Action when an object is added to the canvas
+     */
     _onObjectAdded = (e) => {
         if (!this.state.action) {
-            this.setState({ action: true })
+            this.setState({action: true});
             return
         }
-        let obj = e.target
-        obj.version = 1
-        let state = JSON.stringify(obj.originalState)
+        let obj = e.target;
+        obj.version = 1;
+        // record current object state as json and save as originalState
+        let objState = obj.toJSON();
+        obj.originalState = objState;
+        let state = JSON.stringify(objState);
         // object, previous state, current state
         this._history.keep([obj, state, state])
-    }
+    };
 
-    _onObjectModified = (e) => {
-        let obj = e.target
-        obj.version += 1
-        let prevState = JSON.stringify(obj.originalState)
-        obj.saveState()
-        let currState = JSON.stringify(obj.originalState)
-        this._history.keep([obj, prevState, currState])
-    }
-
+    /**
+     * Action when an object is moving around inside the canvas
+     */
     _onObjectMoving = (e) => {
 
-    }
+    };
 
+    /**
+     * Action when an object is scaling inside the canvas
+     */
     _onObjectScaling = (e) => {
 
-    }
+    };
 
+    /**
+     * Action when an object is rotating inside the canvas
+     */
     _onObjectRotating = (e) => {
 
-    }
+    };
 
+    /**
+     * Action when an object is removed from the canvas
+     */
     _onObjectRemoved = (e) => {
-        let obj = e.target
-        obj.version = 0
-    }
+        let obj = e.target;
+        obj.version = 0;
+    };
 
+    /**
+     * Action when the mouse button is pressed down
+     */
     _onMouseDown = (e) => {
-        this._selectedTool.doMouseDown(e)
-    }
+        this._selectedTool.doMouseDown(e);
+    };
 
+    /**
+     * Action when the mouse cursor is moving around within the canvas
+     */
     _onMouseMove = (e) => {
-        this._selectedTool.doMouseMove(e)
-    }
+        this._selectedTool.doMouseMove(e);
+    };
 
-    _onMouseUp = (e) => {
-        this._selectedTool.doMouseUp(e)
-        if (this.props.onChange) {
-            let onChange = this.props.onChange
-            setTimeout(() => {
-                onChange(e.e)
-            }, 10)
-        }
-    }
-
+    /**
+     * Action when the mouse cursor is moving out from the canvas
+     */
     _onMouseOut = (e) => {
-        this._selectedTool.doMouseOut(e)
+        this._selectedTool.doMouseOut(e);
         if (this.props.onChange) {
-            let onChange = this.props.onChange
+            let onChange = this.props.onChange;
             setTimeout(() => {
                 onChange(e.e)
             }, 10)
         }
-    }
+    };
 
     /**
      * Track the resize of the window and update our state
@@ -251,56 +175,55 @@ class SketchField extends PureComponent {
      * @private
      */
     _resize = (e) => {
-        if (e) e.preventDefault()
-        let { widthCorrection, heightCorrection } = this.props
-        let canvas = this._fc
-        let { offsetWidth, clientHeight } = this._container
-        let prevWidth = canvas.getWidth()
-        let prevHeight = canvas.getHeight()
-        let wfactor = ((offsetWidth - widthCorrection) / prevWidth).toFixed(2)
-        let hfactor = ((clientHeight - heightCorrection) / prevHeight).toFixed(
-            2)
-        canvas.setWidth(offsetWidth - widthCorrection)
-        canvas.setHeight(clientHeight - heightCorrection)
+        if (e) e.preventDefault();
+        let {widthCorrection, heightCorrection} = this.props;
+        let canvas = this._fc;
+        let {offsetWidth, clientHeight} = this._container;
+        let prevWidth = canvas.getWidth();
+        let prevHeight = canvas.getHeight();
+        let wfactor = ((offsetWidth - widthCorrection) / prevWidth).toFixed(2);
+        let hfactor = ((clientHeight - heightCorrection) / prevHeight).toFixed(2);
+        canvas.setWidth(offsetWidth - widthCorrection);
+        canvas.setHeight(clientHeight - heightCorrection);
         if (canvas.backgroundImage) {
             // Need to scale background images as well
-            let bi = canvas.backgroundImage
-            bi.width = bi.width * wfactor
+            let bi = canvas.backgroundImage;
+            bi.width = bi.width * wfactor;
             bi.height = bi.height * hfactor
         }
-        let objects = canvas.getObjects()
+        let objects = canvas.getObjects();
         for (let i in objects) {
-            let obj = objects[i]
-            let scaleX = obj.scaleX
-            let scaleY = obj.scaleY
-            let left = obj.left
-            let top = obj.top
-            let tempScaleX = scaleX * wfactor
-            let tempScaleY = scaleY * hfactor
-            let tempLeft = left * wfactor
-            let tempTop = top * hfactor
-            obj.scaleX = tempScaleX
-            obj.scaleY = tempScaleY
-            obj.left = tempLeft
-            obj.top = tempTop
+            let obj = objects[i];
+            let scaleX = obj.scaleX;
+            let scaleY = obj.scaleY;
+            let left = obj.left;
+            let top = obj.top;
+            let tempScaleX = scaleX * wfactor;
+            let tempScaleY = scaleY * hfactor;
+            let tempLeft = left * wfactor;
+            let tempTop = top * hfactor;
+            obj.scaleX = tempScaleX;
+            obj.scaleY = tempScaleY;
+            obj.left = tempLeft;
+            obj.top = tempTop;
             obj.setCoords()
         }
         this.setState({
             parentWidth: offsetWidth
-        })
-        canvas.renderAll()
-        canvas.calcOffset()
-    }
+        });
+        canvas.renderAll();
+        canvas.calcOffset();
+    };
 
     /**
      * Sets the background color for this sketch
      * @param color in rgba or hex format
      */
     _backgroundColor = (color) => {
-        if (!color) return
-        let canvas = this._fc
+        if (!color) return;
+        let canvas = this._fc;
         canvas.setBackgroundColor(color, () => canvas.renderAll())
-    }
+    };
 
     /**
      * Zoom the drawing by the factor specified
@@ -311,64 +234,65 @@ class SketchField extends PureComponent {
      * @param factor the zoom factor
      */
     zoom = (factor) => {
-        let canvas = this._fc
-        let objects = canvas.getObjects()
+        let canvas = this._fc;
+        let objects = canvas.getObjects();
         for (let i in objects) {
-            objects[i].scaleX = objects[i].scaleX * factor
-            objects[i].scaleY = objects[i].scaleY * factor
-            objects[i].left = objects[i].left * factor
-            objects[i].top = objects[i].top * factor
-            objects[i].setCoords()
+            objects[i].scaleX = objects[i].scaleX * factor;
+            objects[i].scaleY = objects[i].scaleY * factor;
+            objects[i].left = objects[i].left * factor;
+            objects[i].top = objects[i].top * factor;
+            objects[i].setCoords();
         }
-        canvas.renderAll()
-        canvas.calcOffset()
-    }
+        canvas.renderAll();
+        canvas.calcOffset();
+    };
 
     /**
      * Perform an undo operation on canvas, if it cannot undo it will leave the canvas intact
      */
     undo = () => {
-        let history = this._history
-        let [obj, prevState, currState] = history.getCurrent()
-        history.undo()
+        let history = this._history;
+        let [obj, prevState, currState] = history.getCurrent();
+        history.undo();
         if (obj.version === 1) {
-            obj.remove()
+            obj.remove();
         } else {
-            obj.setOptions(JSON.parse(prevState))
-            obj.setCoords()
-            obj.version -= 1
+            obj.setOptions(JSON.parse(prevState));
+            obj.setCoords();
+            obj.version -= 1;
             this._fc.renderAll()
         }
         if (this.props.onChange) {
             this.props.onChange()
         }
-    }
+    };
 
     /**
      * Perform a redo operation on canvas, if it cannot redo it will leave the canvas intact
      */
+
     redo = () => {
-        let history = this._history
+        let history = this._history;
         if (history.canRedo()) {
-            let canvas = this._fc
+            let canvas = this._fc;
             //noinspection Eslint
-            let [obj, prevState, currState] = history.redo()
+            let [obj, prevState, currState] = history.redo();
             if (obj.version === 0) {
-                this.setState({ action: false }, () => {
-                    canvas.add(obj)
+                this.setState({action: false}, () => {
+                    canvas.add(obj);
                     obj.version = 1
                 })
             } else {
-                obj.version += 1
+                obj.version += 1;
                 obj.setOptions(JSON.parse(currState))
             }
-            obj.setCoords()
-            canvas.renderAll()
+            obj.setCoords();
+            canvas.renderAll();
             if (this.props.onChange) {
                 this.props.onChange()
             }
         }
-    }
+    };
 
     /**
      * Delegation method to check if we can perform an undo Operation, useful to disable/enable possible buttons
@@ -377,7 +301,7 @@ class SketchField extends PureComponent {
      */
     canUndo = () => {
         return this._history.canUndo()
-    }
+    };
 
     /**
      * Delegation method to check if we can perform a redo Operation, useful to disable/enable possible buttons
@@ -386,7 +310,7 @@ class SketchField extends PureComponent {
      */
     canRedo = () => {
         return this._history.canRedo()
-    }
+    };
 
     /**
      * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
@@ -409,7 +333,7 @@ class SketchField extends PureComponent {
      */
     toDataURL = (options) => {
         return this._fc.toDataURL(options)
-    }
+    };
 
     /**
      * Returns JSON representation of canvas
@@ -419,7 +343,7 @@ class SketchField extends PureComponent {
      */
     toJSON = (propertiesToInclude) => {
         return this._fc.toJSON(propertiesToInclude)
-    }
+    };
 
     /**
      * Populates canvas with data from the specified JSON.
@@ -429,17 +353,17 @@ class SketchField extends PureComponent {
      * @param json JSON string or object
      */
     fromJSON = (json) => {
-        if (!json) return
-        let canvas = this._fc
+        if (!json) return;
+        let canvas = this._fc;
         setTimeout(() => {
             canvas.loadFromJSON(json, () => {
-                canvas.renderAll()
+                canvas.renderAll();
                 if (this.props.onChange) {
                     this.props.onChange()
                 }
             })
         }, 100)
-    }
+    };
 
     /**
      * Clear the content of the canvas, this will also clear history but will return the canvas content as JSON to be
@@ -449,50 +373,167 @@ class SketchField extends PureComponent {
      * @returns {string} JSON string of the canvas just cleared
      */
     clear = (propertiesToInclude) => {
-        let discarded = this.toJSON(propertiesToInclude)
-        this._fc.clear()
-        this._history.clear()
+        let discarded = this.toJSON(propertiesToInclude);
+        this._fc.clear();
+        this._history.clear();
         return discarded
-    }
-
+    };
+    /**
+     * Sets the background from the dataUrl given
+     *
+     * @param dataUrl the dataUrl to be used as a background
+     * @param options
+     */
     setBackgroundFromDataUrl = (dataUrl, options = {}) => {
-        let canvas = this._fc
+        let canvas = this._fc;
         if (options.stretched) {
-            delete options.stretched
+            delete options.stretched;
             Object.assign(options, {
                 width: canvas.width,
                 height: canvas.height
             })
         }
         if (options.stretchedX) {
-            delete options.stretchedX
+            delete options.stretchedX;
             Object.assign(options, {
                 width: canvas.width
             })
         }
         if (options.stretchedY) {
-            delete options.stretchedY
+            delete options.stretchedY;
             Object.assign(options, {
                 height: canvas.height
             })
         }
-        let img = new Image()
+        let img = new Image();
         img.onload = () => canvas.setBackgroundImage(new fabric.Image(img),
-            () => canvas.renderAll(), options)
+            () => canvas.renderAll(), options);
         img.src = dataUrl
-    }
+    };
 
-    render() {
+    componentDidMount = () => {
+        let {
+            tool,
+            undoSteps,
+            defaultData,
+            defaultDataType
+        } = this.props;
+
+        let canvas = this._fc = new fabric.Canvas(this._canvas/*, {
+         preserveObjectStacking: false,
+         renderOnAddRemove: false,
+         skipTargetFind: true
+         }*/);
+
+        this._initTools(canvas);
+
+        let selectedTool = this._tools[tool];
+        selectedTool.configureCanvas(this.props);
+        this._selectedTool = selectedTool;
+
+        // Control resize
+        window.addEventListener('resize', this._resize, false);
+
+        // Initialize History, with maximum number of undo steps
+        this._history = new History(undoSteps);
+
+        // Events binding
+        canvas.on('object:added', this._onObjectAdded);
+        canvas.on('object:modified', this._onObjectModified);
+        canvas.on('object:removed', this._onObjectRemoved);
+        canvas.on('mouse:down', this._onMouseDown);
+        canvas.on('mouse:move', this._onMouseMove);
+        canvas.on('mouse:up', this._onMouseUp);
+        canvas.on('mouse:out', this._onMouseOut);
+        canvas.on('object:moving', this._onObjectMoving);
+        canvas.on('object:scaling', this._onObjectScaling);
+        canvas.on('object:rotating', this._onObjectRotating);
+
+        this.disableTouchScroll();
+        this._resize();
+
+        // initialize canvas with default data
+        if (defaultData) {
+            if ('json' === defaultDataType) {
+                this.fromJSON(defaultData)
+            }
+            if ('url' === defaultDataType) {
+                this.setBackgroundFromDataUrl(defaultData)
+            }
+        }
+    };
+
+    componentWillUnmount = () => window.removeEventListener('resize', this._resize);
+
+
+    componentDidUpdate = (prevProps, prevState) => {
+        if (this.state.parentWidth !== prevState.parentWidth
+            || this.props.width !== prevProps.width
+            || this.props.height !== prevProps.height) {
+
+            this._resize()
+        }
+    };
+
+    componentWillReceiveProps = (nextProps) => {
+        if (this.props.tool !== nextProps.tool) {
+            this._selectedTool = this._tools[nextProps.tool] ||
+                this._tools[Tool.Pencil]
+        }
+
+        //Bring the cursor back to default if it is changed by a tool
+        this._fc.defaultCursor = 'default';
+
+        this._selectedTool.configureCanvas(nextProps);
+        if (this.props.backgroundColor !== nextProps.backgroundColor) {
+            this._backgroundColor(nextProps.backgroundColor)
+        }
+
+    };
+
+    _onObjectModified = (e) => {
+        let obj = e.target;
+        obj.version += 1;
+        let prevState = JSON.stringify(obj.originalState);
+        let objState = obj.toJSON();
+        // record current object state as json and update to originalState
+        obj.originalState = objState;
+        let currState = JSON.stringify(objState);
+        this._history.keep([obj, prevState, currState]);
+    };
+
+    _onMouseUp = (e) => {
+        this._selectedTool.doMouseUp(e);
+        // Update the final state to new-generated object
+        // Ignore Path object since it would be created after mouseUp
+        // Assumed the last object in canvas.getObjects() in the newest object
+        if (this.props.tool !== Tool.Pencil) {
+            const canvas = this._fc;
+            const objects = canvas.getObjects();
+            const newObj = objects[objects.length - 1];
+            if (newObj && newObj.version === 1) {
+                newObj.originalState = newObj.toJSON();
+            }
+        }
+        if (this.props.onChange) {
+            let onChange = this.props.onChange;
+            setTimeout(() => {
+                onChange(e.e)
+            }, 10)
+        }
+    };
+
+    render = () => {
         let {
             className,
             style,
             width,
             height
-        } = this.props
+        } = this.props;
 
         let canvasDivStyle = Object.assign({}, style ? style : {},
-            width ? { width: width } : {},
-            height ? { height: height } : { height: 512 })
+            width ? {width: width} : {},
+            height ? {height: height} : {height: 512});
 
         return (
             <div
