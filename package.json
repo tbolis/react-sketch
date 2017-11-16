@@ -37,7 +37,7 @@
     "posttest": "npm run lint"
   },
   "engines": {
-    "node": ">=4.4.1 <9.0.0"
+    "node": ">= 6 <9.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
