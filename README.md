@@ -54,10 +54,10 @@ Configuration Options
 | undoSteps         | Number                | 15            | number of undo/redo steps to maintain                             |
 | imageFormat       | String                | png           | image format when calling toDataURL, can be png or jpeg           | 
 | width             | Number                | No Value(null)| Set/control the canvas width, if left empty the sketch will scale to parent element |
-| height            | Number                | 512 | Set/control the canvas height, if left empty the sketch will take a reasonable default height |
-| defaultData       | JSON or data URL      |               | Default initial data, can be json or URL data accroding to configuration option below, in the case of data URL the initial drawing will be imported as an image |
-| defaultDataType   | Enumeration (string)  | json          | The Type of initial data, can be either json or url               | 
-| widthCorrection   | Number                | 2             | Specify some width correction which will be applied on resize of canvas, this will help to correct some possible border on the canvas style | 
+| height            | Number                | 512           | Set/control the canvas height, if left empty the sketch will take a reasonable default height |
+| value             | JSON                  |               | Property to utilize and handle the sketch data as controlled component |
+| defaultValue      | JSON or data URL      |               | Default initial data, to load. If value is set then value will be loaded instead |
+| widthCorrection   | Number                | 2             | Specify some width correction which will be applied on resize of canvas, this will help to correct some possible border on the canvas style |
 | heightCorrection  | Number                | 0             | Specify some height correction which will be applied on resize of canvas, this will help to correct some possible border on the canvas style | 
 
 
@@ -67,6 +67,7 @@ Available tools
 |---                |---          |
 | Pencil            | Free drawing pencil |
 | Line              | Gives you the ability to draw lines |
+| Rectangle         | Create rectangles |
 | Circle            | Create circles |
 | Rectangle         | Create Rectangles |
 | Select            | Disables drawing and gives you the ability to modify existing elements in the canvas |
@@ -79,7 +80,7 @@ The project includes a webpack server for running the examples, just run:
 
 ```sh
 git clone https://github.com/tbolis/react-sketch.git
-npm install
+yarn install
 npm start
 ```
 
