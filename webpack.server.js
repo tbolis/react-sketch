@@ -21,8 +21,18 @@ const port = 23000;
 const config = {
     entry: {
         examples: [
-            'webpack-dev-server/client?http://localhost:' + port,
+            // activate HMR for React
+            'react-hot-loader/patch',
+
+            // bundle the client for webpack-dev-server
+            // and connect to the provided endpoint
+            'webpack-dev-server/client?http://0.0.0.0:' + port,
+
+            // bundle the client for hot reloading
+            // only- means to only hot reload for successful updates
             'webpack/hot/only-dev-server',
+
+            // the entry point of our app
             path.join(examplesPath, 'run')
         ]
     },

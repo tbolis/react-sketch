@@ -8,14 +8,16 @@ import './main.css';
 import {
     AppBar,
     Card,
-    CardText,
     CardHeader,
-    IconButton,
+    CardText,
     GridList,
     GridTile,
+    IconButton,
     MenuItem,
-    Slider,
+    RaisedButton,
     SelectField,
+    Slider,
+    TextField,
     Toggle,
     ToolbarSeparator
 } from 'material-ui';
@@ -30,6 +32,9 @@ import DownloadIcon from 'material-ui/svg-icons/file/file-download';
 import ZoomInIcon from 'material-ui/svg-icons/action/zoom-in';
 import ZoomOutIcon from 'material-ui/svg-icons/action/zoom-out';
 import dataJson from './data.json';
+import dataJsonControlled from './data.json.controlled';
+import dataUrl from './data.url';
+
 import {SketchField, Tools} from '../src';
 import DropZone from 'react-dropzone';
 
@@ -102,22 +107,6 @@ function eventFire(el, etype) {
 }
 
 class SketchFieldDemo extends React.Component {
-    constructor(params) {
-        super(params);
-
-        this._save = this._save.bind(this);
-        this._undo = this._undo.bind(this);
-        this._redo = this._redo.bind(this);
-        this._clear = this._clear.bind(this);
-        this._removeMe = this._removeMe.bind(this);
-        this._download = this._download.bind(this);
-        this._renderTile = this._renderTile.bind(this);
-        this._selectTool = this._selectTool.bind(this);
-        this._onSketchChange = this._onSketchChange.bind(this);
-        this._onBackgroundImageDrop = this._onBackgroundImageDrop.bind(this);
-
-    }
-
     state = {
         lineColor: 'black',
         lineWidth: 10,
@@ -140,8 +129,99 @@ class SketchFieldDemo extends React.Component {
         originX: 'left',
         originY: 'top'
     };
+    _selectTool = (event, index, value) => {
+        this.setState({
+            tool: value
+        });
+    };
+    _save = () => {
+        let drawings = this.state.drawings;
+        drawings.push(this._sketch.toDataURL());
+        this.setState({drawings: drawings});
+    };
+    _download = () => {
+        /*eslint-disable no-console*/
 
-    componentDidMount() {
+        console.save(this._sketch.toDataURL(), 'toDataURL.txt');
+        console.save(JSON.stringify(this._sketch.toJSON()), 'toDataJSON.txt');
+
+        /*eslint-enable no-console*/
+
+        let {imgDown} = this.refs;
+        let event = new Event('click', {});
+
+        imgDown.href = this._sketch.toDataURL();
+        imgDown.download = 'toPNG.png';
+        imgDown.dispatchEvent(event);
+    };
+    _renderTile = (drawing, index) => {
+        return (
+            <GridTile
+                key={index}
+                title='Canvas Image'
+                actionPosition="left"
+                titlePosition="top"
+                titleBackground="linear-gradient(to bottom, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
+                cols={1} rows={1} style={styles.gridTile}
+                actionIcon={<IconButton onTouchTap={(c) => this._removeMe(index)}><RemoveIcon
+                    color="white"/></IconButton>}>
+                <img src={drawing}/>
+            </GridTile>
+        );
+    };
+    _removeMe = (index) => {
+        let drawings = this.state.drawings;
+        drawings.splice(index, 1);
+        this.setState({drawings: drawings});
+    };
+    _undo = () => {
+        this._sketch.undo();
+        this.setState({
+            canUndo: this._sketch.canUndo(),
+            canRedo: this._sketch.canRedo()
+        })
+    };
+    _redo = () => {
+        this._sketch.redo();
+        this.setState({
+            canUndo: this._sketch.canUndo(),
+            canRedo: this._sketch.canRedo()
+        })
+    };
+    _clear = () => {
+        this._sketch.clear();
+        this._sketch.setBackgroundFromDataUrl('');
+        this.setState({
+            controlledValue: null,
+            backgroundColor: 'transparent',
+            fillWithBackgroundColor: false,
+            canUndo: this._sketch.canUndo(),
+            canRedo: this._sketch.canRedo()
+        })
+    };
+    _onSketchChange = () => {
+        let prev = this.state.canUndo;
+        let now = this._sketch.canUndo();
+        if (prev !== now) {
+            this.setState({canUndo: now});
+        }
+    };
+    _onBackgroundImageDrop = (accepted/*, rejected*/) => {
+        if (accepted && accepted.length > 0) {
+            let sketch = this._sketch;
+            let reader = new FileReader();
+            let {stretched, stretchedX, stretchedY, originX, originY} = this.state;
+            reader.addEventListener('load', () => sketch.setBackgroundFromDataUrl(reader.result, {
+                stretched: stretched,
+                stretchedX: stretchedX,
+                stretchedY: stretchedY,
+                originX: originX,
+                originY: originY
+            }), false);
+            reader.readAsDataURL(accepted[0]);
+        }
+    };
+    componentDidMount = () => {
 
         /*eslint-disable no-console*/
 
@@ -168,110 +248,9 @@ class SketchFieldDemo extends React.Component {
 
         /*eslint-enable no-console*/
 
-    }
-
-    _selectTool(event, index, value) {
-        this.setState({
-            tool: value
-        });
-    }
-
-    _save() {
-        let drawings = this.state.drawings;
-        drawings.push(this._sketch.toDataURL());
-        this.setState({drawings: drawings});
-    }
-
-    _download() {
-        /*eslint-disable no-console*/
-
-        console.save(this._sketch.toDataURL(), 'toDataURL.txt');
-        console.save(JSON.stringify(this._sketch.toJSON()), 'toDataJSON.txt');
-
-        /*eslint-enable no-console*/
-
-        let {imgDown} = this.refs;
-        let event = new Event('click', {});
-
-        imgDown.href = this._sketch.toDataURL();
-        imgDown.download = 'toPNG.png';
-        imgDown.dispatchEvent(event);
-    }
-
-    _renderTile(drawing, index) {
-        return (
-            <GridTile
-                key={index}
-                title='Canvas Image'
-                actionPosition="left"
-                titlePosition="top"
-                titleBackground="linear-gradient(to bottom, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
-                cols={1} rows={1} style={styles.gridTile}
-                actionIcon={<IconButton onTouchTap={(c) => this._removeMe(index)}><RemoveIcon
-                    color="white"/></IconButton>}>
-                <img src={drawing}/>
-            </GridTile>
-        );
-    }
-
-    _removeMe(index) {
-        let drawings = this.state.drawings;
-        drawings.splice(index, 1);
-        this.setState({drawings: drawings});
-    }
-
-    _undo() {
-        this._sketch.undo();
-        this.setState({
-            canUndo: this._sketch.canUndo(),
-            canRedo: this._sketch.canRedo()
-        })
-    }
-
-    _redo() {
-        this._sketch.redo();
-        this.setState({
-            canUndo: this._sketch.canUndo(),
-            canRedo: this._sketch.canRedo()
-        })
-    }
-
-    _clear() {
-        this._sketch.clear();
-        this._sketch.setBackgroundFromDataUrl('');
-        this.setState({
-            backgroundColor: 'transparent',
-            fillWithBackgroundColor: false,
-            canUndo: this._sketch.canUndo(),
-            canRedo: this._sketch.canRedo()
-        })
-    }
-
-    _onSketchChange() {
-        let prev = this.state.canUndo;
-        let now = this._sketch.canUndo();
-        if (prev !== now) {
-            this.setState({canUndo: now});
-        }
-    }
-
-    _onBackgroundImageDrop(accepted/*, rejected*/) {
-        if (accepted && accepted.length > 0) {
-            let sketch = this._sketch;
-            let reader = new FileReader();
-            let {stretched, stretchedX, stretchedY, originX, originY} = this.state;
-            reader.addEventListener('load', () => sketch.setBackgroundFromDataUrl(reader.result, {
-                stretched: stretched,
-                stretchedX: stretchedX,
-                stretchedY: stretchedY,
-                originX: originX,
-                originY: originY
-            }), false);
-            reader.readAsDataURL(accepted[0]);
-        }
-    }
-
-    render() {
+    };
+    render = () => {
+        let {controlledValue} = this.state;
         return (
             <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <div>
@@ -285,7 +264,7 @@ class SketchFieldDemo extends React.Component {
                                     onTouchTap={this._undo}
                                     iconStyle={styles.iconButton}
                                     disabled={!this.state.canUndo}>
-                                    <UndoIcon />
+                                    <UndoIcon/>
                                 </IconButton>
                                 <IconButton
                                     onTouchTap={this._redo}
@@ -297,19 +276,19 @@ class SketchFieldDemo extends React.Component {
                                 <IconButton
                                     onTouchTap={this._save}
                                     iconStyle={styles.iconButton}>
-                                    <SaveIcon />
+                                    <SaveIcon/>
                                 </IconButton>
                                 <IconButton
                                     onTouchTap={this._download}
                                     iconStyle={styles.iconButton}>
-                                    <DownloadIcon />
+                                    <DownloadIcon/>
                                 </IconButton>
                                 <a ref='imgDown'/>
                                 <ToolbarSeparator style={styles.separator}/>
                                 <IconButton
                                     onTouchTap={this._clear}
                                     iconStyle={styles.iconButton}>
-                                    <ClearIcon />
+                                    <ClearIcon/>
                                 </IconButton>
                             </AppBar>
                         </div>
@@ -321,6 +300,7 @@ class SketchFieldDemo extends React.Component {
                         <div className='col-xs-7 col-sm-7 col-md-9 col-lg-9'>
 
                             {/* Sketch area */}
+
                             <SketchField
                                 name='sketch'
                                 className='canvas-area'
@@ -331,11 +311,13 @@ class SketchFieldDemo extends React.Component {
                                 backgroundColor={this.state.fillWithBackgroundColor ? this.state.backgroundColor : 'transparent'}
                                 width={this.state.controlledSize ? this.state.sketchWidth : null}
                                 height={this.state.controlledSize ? this.state.sketchHeight : null}
-                                defaultData={dataJson}
-                                defaultDataType="json"
+                                defaultValue={dataJson}
+                                value={controlledValue}
+                                forceValue={true}
                                 onChange={this._onSketchChange}
                                 tool={this.state.tool}
                             />
+
                         </div>
                         <div className='col-xs-5 col-sm-5 col-md-3 col-lg-3'>
                             <Card style={{margin: '10px 10px 5px 0'}}>
@@ -363,12 +345,12 @@ class SketchFieldDemo extends React.Component {
                                         <IconButton
                                             ref='zoom'
                                             onTouchTap={(e) => this._sketch.zoom(1.25)}>
-                                            <ZoomInIcon />
+                                            <ZoomInIcon/>
                                         </IconButton>
                                         <IconButton
                                             ref='zoom1'
                                             onTouchTap={(e) => this._sketch.zoom(0.8)}>
-                                            <ZoomOutIcon />
+                                            <ZoomOutIcon/>
                                         </IconButton>
                                         <br/>
                                         <br/>
@@ -451,6 +433,54 @@ class SketchFieldDemo extends React.Component {
                                     </div>
                                 </CardText>
                             </Card>
+
+                            <Card style={{margin: '5px 10px 5px 0'}}>
+                                <CardHeader title='Images' actAsExpander={true} showExpandableButton={true}/>
+                                <CardText expandable={true}>
+
+                                    <div>
+                                        <TextField
+                                            floatingLabelText='Image URL'
+                                            hintText='Copy/Paste an image URL'
+                                            ref={(c) => this._imageUrlTxt = c}
+                                            defaultValue='https://files.gamebanana.com/img/ico/sprays/4ea2f4dad8d6f.png'/>
+
+                                        <br/>
+
+                                        <RaisedButton
+                                            label='Load Image from URL'
+                                            onTouchTap={(e) => this._sketch.addImg(this._imageUrlTxt.getValue())}/>
+                                    </div>
+
+                                    <br/>
+
+                                    <br/>
+
+                                    <div>
+                                        <RaisedButton
+                                            label='Load Image from Data URL'
+                                            onTouchTap={(e) => this._sketch.addImg(dataUrl)}/>
+                                    </div>
+
+                                </CardText>
+                            </Card>
+
+                            <Card style={{margin: '5px 10px 5px 0'}}>
+                                <CardHeader title='Controlled value' actAsExpander={true} showExpandableButton={true}/>
+                                <CardText expandable={true}>
+
+                                    <div>
+
+                                        <RaisedButton
+                                            label='Load controlled Value'
+                                            onTouchTap={(e) => this.setState({
+                                                controlledValue: dataJsonControlled
+                                            })}
+                                        />
+                                    </div>
+
+                                </CardText>
+                            </Card>
                         </div>
                     </div>
 
@@ -471,7 +501,7 @@ class SketchFieldDemo extends React.Component {
                 </div>
             </MuiThemeProvider>
         )
-    }
+    };
 }
 
 export default SketchFieldDemo;

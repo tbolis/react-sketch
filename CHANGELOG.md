@@ -1,5 +1,17 @@
 ## Changelog
 
+* **0.4.0** New Features and fixes
+    - Fixes
+    -- Upgraded to latest packages (thanks @fjogeleit)
+    -- Fix for undo/redo (thanks @pomelyu)
+    -- Issue #9 fixed
+    -- Issue #10 and #15 you can no longer give dataUrl as value only as background image and/or by adding the image as an object
+    - Breaking Changes
+    -- `data` and `dataType` properties have been replaced with `value` and `defaultValue`
+    to be able to use the component as controlled component
+    -- node support of 6,7 and 8
+    - New Features
+    -- ability to add an image as object
 * **0.3.0** New Features and fixes
     - HOT Deploy fixed
     - Added selection of background Color
