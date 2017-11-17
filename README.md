@@ -16,11 +16,17 @@ A Sketch tool for React based applications, backed-up by [FabricJS](http://fabri
 npm install react-sketch --save
 ```
 
+or with yarn
+
+```sh
+yarn add react-sketch
+```
+
 ### Source installation
 
 In order to build from source, read the [relevant instructions](http://fabricjs.com/fabric-intro-part-4#node) first. 
 
-Tested with node versions 4,5,6,7,8.
+Tested with node versions 6,7,8.
 
 ## Usage
 
@@ -84,7 +90,7 @@ yarn install
 npm start
 ```
 
-and navigate to http://localhost:9999
+and navigate to http://localhost:23000
 
 You can as well check the live showcase here: http://tbolis.github.io/showcase/react-sketch/
                                          
