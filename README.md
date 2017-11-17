@@ -56,7 +56,7 @@ Configuration Options
 | width             | Number                | No Value(null)| Set/control the canvas width, if left empty the sketch will scale to parent element |
 | height            | Number                | 512           | Set/control the canvas height, if left empty the sketch will take a reasonable default height |
 | value             | JSON                  |               | Property to utilize and handle the sketch data as controlled component |
-| defaultValue      | JSON or data URL      |               | Default initial data, to load. If value is set then value will be loaded instead |
+| defaultValue      | JSON                  |               | Default initial data, to load. If value is set then value will be loaded instead |
 | widthCorrection   | Number                | 2             | Specify some width correction which will be applied on resize of canvas, this will help to correct some possible border on the canvas style |
 | heightCorrection  | Number                | 0             | Specify some height correction which will be applied on resize of canvas, this will help to correct some possible border on the canvas style | 
 
