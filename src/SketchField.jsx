@@ -37,13 +37,11 @@ class SketchField extends PureComponent {
         tool: PropTypes.string,
         // image format when calling toDataURL
         imageFormat: PropTypes.string,
-        // Default initial data
-        defaultData: PropTypes.oneOfType([
-            PropTypes.string,
-            PropTypes.object
-        ]),
-        // Type of initial data
-        defaultDataType: PropTypes.oneOf(['json', 'url']),
+        // Sketch data for controlling sketch from
+        // outside the component
+        value: PropTypes.object,
+        // Set to true if you wish to force load the given value, even if it is  the same
+        forceValue: PropTypes.bool,
         // Specify some width correction which will be applied on auto resize
         widthCorrection: PropTypes.number,
         // Specify some height correction which will be applied on auto resize
@@ -58,9 +56,9 @@ class SketchField extends PureComponent {
         opacity: 1.0,
         undoSteps: 25,
         tool: Tool.Pencil,
-        defaultDataType: 'json',
         widthCorrection: 2,
-        heightCorrection: 0
+        heightCorrection: 0,
+        forceValue: false
     };
 
     state = {
@@ -76,6 +74,7 @@ class SketchField extends PureComponent {
         this._tools[Tool.Circle] = new Circle(fabricCanvas);
         this._tools[Tool.Pan] = new Pan(fabricCanvas)
     };
+
     /**
      * Enable touch Scrolling on Canvas
      */
@@ -84,6 +83,7 @@ class SketchField extends PureComponent {
         if (canvas.allowTouchScrolling) return;
         canvas.allowTouchScrolling = true
     };
+
     /**
      * Disable touch Scrolling on Canvas
      */
@@ -92,6 +92,36 @@ class SketchField extends PureComponent {
         if (canvas.allowTouchScrolling) {
             canvas.allowTouchScrolling = false
         }
+    };
+
+    /**
+     * Add an image as object to the canvas
+     *
+     * @param dataUrl the image url or Data Url
+     * @param options object to pass and change some options when loading image, the format of the object is:
+     *
+     * {
+     *   left: <Number: distance from left of canvas>,
+     *   top: <Number: distance from top of canvas>,
+     *   scale: <Number: initial scale of image>
+     * }
+     */
+    addImg = (dataUrl, options = {}) => {
+        let canvas = this._fc;
+        fabric.Image.fromURL(dataUrl, (oImg) => {
+            let opts = {
+                left: Math.random() * (canvas.getWidth() - oImg.width * 0.5),
+                top: Math.random() * (canvas.getHeight() - oImg.height * 0.5),
+                scale: 0.5
+            };
+            Object.assign(opts, options);
+            oImg.scale(opts.scale);
+            oImg.set({
+                'left': opts.left,
+                'top': opts.top
+            });
+            canvas.add(oImg);
+        });
     };
 
     /**
@@ -331,9 +361,7 @@ class SketchField extends PureComponent {
      *
      * @returns {String} URL containing a representation of the object in the format specified by options.format
      */
-    toDataURL = (options) => {
-        return this._fc.toDataURL(options)
-    };
+    toDataURL = (options) => this._fc.toDataURL(options);
 
     /**
      * Returns JSON representation of canvas
@@ -341,9 +369,7 @@ class SketchField extends PureComponent {
      * @param propertiesToInclude Array <optional> Any properties that you might want to additionally include in the output
      * @returns {string} JSON string
      */
-    toJSON = (propertiesToInclude) => {
-        return this._fc.toJSON(propertiesToInclude)
-    };
+    toJSON = (propertiesToInclude) => this._fc.toJSON(propertiesToInclude);
 
     /**
      * Populates canvas with data from the specified JSON.
@@ -414,9 +440,9 @@ class SketchField extends PureComponent {
     componentDidMount = () => {
         let {
             tool,
-            undoSteps,
-            defaultData,
-            defaultDataType
+            value,
+            defaultValue,
+            undoSteps
         } = this.props;
 
         let canvas = this._fc = new fabric.Canvas(this._canvas/*, {
@@ -450,21 +476,15 @@ class SketchField extends PureComponent {
         canvas.on('object:rotating', this._onObjectRotating);
 
         this.disableTouchScroll();
+
         this._resize();
 
-        // initialize canvas with default data
-        if (defaultData) {
-            if ('json' === defaultDataType) {
-                this.fromJSON(defaultData)
-            }
-            if ('url' === defaultDataType) {
-                this.setBackgroundFromDataUrl(defaultData)
-            }
-        }
+        // initialize canvas with controlled value if exists
+        (value || defaultValue) && this.fromJSON(value || defaultValue);
+
     };
 
     componentWillUnmount = () => window.removeEventListener('resize', this._resize);
-
 
     componentDidUpdate = (prevProps, prevState) => {
         if (this.state.parentWidth !== prevState.parentWidth
@@ -477,18 +497,20 @@ class SketchField extends PureComponent {
 
     componentWillReceiveProps = (nextProps) => {
         if (this.props.tool !== nextProps.tool) {
-            this._selectedTool = this._tools[nextProps.tool] ||
-                this._tools[Tool.Pencil]
+            this._selectedTool = this._tools[nextProps.tool] || this._tools[Tool.Pencil]
         }
 
         //Bring the cursor back to default if it is changed by a tool
         this._fc.defaultCursor = 'default';
-
         this._selectedTool.configureCanvas(nextProps);
+
         if (this.props.backgroundColor !== nextProps.backgroundColor) {
             this._backgroundColor(nextProps.backgroundColor)
         }
 
+        if ((this.props.value !== nextProps.value) || (nextProps.value && nextProps.forceValue)) {
+            this.fromJSON(nextProps.value);
+        }
     };
 
     _onObjectModified = (e) => {
