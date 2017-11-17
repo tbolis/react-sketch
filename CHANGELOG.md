@@ -4,6 +4,8 @@
     - Fixes
     -- Upgraded to latest packages (thanks @fjogeleit)
     -- Fix for undo/redo (thanks @pomelyu)
+    -- Issue #9 fixed
+    -- Issue #10 and #15 you can no longer give dataUrl as value only as background image and/or by adding the image as an object
     - Breaking Changes
     -- `data` and `dataType` properties have been replaced with `value` and `defaultValue`
     to be able to use the component as controlled component
