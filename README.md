@@ -41,7 +41,7 @@ class SketchFieldDemo extends React.Component {
             <SketchField width='1024px' 
                          height='768px' 
                          tool={Tools.Pencil} 
-                         color='black'
+                         lineColor='black'
                          lineWidth={3}/>
         )
      }
