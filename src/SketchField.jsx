@@ -1,10 +1,10 @@
 /*eslint no-unused-vars: 0*/
 'use strict';
 
-import React, {PureComponent} from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import History from './history'
-import {uuid4} from './utils'
+import { uuid4 } from './utils'
 import Select from './select'
 import Pencil from './pencil'
 import Line from './line'
@@ -124,12 +124,28 @@ class SketchField extends PureComponent {
         });
     };
 
+    addText = (text, options = {}) => {
+        let canvas = this._fc;
+        let iText = new fabric.IText(text, options);
+        let opts = {
+            left: (canvas.getWidth() - iText.width) * 0.5,
+            top: (canvas.getHeight() - iText.height) * 0.5,
+        };
+        Object.assign(options, opts);
+        iText.set({
+            'left': options.left,
+            'top': options.top
+        })
+
+        canvas.add(iText);
+    }
+
     /**
      * Action when an object is added to the canvas
      */
     _onObjectAdded = (e) => {
         if (!this.state.action) {
-            this.setState({action: true});
+            this.setState({ action: true });
             return
         }
         let obj = e.target;
@@ -206,9 +222,9 @@ class SketchField extends PureComponent {
      */
     _resize = (e) => {
         if (e) e.preventDefault();
-        let {widthCorrection, heightCorrection} = this.props;
+        let { widthCorrection, heightCorrection } = this.props;
         let canvas = this._fc;
-        let {offsetWidth, clientHeight} = this._container;
+        let { offsetWidth, clientHeight } = this._container;
         let prevWidth = canvas.getWidth();
         let prevHeight = canvas.getHeight();
         let wfactor = ((offsetWidth - widthCorrection) / prevWidth).toFixed(2);
@@ -308,7 +324,7 @@ class SketchField extends PureComponent {
             //noinspection Eslint
             let [obj, prevState, currState] = history.redo();
             if (obj.version === 0) {
-                this.setState({action: false}, () => {
+                this.setState({ action: false }, () => {
                     canvas.add(obj);
                     obj.version = 1
                 })
@@ -474,6 +490,11 @@ class SketchField extends PureComponent {
         canvas.on('object:moving', this._onObjectMoving);
         canvas.on('object:scaling', this._onObjectScaling);
         canvas.on('object:rotating', this._onObjectRotating);
+        // IText Events fired on Adding Text
+        // canvas.on("text:event:changed", console.log)
+        // canvas.on("text:selection:changed", console.log)
+        // canvas.on("text:editing:entered", console.log)
+        // canvas.on("text:editing:exited", console.log)
 
         this.disableTouchScroll();
 
@@ -554,8 +575,8 @@ class SketchField extends PureComponent {
         } = this.props;
 
         let canvasDivStyle = Object.assign({}, style ? style : {},
-            width ? {width: width} : {},
-            height ? {height: height} : {height: 512});
+            width ? { width: width } : {},
+            height ? { height: height } : { height: 512 });
 
         return (
             <div
