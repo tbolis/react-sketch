@@ -1,5 +1,6 @@
 language: node_js
 node_js:
+  - "9"
   - "8"
   - "7"
   - "6"
@@ -14,4 +15,6 @@ addons:
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev
+  - sudo npm install -g yarn
+  - yarn install
 script: 'npm run build && npm run test'
