@@ -1,6 +1,6 @@
 {
   "name": "react-sketch",
-  "version": "0.4.2",
+  "version": "0.4.4",
   "description": "Sketch Element for React based applications, backed-up by fabricjs as its core",
   "keywords": [
     "react",
@@ -79,7 +79,6 @@
     "my-local-ip": "^1.0.0",
     "open": "0.0.5",
     "open-browser-webpack-plugin": "0.0.5",
-    "phantomjs-prebuilt": "^2.1.16",
     "postcss-loader": "^2.1.0",
     "react-color": "^2.13.8",
     "react-hot-loader": "^3.1",
@@ -93,6 +92,7 @@
     "weinre": "^2.0.0-pre-I0Z7U9OV"
   },
   "dependencies": {
+    "phantomjs-prebuilt": "2.1.7",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",

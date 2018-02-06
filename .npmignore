@@ -8,6 +8,8 @@ docs/
 .gitignore
 .karma.config.js
 webpack.*
+yarn.lock
+package.lock
 
 
 ### Linux template
