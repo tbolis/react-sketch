@@ -206,7 +206,7 @@ class SketchField extends PureComponent {
     };
 
 
-    _addAnimation = (dataUrl, options = {}) => {
+    addAnimation = (dataUrl, options = {}) => {
         let canvas = this._fc;
         console.log(fabric)
         fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
