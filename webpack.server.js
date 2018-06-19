@@ -13,6 +13,7 @@ const NoEmitOnErrorsPlugin = require('webpack/lib/NoEmitOnErrorsPlugin');
 const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlugin');
 
 const srcPath = path.join(__dirname, 'src');
+const publicPath = path.join(__dirname, 'public');
 const examplesPath = path.join(__dirname, 'examples');
 
 const port = 23000;
@@ -47,16 +48,17 @@ const config = {
     devtool: 'inline-source-map',
     devServer: {
         historyApiFallback: true,
-        stats: {colors: true},
+        stats: { colors: true },
         publicPath: '/',
         noInfo: false,
         lazy: false,
         port: port,
-        hot: true
+        hot: true,
+        publicPath: publicPath
     },
     module: {
         loaders: [
-            {test: /\.css$/, loader: 'style-loader!css-loader'},
+            { test: /\.css$/, loader: 'style-loader!css-loader' },
             {
                 test: /\.(js|jsx)$/,
                 include: [srcPath, examplesPath],
@@ -83,7 +85,7 @@ const config = {
                 'NODE_ENV': JSON.stringify('development')
             }
         }),
-        new OpenBrowserPlugin({url: 'http://localhost:' + port})
+        new OpenBrowserPlugin({ url: 'http://localhost:' + port })
     ]
 };
 
@@ -91,5 +93,5 @@ new WebpackDevServer(webpack(config), config.devServer)
     .listen(port, '0.0.0.0', function (err) {
         err && console.log(err);
         console.log('Serving from http://' + myLocalIP() + ':' + port);
-        }
+    }
     );
