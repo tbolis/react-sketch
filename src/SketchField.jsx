@@ -1,10 +1,10 @@
 /*eslint no-unused-vars: 0*/
 'use strict';
 
-import React, {PureComponent} from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import History from './history'
-import {uuid4} from './utils'
+import { uuid4 } from './utils'
 import Select from './select'
 import Pencil from './pencil'
 import Line from './line'
@@ -14,6 +14,87 @@ import Pan from './pan'
 import Tool from './tools'
 
 const fabric = require('fabric').fabric;
+
+fabric.Sprite = fabric.util.createClass(fabric.Image, {
+
+    type: 'sprite',
+
+    spriteWidth: 50,
+    spriteHeight: 72,
+    spriteIndex: 0,
+
+    initialize: function (element, options) {
+        options || (options = {});
+
+        options.width = this.spriteWidth;
+        options.height = this.spriteHeight;
+        options.animationSrc = options.animationSrc;
+        this.callSuper('initialize', element, options);
+
+        this.createTmpCanvas();
+        this.createSpriteImages();
+    },
+
+    createTmpCanvas: function () {
+        this.tmpCanvasEl = fabric.util.createCanvasElement();
+        this.tmpCanvasEl.width = this.spriteWidth || this.width;
+        this.tmpCanvasEl.height = this.spriteHeight || this.height;
+    },
+
+    createSpriteImages: function () {
+        this.spriteImages = [];
+
+        var steps = this._element.width / this.spriteWidth;
+        for (var i = 0; i < steps; i++) {
+            this.createSpriteImage(i);
+        }
+    },
+
+    createSpriteImage: function (i) {
+        var tmpCtx = this.tmpCanvasEl.getContext('2d');
+        tmpCtx.clearRect(0, 0, this.tmpCanvasEl.width, this.tmpCanvasEl.height);
+        tmpCtx.drawImage(this._element, -i * this.spriteWidth, 0);
+
+        var dataURL = this.tmpCanvasEl.toDataURL('image/png');
+        var tmpImg = fabric.util.createImage();
+
+        tmpImg.src = dataURL;
+
+        this.spriteImages.push(tmpImg);
+    },
+
+    _render: function (ctx) {
+        ctx.drawImage(
+            this.spriteImages[this.spriteIndex],
+            -this.width / 2,
+            -this.height / 2
+        );
+    },
+
+    play: function () {
+        var _this = this;
+        this.animInterval = setInterval(function () {
+
+            _this.onPlay && _this.onPlay();
+
+            _this.spriteIndex++;
+            if (_this.spriteIndex === _this.spriteImages.length) {
+                _this.spriteIndex = 0;
+            }
+        }, 100);
+    },
+
+    stop: function () {
+        clearInterval(this.animInterval);
+    }
+});
+
+fabric.Sprite.fromURL = function (url, callback, imgOptions) {
+    fabric.util.loadImage(url, function (img) {
+        callback(new fabric.Sprite(img, imgOptions));
+    });
+};
+fabric.Sprite.async = true;
 
 /**
  * Sketch Tool based on FabricJS for React Applications
@@ -124,12 +205,39 @@ class SketchField extends PureComponent {
         });
     };
 
+
+    addAnimation = (dataUrl, options = {}) => {
+        let canvas = this._fc;
+        console.log(fabric)
+        fabric.Object.prototype.originX = fabric.Object.prototype.originY = 'center';
+        fabric.Object.prototype.transparentCorners = false;
+        var url = '/public/sprite.png';
+
+        fabric.Sprite.fromURL(url, (oSpriteImg) => {
+            oSpriteImg.set({
+                left: (canvas.getWidth() - oSpriteImg.width * 0.5),
+                top: (canvas.getHeight() - oSpriteImg.height * 0.5),
+                scale: 0.9
+            });
+            canvas.add(oSpriteImg);
+            setTimeout(function () {
+                oSpriteImg.play();
+            }, 100);
+        });
+
+        (function render() {
+            canvas.renderAll();
+            fabric.util.requestAnimFrame(render);
+        })();
+    };
+
+
     /**
      * Action when an object is added to the canvas
      */
     _onObjectAdded = (e) => {
         if (!this.state.action) {
-            this.setState({action: true});
+            this.setState({ action: true });
             return
         }
         let obj = e.target;
@@ -206,9 +314,9 @@ class SketchField extends PureComponent {
      */
     _resize = (e) => {
         if (e) e.preventDefault();
-        let {widthCorrection, heightCorrection} = this.props;
+        let { widthCorrection, heightCorrection } = this.props;
         let canvas = this._fc;
-        let {offsetWidth, clientHeight} = this._container;
+        let { offsetWidth, clientHeight } = this._container;
         let prevWidth = canvas.getWidth();
         let prevHeight = canvas.getHeight();
         let wfactor = ((offsetWidth - widthCorrection) / prevWidth).toFixed(2);
@@ -308,7 +416,7 @@ class SketchField extends PureComponent {
             //noinspection Eslint
             let [obj, prevState, currState] = history.redo();
             if (obj.version === 0) {
-                this.setState({action: false}, () => {
+                this.setState({ action: false }, () => {
                     canvas.add(obj);
                     obj.version = 1
                 })
@@ -554,8 +662,8 @@ class SketchField extends PureComponent {
         } = this.props;
 
         let canvasDivStyle = Object.assign({}, style ? style : {},
-            width ? {width: width} : {},
-            height ? {height: height} : {height: 512});
+            width ? { width: width } : {},
+            height ? { height: height } : { height: 512 });
 
         return (
             <div

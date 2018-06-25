@@ -2,7 +2,7 @@
 'use strict';
 
 import React from 'react';
-import {CompactPicker} from 'react-color';
+import { CompactPicker } from 'react-color';
 import 'flexboxgrid';
 import './main.css';
 import {
@@ -35,7 +35,7 @@ import dataJson from './data.json';
 import dataJsonControlled from './data.json.controlled';
 import dataUrl from './data.url';
 
-import {SketchField, Tools} from '../src';
+import { SketchField, Tools } from '../src';
 import DropZone from 'react-dropzone';
 
 const styles = {
@@ -137,7 +137,7 @@ class SketchFieldDemo extends React.Component {
     _save = () => {
         let drawings = this.state.drawings;
         drawings.push(this._sketch.toDataURL());
-        this.setState({drawings: drawings});
+        this.setState({ drawings: drawings });
     };
     _download = () => {
         /*eslint-disable no-console*/
@@ -147,7 +147,7 @@ class SketchFieldDemo extends React.Component {
 
         /*eslint-enable no-console*/
 
-        let {imgDown} = this.refs;
+        let { imgDown } = this.refs;
         let event = new Event('click', {});
 
         imgDown.href = this._sketch.toDataURL();
@@ -164,15 +164,15 @@ class SketchFieldDemo extends React.Component {
                 titleBackground="linear-gradient(to bottom, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
                 cols={1} rows={1} style={styles.gridTile}
                 actionIcon={<IconButton onTouchTap={(c) => this._removeMe(index)}><RemoveIcon
-                    color="white"/></IconButton>}>
-                <img src={drawing}/>
+                    color="white" /></IconButton>}>
+                <img src={drawing} />
             </GridTile>
         );
     };
     _removeMe = (index) => {
         let drawings = this.state.drawings;
         drawings.splice(index, 1);
-        this.setState({drawings: drawings});
+        this.setState({ drawings: drawings });
     };
     _undo = () => {
         this._sketch.undo();
@@ -203,14 +203,14 @@ class SketchFieldDemo extends React.Component {
         let prev = this.state.canUndo;
         let now = this._sketch.canUndo();
         if (prev !== now) {
-            this.setState({canUndo: now});
+            this.setState({ canUndo: now });
         }
     };
     _onBackgroundImageDrop = (accepted/*, rejected*/) => {
         if (accepted && accepted.length > 0) {
             let sketch = this._sketch;
             let reader = new FileReader();
-            let {stretched, stretchedX, stretchedY, originX, originY} = this.state;
+            let { stretched, stretchedX, stretchedY, originX, originY } = this.state;
             reader.addEventListener('load', () => sketch.setBackgroundFromDataUrl(reader.result, {
                 stretched: stretched,
                 stretchedX: stretchedX,
@@ -235,7 +235,7 @@ class SketchFieldDemo extends React.Component {
                 if (typeof data === 'object') {
                     data = JSON.stringify(data, undefined, 4)
                 }
-                var blob = new Blob([data], {type: 'text/json'}),
+                var blob = new Blob([data], { type: 'text/json' }),
                     e = document.createEvent('MouseEvents'),
                     a = document.createElement('a');
                 a.download = filename;
@@ -249,8 +249,13 @@ class SketchFieldDemo extends React.Component {
         /*eslint-enable no-console*/
 
     };
+    _processSprite() {
+        console.log('process Sprite')
+        this._sketch._addAnimation();
+    }
+
     render = () => {
-        let {controlledValue} = this.state;
+        let { controlledValue } = this.state;
         return (
             <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <div>
@@ -264,31 +269,31 @@ class SketchFieldDemo extends React.Component {
                                     onTouchTap={this._undo}
                                     iconStyle={styles.iconButton}
                                     disabled={!this.state.canUndo}>
-                                    <UndoIcon/>
+                                    <UndoIcon />
                                 </IconButton>
                                 <IconButton
                                     onTouchTap={this._redo}
                                     iconStyle={styles.iconButton}
                                     disabled={!this.state.canRedo}>
-                                    <RedoIcon/>
+                                    <RedoIcon />
                                 </IconButton>
-                                <ToolbarSeparator style={styles.separator}/>
+                                <ToolbarSeparator style={styles.separator} />
                                 <IconButton
                                     onTouchTap={this._save}
                                     iconStyle={styles.iconButton}>
-                                    <SaveIcon/>
+                                    <SaveIcon />
                                 </IconButton>
                                 <IconButton
                                     onTouchTap={this._download}
                                     iconStyle={styles.iconButton}>
-                                    <DownloadIcon/>
+                                    <DownloadIcon />
                                 </IconButton>
-                                <a ref='imgDown'/>
-                                <ToolbarSeparator style={styles.separator}/>
+                                <a ref='imgDown' />
+                                <ToolbarSeparator style={styles.separator} />
                                 <IconButton
                                     onTouchTap={this._clear}
                                     iconStyle={styles.iconButton}>
-                                    <ClearIcon/>
+                                    <ClearIcon />
                                 </IconButton>
                             </AppBar>
                         </div>
@@ -320,102 +325,102 @@ class SketchFieldDemo extends React.Component {
 
                         </div>
                         <div className='col-xs-5 col-sm-5 col-md-3 col-lg-3'>
-                            <Card style={{margin: '10px 10px 5px 0'}}>
-                                <CardHeader title='Tools' actAsExpander={true} showExpandableButton={true}/>
+                            <Card style={{ margin: '10px 10px 5px 0' }}>
+                                <CardHeader title='Tools' actAsExpander={true} showExpandableButton={true} />
                                 <CardText expandable={true}>
-                                    <label htmlFor='tool'>Canvas Tool</label><br/>
+                                    <label htmlFor='tool'>Canvas Tool</label><br />
                                     <SelectField ref='tool' value={this.state.tool} onChange={this._selectTool}>
-                                        <MenuItem value={Tools.Select} primaryText="Select"/>
-                                        <MenuItem value={Tools.Pencil} primaryText="Pencil"/>
-                                        <MenuItem value={Tools.Line} primaryText="Line"/>
-                                        <MenuItem value={Tools.Rectangle} primaryText="Rectangle"/>
-                                        <MenuItem value={Tools.Circle} primaryText="Circle"/>
-                                        <MenuItem value={Tools.Pan} primaryText="Pan"/>
+                                        <MenuItem value={Tools.Select} primaryText="Select" />
+                                        <MenuItem value={Tools.Pencil} primaryText="Pencil" />
+                                        <MenuItem value={Tools.Line} primaryText="Line" />
+                                        <MenuItem value={Tools.Rectangle} primaryText="Rectangle" />
+                                        <MenuItem value={Tools.Circle} primaryText="Circle" />
+                                        <MenuItem value={Tools.Pan} primaryText="Pan" />
                                     </SelectField>
-                                    <br/>
-                                    <br/>
-                                    <br/>
+                                    <br />
+                                    <br />
+                                    <br />
                                     <label htmlFor='slider'>Line Weight</label>
                                     <Slider ref='slider' step={0.1}
-                                            defaultValue={this.state.lineWidth / 100}
-                                            onChange={(e, v) => this.setState({lineWidth: v * 100})}/>
-                                    <br/>
+                                        defaultValue={this.state.lineWidth / 100}
+                                        onChange={(e, v) => this.setState({ lineWidth: v * 100 })} />
+                                    <br />
                                     <label htmlFor='zoom'>Zoom</label>
                                     <div>
                                         <IconButton
                                             ref='zoom'
                                             onTouchTap={(e) => this._sketch.zoom(1.25)}>
-                                            <ZoomInIcon/>
+                                            <ZoomInIcon />
                                         </IconButton>
                                         <IconButton
                                             ref='zoom1'
                                             onTouchTap={(e) => this._sketch.zoom(0.8)}>
-                                            <ZoomOutIcon/>
+                                            <ZoomOutIcon />
                                         </IconButton>
-                                        <br/>
-                                        <br/>
+                                        <br />
+                                        <br />
                                         <Toggle label="Control size"
-                                                defaultToggled={this.state.controlledSize}
-                                                onToggle={(e) => this.setState({controlledSize: !this.state.controlledSize})}/>
-                                        <br/>
+                                            defaultToggled={this.state.controlledSize}
+                                            onToggle={(e) => this.setState({ controlledSize: !this.state.controlledSize })} />
+                                        <br />
                                         <label htmlFor='xSize'>Change Canvas Width</label>
                                         <Slider ref='xSize' step={1}
-                                                min={10} max={1000}
-                                                defaultValue={this.state.sketchWidth}
-                                                onChange={(e, v) => this.setState({sketchWidth: v})}/>
-                                        <br/>
+                                            min={10} max={1000}
+                                            defaultValue={this.state.sketchWidth}
+                                            onChange={(e, v) => this.setState({ sketchWidth: v })} />
+                                        <br />
                                         <label htmlFor='ySize'>Change Canvas Height</label>
                                         <Slider ref='ySize' step={1}
-                                                min={10} max={1000}
-                                                defaultValue={this.state.sketchHeight}
-                                                onChange={(e, v) => this.setState({sketchHeight: v})}/>
-                                        <br/>
+                                            min={10} max={1000}
+                                            defaultValue={this.state.sketchHeight}
+                                            onChange={(e, v) => this.setState({ sketchHeight: v })} />
+                                        <br />
                                     </div>
                                 </CardText>
                             </Card>
-                            <Card style={{margin: '5px 10px 5px 0'}}>
-                                <CardHeader title='Colors' actAsExpander={true} showExpandableButton={true}/>
+                            <Card style={{ margin: '5px 10px 5px 0' }}>
+                                <CardHeader title='Colors' actAsExpander={true} showExpandableButton={true} />
                                 <CardText expandable={true}>
                                     <label htmlFor='lineColor'>Line</label>
                                     <CompactPicker
                                         id='lineColor' color={this.state.lineColor}
-                                        onChange={(color) => this.setState({lineColor: color.hex})}/>
-                                    <br/>
-                                    <br/>
+                                        onChange={(color) => this.setState({ lineColor: color.hex })} />
+                                    <br />
+                                    <br />
                                     <Toggle label="Fill"
-                                            defaultToggled={this.state.fillWithColor}
-                                            onToggle={(e) => this.setState({fillWithColor: !this.state.fillWithColor})}/>
+                                        defaultToggled={this.state.fillWithColor}
+                                        onToggle={(e) => this.setState({ fillWithColor: !this.state.fillWithColor })} />
                                     <CompactPicker
                                         color={this.state.fillColor}
-                                        onChange={(color) => this.setState({fillColor: color.hex})}/>
+                                        onChange={(color) => this.setState({ fillColor: color.hex })} />
                                 </CardText>
                             </Card>
-                            <Card style={{margin: '5px 10px 5px 0'}}>
-                                <CardHeader title='Background' actAsExpander={true} showExpandableButton={true}/>
+                            <Card style={{ margin: '5px 10px 5px 0' }}>
+                                <CardHeader title='Background' actAsExpander={true} showExpandableButton={true} />
                                 <CardText expandable={true}>
                                     <Toggle label="Background Color"
-                                            defaultToggled={this.state.fillWithBackgroundColor}
-                                            onToggle={(e) => this.setState({fillWithBackgroundColor: !this.state.fillWithBackgroundColor})}/>
+                                        defaultToggled={this.state.fillWithBackgroundColor}
+                                        onToggle={(e) => this.setState({ fillWithBackgroundColor: !this.state.fillWithBackgroundColor })} />
                                     <CompactPicker
                                         color={this.state.backgroundColor}
-                                        onChange={(color) => this.setState({backgroundColor: color.hex})}/>
+                                        onChange={(color) => this.setState({ backgroundColor: color.hex })} />
 
-                                    <br/>
-                                    <br/>
+                                    <br />
+                                    <br />
                                     <label htmlFor='lineColor'>Set Image Background</label>
-                                    <br/>
+                                    <br />
 
                                     <Toggle label="Fit canvas (X,Y)"
-                                            defaultToggled={this.state.stretched}
-                                            onToggle={(e) => this.setState({stretched: !this.state.stretched})}/>
+                                        defaultToggled={this.state.stretched}
+                                        onToggle={(e) => this.setState({ stretched: !this.state.stretched })} />
 
                                     <Toggle label="Fit canvas (X)"
-                                            defaultToggled={this.state.stretchedX}
-                                            onToggle={(e) => this.setState({stretchedX: !this.state.stretchedX})}/>
+                                        defaultToggled={this.state.stretchedX}
+                                        onToggle={(e) => this.setState({ stretchedX: !this.state.stretchedX })} />
 
                                     <Toggle label="Fit canvas (Y)"
-                                            defaultToggled={this.state.stretchedY}
-                                            onToggle={(e) => this.setState({stretchedY: !this.state.stretchedY})}/>
+                                        defaultToggled={this.state.stretchedY}
+                                        onToggle={(e) => this.setState({ stretchedY: !this.state.stretchedY })} />
 
                                     <div>
                                         <DropZone
@@ -426,16 +431,16 @@ class SketchFieldDemo extends React.Component {
                                             activeStyle={styles.activeStyle}
                                             rejectStyle={styles.rejectStyle}
                                             onDrop={this._onBackgroundImageDrop}>
-                                            Try dropping an image here,<br/>
-                                            or click<br/>
+                                            Try dropping an image here,<br />
+                                            or click<br />
                                             to select image as background.
                                         </DropZone>
                                     </div>
                                 </CardText>
                             </Card>
 
-                            <Card style={{margin: '5px 10px 5px 0'}}>
-                                <CardHeader title='Images' actAsExpander={true} showExpandableButton={true}/>
+                            <Card style={{ margin: '5px 10px 5px 0' }}>
+                                <CardHeader title='Images' actAsExpander={true} showExpandableButton={true} />
                                 <CardText expandable={true}>
 
                                     <div>
@@ -443,30 +448,37 @@ class SketchFieldDemo extends React.Component {
                                             floatingLabelText='Image URL'
                                             hintText='Copy/Paste an image URL'
                                             ref={(c) => this._imageUrlTxt = c}
-                                            defaultValue='https://files.gamebanana.com/img/ico/sprays/4ea2f4dad8d6f.png'/>
+                                            defaultValue='https://files.gamebanana.com/img/ico/sprays/4ea2f4dad8d6f.png' />
 
-                                        <br/>
+                                        <br />
 
                                         <RaisedButton
                                             label='Load Image from URL'
-                                            onTouchTap={(e) => this._sketch.addImg(this._imageUrlTxt.getValue())}/>
+                                            onTouchTap={(e) => this._sketch.addImg(this._imageUrlTxt.getValue())} />
+
+                                        <br />
+
+                                        <br />
+                                        <RaisedButton
+                                            label='Load Sprite from Local Path'
+                                            onTouchTap={(e) => this._processSprite()} />
                                     </div>
 
-                                    <br/>
+                                    <br />
 
-                                    <br/>
+                                    <br />
 
                                     <div>
                                         <RaisedButton
                                             label='Load Image from Data URL'
-                                            onTouchTap={(e) => this._sketch.addImg(dataUrl)}/>
+                                            onTouchTap={(e) => this._sketch.addImg(dataUrl)} />
                                     </div>
 
                                 </CardText>
                             </Card>
 
-                            <Card style={{margin: '5px 10px 5px 0'}}>
-                                <CardHeader title='Controlled value' actAsExpander={true} showExpandableButton={true}/>
+                            <Card style={{ margin: '5px 10px 5px 0' }}>
+                                <CardHeader title='Controlled value' actAsExpander={true} showExpandableButton={true} />
                                 <CardText expandable={true}>
 
                                     <div>
