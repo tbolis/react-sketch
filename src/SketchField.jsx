@@ -28,7 +28,7 @@ fabric.Sprite = fabric.util.createClass(fabric.Image, {
 
         options.width = this.spriteWidth;
         options.height = this.spriteHeight;
-
+        options.animationSrc = options.animationSrc;
         this.callSuper('initialize', element, options);
 
         this.createTmpCanvas();
