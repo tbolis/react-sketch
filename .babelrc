@@ -1,18 +1,16 @@
 {
   "presets": [
     [
-      "env",
+      "@babel/preset-env",
       {
         "modules": false
       }
     ],
-    "react",
-    "stage-0"
+    "@babel/preset-react"
   ],
   "plugins": [
-    "react-hot-loader/babel",
-    "transform-object-assign",
-    "transform-react-display-name",
-    "transform-runtime"
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-transform-react-inline-elements",
+    "@babel/plugin-transform-react-constant-elements"
   ]
 }

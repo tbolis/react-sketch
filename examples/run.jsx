@@ -16,7 +16,7 @@
     /* Some components use react-tap-event-plugin to listen for touch events.
      This dependency is temporary and will go away once react v1.0 is released.
      Until then, be sure to inject this plugin at the start of your app */
-    injectTapEventPlugin();
+    // injectTapEventPlugin();
 
     // Render the main app react component into the app div
     ReactDOM.render(<AppContainer><Demo /></AppContainer>, document.getElementById('container'));

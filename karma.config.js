@@ -12,7 +12,7 @@ process.env.NODE_ENV = 'testing';
 module.exports = function (config) {
     config.set({
         basePath: './',
-        browsers: ['PhantomJS'],
+        browsers: ['ChromeHeadless'],
         files: [
             'test/**/*Test.js'
         ],
@@ -20,7 +20,7 @@ module.exports = function (config) {
             'test/**/*Test.js': ['webpack', 'sourcemap']
         },
         captureTimeout: 60000,
-        frameworks: ['es6-shim', 'phantomjs-shim', 'mocha', 'chai'],
+        frameworks: ['jasmine', 'mocha'],
         client: {
             mocha: {},
             captureConsole: false
@@ -38,7 +38,7 @@ module.exports = function (config) {
                 }
             },
             module: {
-                loaders: [
+                rules: [
                     {
                         test: /\.(js|jsx)$/,
                         include: [srcPath, testPath],

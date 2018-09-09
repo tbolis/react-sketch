@@ -55,7 +55,7 @@ const config = {
         hot: true
     },
     module: {
-        loaders: [
+        rules: [
             {test: /\.css$/, loader: 'style-loader!css-loader'},
             {
                 test: /\.(js|jsx)$/,
