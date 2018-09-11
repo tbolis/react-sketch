@@ -63,7 +63,7 @@ describe('SketchField', () => {
         // Check the rectangle existed
         // expect(canvas.getObjects()[0]).to.exist;
         const rect1 = canvas.getObjects()[0];
-        expect(rect1.type).equal('rect');
+        expect(rect1.type).toEqual('rect');
 
         // Check the rectangle dimension
         expect({left: rect1.left, top: rect1.top, width: rect1.width, height: rect1.height}).toEqual(bounding);
@@ -72,7 +72,7 @@ describe('SketchField', () => {
         // From right-bottom to left-top;
         objectFromDrag(canvas, endPt, startPt);
         const rect2 = canvas.getObjects()[0];
-        expect(rect2.type).equal('rect');
+        expect(rect2.type).toEqual('rect');
 
         // Check the rectangle dimension
         expect({left: rect2.left, top: rect2.top, width: rect2.width, height: rect2.height}).toEqual(bounding);
