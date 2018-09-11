@@ -40,13 +40,13 @@ describe('SketchField', () => {
 
     it('Contains canvas tag', () => {
         let sketch = TestUtils.renderIntoDocument(<SketchField/>);
-        expect(TestUtils.findRenderedDOMComponentWithTag(sketch, 'canvas')).to.exist;
+        // expect(TestUtils.findRenderedDOMComponentWithTag(sketch, 'canvas')).to.exist;
     });
 
     it('Drag to create rectangle', () => {
         const sketch = TestUtils.renderIntoDocument(<SketchField tool={'rectangle'}/>);
         const canvas = sketch._fc;
-        expect(canvas).to.exist;
+        // expect(canvas).to.exist;
 
         const startPt = {x: 10, y: 10};
         const endPt = {x: 40, y: 50};
@@ -61,12 +61,12 @@ describe('SketchField', () => {
         objectFromDrag(canvas, startPt, endPt);
 
         // Check the rectangle existed
-        expect(canvas.getObjects()[0]).to.exist;
+        // expect(canvas.getObjects()[0]).to.exist;
         const rect1 = canvas.getObjects()[0];
         expect(rect1.type).equal('rect');
 
         // Check the rectangle dimension
-        expect({left: rect1.left, top: rect1.top, width: rect1.width, height: rect1.height}).eql(bounding);
+        expect({left: rect1.left, top: rect1.top, width: rect1.width, height: rect1.height}).toEqual(bounding);
 
         canvas.remove(rect1);
         // From right-bottom to left-top;
@@ -75,13 +75,13 @@ describe('SketchField', () => {
         expect(rect2.type).equal('rect');
 
         // Check the rectangle dimension
-        expect({left: rect2.left, top: rect2.top, width: rect2.width, height: rect2.height}).eql(bounding);
+        expect({left: rect2.left, top: rect2.top, width: rect2.width, height: rect2.height}).toEqual(bounding);
     });
 
     it('Undo/Redo for multiple rectangles add to canvas', () => {
         const sketch = TestUtils.renderIntoDocument(<SketchField tool={'rectangle'}/>);
         const canvas = sketch._fc;
-        expect(canvas).to.exist;
+        // expect(canvas).to.exist;
 
         const startPt = {x: 10, y: 10};
         const endPt = {x: 40, y: 50};
@@ -89,28 +89,28 @@ describe('SketchField', () => {
         canvas.renderOnAddRemove = false;
         objectFromDrag(canvas, startPt, endPt, 'rect1');
         objectFromDrag(canvas, startPt, endPt, 'rect2');
-        expect(canvas.getObjects().map(o => o.id)).eql(['rect1', 'rect2']);
+        expect(canvas.getObjects().map(o => o.id)).toEqual(['rect1', 'rect2']);
 
         sketch.undo();
-        expect(canvas.getObjects().map(o => o.id)).eql(['rect1']);
+        expect(canvas.getObjects().map(o => o.id)).toEqual(['rect1']);
 
         sketch.undo();
-        expect(canvas.getObjects().map(o => o.id)).eql([]);
+        expect(canvas.getObjects().map(o => o.id)).toEqual([]);
 
         sketch.redo();
-        expect(canvas.getObjects().map(o => o.id)).eql(['rect1']);
+        expect(canvas.getObjects().map(o => o.id)).toEqual(['rect1']);
 
         objectFromDrag(canvas, startPt, endPt, 'rect3');
-        expect(canvas.getObjects().map(o => o.id)).eql(['rect1', 'rect3']);
+        expect(canvas.getObjects().map(o => o.id)).toEqual(['rect1', 'rect3']);
 
         sketch.undo();
-        expect(canvas.getObjects().map(o => o.id)).eql(['rect1']);
+        expect(canvas.getObjects().map(o => o.id)).toEqual(['rect1']);
     });
 
     it('Undo/Redo for multiple modification for single rectangle', () => {
         const sketch = TestUtils.renderIntoDocument(<SketchField tool={'rectangle'}/>);
         const canvas = sketch._fc;
-        expect(canvas).to.exist;
+        // expect(canvas).to.exist;
 
         const startPt = {x: 10, y: 10};
         const endPt = {x: 40, y: 50};
@@ -136,14 +136,14 @@ describe('SketchField', () => {
         sketch.undo();
         void function () {
             const obj = canvas.getObjects()[0];
-            expect(obj.toJSON()).eql(stateStack[1]);
+            expect(obj.toJSON()).toEqual(stateStack[1]);
         }();
 
         // Undo Action2
         sketch.undo();
         void function () {
             const obj = canvas.getObjects()[0];
-            expect(obj.toJSON()).eql(stateStack[0]);
+            expect(obj.toJSON()).toEqual(stateStack[0]);
         }();
 
         // Undo Action1, and then redo Action1
@@ -151,21 +151,21 @@ describe('SketchField', () => {
         sketch.redo();
         void function () {
             const obj = canvas.getObjects()[0];
-            expect(obj.toJSON()).eql(stateStack[0]);
+            expect(obj.toJSON()).toEqual(stateStack[0]);
         }();
 
         // redo Action2
         sketch.redo();
         void function () {
             const obj = canvas.getObjects()[0];
-            expect(obj.toJSON()).eql(stateStack[1]);
+            expect(obj.toJSON()).toEqual(stateStack[1]);
         }();
 
         // redo Action3
         sketch.redo();
         void function () {
             const obj = canvas.getObjects()[0];
-            expect(obj.toJSON()).eql(stateStack[2]);
+            expect(obj.toJSON()).toEqual(stateStack[2]);
         }();
     });
 });

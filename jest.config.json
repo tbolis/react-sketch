@@ -1,0 +1,44 @@
+{
+  "testEnvironment": "jest-environment-jsdom-global",
+  "transform": {
+    ".*": "<rootDir>/jest.transform.js"
+  },
+  "moduleNameMapper": {
+    "\\.(jpeg|jpg|png|css|scss|svg)$": "identity-obj-proxy"
+  },
+  "moduleDirectories": [
+    "node_modules",
+    "src"
+  ],
+  "testPathIgnorePatterns": [
+    "/node_modules/"
+  ],
+  "moduleFileExtensions": [
+    "js",
+    "jsx",
+    "json"
+  ],
+  "testRegex": "./test/.*.jsx?$",
+  "setupFiles": [
+    "<rootDir>/jest.setup.js"
+  ],
+  "snapshotSerializers": [
+    "enzyme-to-json/serializer"
+  ],
+  "collectCoverage": true,
+  "collectCoverageFrom": [
+    "src/**"
+  ],
+  "coverageReporters": [
+    "text", "text-summary", "lcov"
+  ],
+  "coveragePathIgnorePatterns": [
+    "/node_modules/",
+    "<rootDir>/jest.*",
+    "<rootDir>/.*/api.js"
+  ],
+  "modulePathIgnorePatterns": [
+    "__snapshots__",
+    "src/js"
+  ]
+}
