@@ -33,7 +33,7 @@
     "lint:fix": "eslint --fix ./src",
     "start": "node webpack.server.js",
     "start:debug": "weinre --boundHost `my-local-ip` ",
-    "test": "jest --watchAll --coverage",
+    "test": "jest --coverage",
     "update": "ncu -a --packageFile package.json",
     "precommit": "lint-staged",
     "format": "prettier --write 'packages/**/*.js'"
@@ -50,7 +50,7 @@
   },
   "jest": {
     "automock": false,
-    "testEnvironment": "jest-environment-jsdom-global",
+    "testEnvironment": "jest-environment-jsdom",
     "moduleNameMapper": {
       "\\.(css|scss)$": "identity-obj-proxy"
     },
@@ -58,7 +58,7 @@
       "^.+\\.(js|jsx)$": "babel-jest"
     },
     "testRegex": "./test/.*.jsx?$",
-    "setupTestFrameworkScriptFile": "<rootDir>/setupTests.js",
+    "setupTestFrameworkScriptFile": "<rootDir>/jest.setup.js",
     "moduleFileExtensions": [
       "js",
       "json",
@@ -109,12 +109,9 @@
     "jasmine-core": "^3.2.1",
     "jest": "23.5.0",
     "jest-environment-jsdom": "^23.4.0",
-    "jest-environment-jsdom-global": "^1.1.0",
     "jest-enzyme": "6.0.4",
     "jsdom": "^12.0.0",
     "lint-staged": "7.2.2",
-    "material-ui": "^0.20.2",
-    "mocha": "^5.2.0",
     "mock-local-storage": "^1.0.5",
     "my-local-ip": "^1.0.0",
     "npm-check-updates": "^2.14.2",

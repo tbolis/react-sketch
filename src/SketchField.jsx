@@ -1,17 +1,14 @@
-/*eslint no-unused-vars: 0*/
-'use strict';
-
-import React, {PureComponent} from 'react'
-import PropTypes from 'prop-types'
-import History from './history'
-import {uuid4} from './utils'
-import Select from './select'
-import Pencil from './pencil'
-import Line from './line'
-import Rectangle from './rectangle'
-import Circle from './circle'
-import Pan from './pan'
-import Tool from './tools'
+import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
+import History from './history';
+import { uuid4 } from './utils';
+import Select from './select';
+import Pencil from './pencil';
+import Line from './line';
+import Rectangle from './rectangle';
+import Circle from './circle';
+import Pan from './pan';
+import Tool from './tools';
 
 const fabric = require('fabric').fabric;
 
@@ -285,7 +282,7 @@ class SketchField extends PureComponent {
         let [obj, prevState, currState] = history.getCurrent();
         history.undo();
         if (obj.version === 1) {
-            obj.remove();
+            this._fc.remove(obj);
         } else {
             obj.setOptions(JSON.parse(prevState));
             obj.setCoords();
