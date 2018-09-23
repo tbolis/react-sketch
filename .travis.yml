@@ -18,5 +18,5 @@ addons:
       - g++-4.8
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y -qq yarn=1.9.4-1
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version [version]
   - sudo apt-get install -y -qq libgif-dev libpng-dev libjpeg8-dev libpango1.0-dev libcairo2-dev
