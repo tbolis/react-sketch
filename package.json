@@ -85,6 +85,7 @@
     "@babel/preset-react": "7.0.0",
     "@babel/register": "7.0.0",
     "@babel/runtime": "7.0.0",
+    "@material-ui/icons": "^3.0.1",
     "babel-core": "7.0.0-beta.3",
     "babel-eslint": "9.0.0",
     "babel-jest": "23.4.2",
@@ -135,6 +136,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^3.0.3",
+    "@material-ui/lab": "^3.0.0-alpha.23",
     "prop-types": "^15.6.2",
     "react": "^16.5.0",
     "react-dom": "^16.5.0"

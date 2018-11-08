@@ -4,6 +4,7 @@
 [![NPM release][npm-image]][npm-url]
 [![NPM downloads][downloads-image]][downloads-url]
 [![Build status][travis-image]][travis-url]
+[![code style: prettier][prettier-image]][prettier-url]
 
 A Sketch tool for React based applications, backed-up by [FabricJS](http://fabricjs.com/)
 
@@ -116,3 +117,5 @@ MIT, do remember to add a reference if you find it useful :)
 [downloads-url]: https://www.npmjs.com/package/react-sketch
 [travis-image]: https://img.shields.io/travis/tbolis/react-sketch.svg
 [travis-url]: https://travis-ci.org/tbolis/react-sketch
+[prettier-image]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square
+[prettier-url]: https://github.com/prettier/prettier
