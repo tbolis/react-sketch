@@ -35,15 +35,13 @@
     "start:debug": "weinre --boundHost `my-local-ip` ",
     "test": "jest --coverage",
     "update": "ncu -a --packageFile package.json",
-    "precommit": "lint-staged",
-    "format": "prettier --write 'packages/**/*.js'"
+    "precommit": "lint-staged"
   },
   "engines": {
     "node": ">= 6"
   },
   "lint-staged": {
     "*.{js,jsx,css,md}": [
-      "prettier --write --single-quote",
       "eslint --fix",
       "git add"
     ]
@@ -97,12 +95,10 @@
     "enzyme-adapter-react-16": "1.5.0",
     "eslint": "5.5.0",
     "eslint-config-airbnb": "17.1.0",
-    "eslint-config-prettier": "3.0.1",
     "eslint-loader": "2.1.0",
     "eslint-plugin-import": "2.14.0",
     "eslint-plugin-jest": "21.22.0",
     "eslint-plugin-jsx-a11y": "6.1.1",
-    "eslint-plugin-prettier": "2.6.2",
     "eslint-plugin-react": "7.11.1",
     "eslint-watch": "4.0.2",
     "fabric": "2.3.6",
@@ -120,7 +116,6 @@
     "open": "0.0.5",
     "open-browser-webpack-plugin": "0.0.5",
     "postcss-loader": "^3.0.0",
-    "prettier": "^1.14.2",
     "react-color": "^2.14.1",
     "react-dropzone": "5.1.0",
     "react-hot-loader": "^4.3",

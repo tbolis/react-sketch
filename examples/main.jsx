@@ -1,8 +1,10 @@
 /*eslint no-unused-vars: 0*/
+/*eslint no-console: 0*/
+
 'use strict';
 
 import React from 'react';
-import { CompactPicker } from 'react-color';
+import {CompactPicker} from 'react-color';
 import 'flexboxgrid';
 import './main.css';
 import AppBar from '@material-ui/core/AppBar';
@@ -19,7 +21,7 @@ import TextField from '@material-ui/core/TextField';
 import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import {MuiThemeProvider, createMuiTheme} from '@material-ui/core/styles';
 import purple from '@material-ui/core/colors/purple';
 
 import UndoIcon from '@material-ui/icons/Undo';
@@ -32,7 +34,7 @@ import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import ZoomOutIcon from '@material-ui/icons/ZoomOut';
 import dataJson from './data.json';
 import dataJsonControlled from './data.json.controlled';
-import { SketchField, Tools } from '../src';
+import {SketchField, Tools} from '../src';
 import dataUrl from './data.url';
 import DropZone from 'react-dropzone';
 import Toolbar from '@material-ui/core/Toolbar/Toolbar';
@@ -130,14 +132,11 @@ class SketchFieldDemo extends React.Component {
       stretchedY: false,
       originX: 'left',
       originY: 'top',
+      imageUrl: 'https://files.gamebanana.com/img/ico/sprays/4ea2f4dad8d6f.png'
     };
   }
 
-  _selectTool = event => {
-    this.setState({
-      tool: event.target.value,
-    });
-  };
+  _selectTool = event => this.setState({tool: event.target.value});
 
   _save = () => {
     let drawings = this.state.drawings;
@@ -172,11 +171,10 @@ class SketchFieldDemo extends React.Component {
         style={styles.gridTile}
         actionIcon={
           <IconButton onTouchTap={c => this._removeMe(index)}>
-            <RemoveIcon color="white" />
+            <RemoveIcon color="white"/>
           </IconButton>
-        }
-      >
-        <img src={drawing} />
+        }>
+        <img src={drawing}/>
       </GridListTile>
     );
   };
@@ -305,22 +303,22 @@ class SketchFieldDemo extends React.Component {
                     disabled={!this.state.canUndo}
                     onClick={this._undo}
                   >
-                    <UndoIcon />
+                    <UndoIcon/>
                   </IconButton>
                   <IconButton
                     disabled={!this.state.canRedo}
                     onClick={this._redo}
                   >
-                    <RedoIcon />
+                    <RedoIcon/>
                   </IconButton>
                   <IconButton onClick={this._save}>
-                    <SaveIcon />
+                    <SaveIcon/>
                   </IconButton>
                   <IconButton onClick={this._download}>
-                    <DownloadIcon />
+                    <DownloadIcon/>
                   </IconButton>
                   <IconButton onClick={this._clear}>
-                    <ClearIcon />
+                    <ClearIcon/>
                   </IconButton>
                 </Toolbar>
               </AppBar>
@@ -333,7 +331,7 @@ class SketchFieldDemo extends React.Component {
             <div className="col-xs-7 col-sm-7 col-md-9 col-lg-9">
               {/* Sketch area */}
 
-              <div style={{ paddingTop: 80 }} />
+              <div style={{ paddingTop: 80 }}/>
 
               <SketchField
                 name="sketch"
@@ -363,244 +361,244 @@ class SketchFieldDemo extends React.Component {
                 onChange={this._onSketchChange}
                 tool={this.state.tool}
               />
+              <div className="col-xs-5 col-sm-5 col-md-3 col-lg-3">
+                <Card style={{ margin: '10px 10px 5px 0' }}>
+                  <CardContent>
+                    <Typography color="textSecondary" gutterBottom>
+                      Tools
+                    </Typography>
+                    <label htmlFor="tool">Canvas Tool</label>
+                    <TextField
+                      ref="tool"
+                      select
+                      value={this.state.tool}
+                      onChange={this._selectTool}>
+                      <MenuItem value={Tools.Select} key="Select">
+                        Select
+                      </MenuItem>
+                      <MenuItem value={Tools.Pencil} key="Pencil">
+                        Pencil
+                      </MenuItem>
+                      <MenuItem value={Tools.Line} key="Line">
+                        Line
+                      </MenuItem>
+                      <MenuItem value={Tools.Rectangle} key="Rectangle">
+                        Rectangle
+                      </MenuItem>
+                      <MenuItem value={Tools.Circle} key="Circle">
+                        Circle
+                      </MenuItem>
+                      <MenuItem value={Tools.Pan} key="Pan">
+                        Pan
+                      </MenuItem>
+                    </TextField>
+                    <br/>
+                    <br/>
+                    <label htmlFor="slider">Line Weight</label>
+                    <Slider
+                      ref="slider"
+                      step={1}
+                      min={0}
+                      max={10}
+                      aria-labelledby="slider"
+                      value={this.state.lineWidth}
+                      onChange={(e, v) =>
+                        this.setState({ lineWidth: v })
+                      }
+                    />
+                    <br/>
+                    <label htmlFor="zoom">Zoom</label>
+                    <div>
+                      <IconButton
+                        ref='zoom'
+                        onClick={(e) => this._sketch.zoom(1.25)}>
+                        <ZoomInIcon/>
+                      </IconButton>
+                      <IconButton
+                        ref='zoom1'
+                        onClick={(e) => this._sketch.zoom(0.8)}>
+                        <ZoomOutIcon/>
+                      </IconButton>
+                      <br/>
+                      <br/>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            value={this.state.controlledSize}
+                            onChange={(e) => this.setState({ controlledSize: !this.state.controlledSize })}
+                          />
+                        }
+                        label="Control size"
+                      />
 
-                <div className="col-xs-5 col-sm-5 col-md-3 col-lg-3">
-                    <Card style={{ margin: '10px 10px 5px 0' }}>
-                        <CardContent>
-                            <Typography color="textSecondary" gutterBottom>
-                                Tools
-                            </Typography>
-                            <label htmlFor="tool">Canvas Tool</label>
-                            <TextField
-                                ref="tool"
-                                select
-                                value={this.state.tool}
-                                onChange={this._selectTool}
-                            >
-                                <MenuItem value={Tools.Select} key="Select">
-                                    Select
-                                </MenuItem>
-                                <MenuItem value={Tools.Pencil} key="Pencil">
-                                    Pencil
-                                </MenuItem>
-                                <MenuItem value={Tools.Line} key="Line">
-                                    Line
-                                </MenuItem>
-                                <MenuItem value={Tools.Rectangle} key="Rectangle">
-                                    Rectangle
-                                </MenuItem>
-                                <MenuItem value={Tools.Circle} key="Circle">
-                                    Circle
-                                </MenuItem>
-                                <MenuItem value={Tools.Pan} key="Pan">
-                                    Pan
-                                </MenuItem>
-                            </TextField>
-                            <br/>
-                            <br/>
-                            <label htmlFor="slider">Line Weight</label>
-                            <Slider
-                                ref="slider"
-                                step={1}
-                                min={0}
-                                max={10}
-                                aria-labelledby="slider"
-                                value={this.state.lineWidth}
-                                onChange={(e,v) =>
-                                    this.setState({ lineWidth: v })
-                                }
-                            />
-                            <br />
-                            <label htmlFor="zoom">Zoom</label>
-                            <div>
-                                <IconButton
-                                    ref='zoom'
-                                    onClick={(e) => this._sketch.zoom(1.25)}>
-                                    <ZoomInIcon/>
-                                </IconButton>
-                                <IconButton
-                                    ref='zoom1'
-                                    onClick={(e) => this._sketch.zoom(0.8)}>
-                                    <ZoomOutIcon/>
-                                </IconButton>
-                                <br/>
-                                <br/>
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            value={this.state.controlledSize}
-                                            onChange={(e) => this.setState({controlledSize: !this.state.controlledSize})}
-                                        />
-                                    }
-                                    label="Control size"
-                                />
+                      <br/>
+                      <label htmlFor='xSize'>Change Canvas Width</label>
+                      <Slider
+                        ref='xSize' step={1}
+                        min={10} max={1000}
+                        defaultValue={this.state.sketchWidth}
+                        onChange={(e, v) => this.setState({ sketchWidth: v })}/>
+                      <br/>
+                      <label htmlFor='ySize'>Change Canvas Height</label>
+                      <Slider
+                        ref='ySize' step={1}
+                        min={10} max={1000}
+                        defaultValue={this.state.sketchHeight}
+                        onChange={(e, v) => this.setState({ sketchHeight: v })}/>
+                      <br/>
+                    </div>
+                  </CardContent>
+                </Card>
 
-                                <br/>
-                                <label htmlFor='xSize'>Change Canvas Width</label>
-                                <Slider ref='xSize' step={1}
-                                        min={10} max={1000}
-                                        defaultValue={this.state.sketchWidth}
-                                        onChange={(e, v) => this.setState({sketchWidth: v})}/>
-                                <br/>
-                                <label htmlFor='ySize'>Change Canvas Height</label>
-                                <Slider ref='ySize' step={1}
-                                        min={10} max={1000}
-                                        defaultValue={this.state.sketchHeight}
-                                        onChange={(e, v) => this.setState({sketchHeight: v})}/>
-                                <br/>
-                            </div>
-                        </CardContent>
-                    </Card>
+                <Card style={{ margin: '5px 10px 5px 0' }}>
+                  <Typography color="textSecondary" gutterBottom>
+                    Colors
+                  </Typography>
+                  <CardContent>
+                    <label htmlFor='lineColor'>Line</label>
+                    <CompactPicker
+                      id='lineColor' color={this.state.lineColor}
+                      onChange={(color) => this.setState({ lineColor: color.hex })}/>
+                    <br/>
+                    <br/>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          value={this.state.fillWithColor}
+                          onChange={(e) => this.setState({ fillWithColor: !this.state.fillWithColor })}/>
+                      }
+                      label="Fill"
+                    />
 
-                    <Card style={{margin: '5px 10px 5px 0'}}>
-                        <Typography color="textSecondary" gutterBottom>
-                            Colors
-                        </Typography>
-                        <CardContent >
-                            <label htmlFor='lineColor'>Line</label>
-                            <CompactPicker
-                                id='lineColor' color={this.state.lineColor}
-                                onChange={(color) => this.setState({lineColor: color.hex})}/>
-                            <br/>
-                            <br/>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        value={this.state.fillWithColor}
-                                        onChange={(e) => this.setState({fillWithColor: !this.state.fillWithColor})}/>
-                                }
-                                label="Fill"
-                            />
+                    <CompactPicker
+                      color={this.state.fillColor}
+                      onChange={(color) => this.setState({ fillColor: color.hex })}/>
+                  </CardContent>
+                </Card>
 
-                            <CompactPicker
-                                color={this.state.fillColor}
-                                onChange={(color) => this.setState({fillColor: color.hex})}/>
-                        </CardContent>
-                    </Card>
+                <Card style={{ margin: '5px 10px 5px 0' }}>
+                  <Typography color="textSecondary" gutterBottom>
+                    Background
+                  </Typography>
+                  <CardContent>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          value={this.state.fillWithBackgroundColor}
+                          onChange={(e) => this.setState({ fillWithBackgroundColor: !this.state.fillWithBackgroundColor })}/>
+                      }
+                      label="Background Color"
+                    />
 
-                    <Card style={{margin: '5px 10px 5px 0'}}>
-                        <Typography color="textSecondary" gutterBottom>
-                            Background
-                        </Typography>
-                        <CardContent>
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        value={this.state.fillWithBackgroundColor}
-                                        onChange={(e) => this.setState({fillWithBackgroundColor: !this.state.fillWithBackgroundColor})}/>
-                                }
-                                label="Background Color"
-                            />
+                    <CompactPicker
+                      color={this.state.backgroundColor}
+                      onChange={(color) => this.setState({ backgroundColor: color.hex })}/>
 
-                            <CompactPicker
-                                color={this.state.backgroundColor}
-                                onChange={(color) => this.setState({backgroundColor: color.hex})}/>
+                    <br/>
+                    <br/>
+                    <label htmlFor='lineColor'>Set Image Background</label>
+                    <br/>
 
-                            <br/>
-                            <br/>
-                            <label htmlFor='lineColor'>Set Image Background</label>
-                            <br/>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          value={this.state.stretched}
+                          onChange={(e) => this.setState({ stretched: !this.state.stretched })}/>
+                      }
+                      label="Fit canvas (X,Y)"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          value={this.state.stretchedX}
+                          onChange={(e) => this.setState({ stretchedX: !this.state.stretchedX })}/>
+                      }
+                      label="Fit canvas (X)"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          value={this.state.stretchedY}
+                          onChange={(e) => this.setState({ stretchedY: !this.state.stretchedY })}/>
+                      }
+                      label="Fit canvas (Y)"
+                    />
 
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        value={this.state.stretched}
-                                        onChange={(e) => this.setState({stretched: !this.state.stretched})}/>
-                                }
-                                label="Fit canvas (X,Y)"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        value={this.state.stretchedX}
-                                        onChange={(e) => this.setState({stretchedX: !this.state.stretchedX})}/>
-                                }
-                                label="Fit canvas (X)"
-                            />
-                            <FormControlLabel
-                                control={
-                                    <Switch
-                                        value={this.state.stretchedY}
-                                        onChange={(e) => this.setState({stretchedY: !this.state.stretchedY})}/>
-                                }
-                                label="Fit canvas (Y)"
-                            />
+                    <div>
+                      <DropZone
+                        ref="dropzone"
+                        accept='image/*'
+                        multiple={false}
+                        style={styles.dropArea}
+                        activeStyle={styles.activeStyle}
+                        rejectStyle={styles.rejectStyle}
+                        onDrop={this._onBackgroundImageDrop}>
+                        Try dropping an image here,<br/>
+                        or click<br/>
+                        to select image as background.
+                      </DropZone>
+                    </div>
+                  </CardContent>
+                </Card>
 
-                            <div>
-                                <DropZone
-                                    ref="dropzone"
-                                    accept='image/*'
-                                    multiple={false}
-                                    style={styles.dropArea}
-                                    activeStyle={styles.activeStyle}
-                                    rejectStyle={styles.rejectStyle}
-                                    onDrop={this._onBackgroundImageDrop}>
-                                    Try dropping an image here,<br/>
-                                    or click<br/>
-                                    to select image as background.
-                                </DropZone>
-                            </div>
-                        </CardContent>
-                    </Card>
+                <Card style={{ margin: '5px 10px 5px 0' }}>
+                  <Typography color="textSecondary" gutterBottom>
+                    Images
+                  </Typography>
+                  <CardContent>
+                    <div>
+                      <TextField
+                        floatingLabelText='Image URL'
+                        hintText='Copy/Paste an image URL'
+                        onChange={(e) => this.setState({ imageUrl: e.target.value })}
+                        value={this.state.imageUrl}/>
+                      <br/>
 
-                    <Card style={{margin: '5px 10px 5px 0'}}>
-                        <Typography color="textSecondary" gutterBottom>
-                            Images
-                        </Typography>
-                        <CardContent>
-                            <div>
-                                <TextField
-                                    floatingLabelText='Image URL'
-                                    hintText='Copy/Paste an image URL'
-                                    ref={(c) => this._imageUrlTxt = c}
-                                    defaultValue='https://files.gamebanana.com/img/ico/sprays/4ea2f4dad8d6f.png'/>
+                      <Button
+                        variant="outlined"
+                        onClick={(e) => {
+                          this._sketch.addImg(this.state.imageUrl)
+                        }
+                        }>
+                        Load Image from URL
+                      </Button>
+                    </div>
 
-                                <br/>
+                    <br/>
 
-                                <Button
-                                    variant="outlined"
-                                    onClick={(e) => this._sketch.addImg(this._imageUrlTxt.getValue())}>
-                                    Load Image from URL
-                                </Button>
-                            </div>
+                    <br/>
 
-                            <br/>
+                    <div>
+                      <Button
+                        variant="outlined"
+                        onClick={(e) => this._sketch.addImg(dataUrl)}>
+                        Load Image from Data URL
+                      </Button>
+                    </div>
 
-                            <br/>
+                  </CardContent>
+                </Card>
 
-                            <div>
-                                <Button
-                                    variant="outlined"
-                                    onClick={(e) => this._sketch.addImg(dataUrl)}>
-                                    Load Image from Data URL
-                                </Button>
-                            </div>
+                <Card style={{ margin: '5px 10px 5px 0' }}>
+                  <Typography color="textSecondary" gutterBottom>
+                    Controlled value
+                  </Typography>
+                  <CardContent>
+                    <div>
+                      <Button
+                        variant="outlined"
+                        onClick={(e) => this.setState({
+                          controlledValue: dataJsonControlled
+                        })}>
+                        Load controlled Value
+                      </Button>
+                    </div>
 
-                        </CardContent>
-                    </Card>
-
-                    <Card style={{margin: '5px 10px 5px 0'}}>
-                        <Typography color="textSecondary" gutterBottom>
-                            Controlled value
-                        </Typography>
-                        <CardContent >
-                            <div>
-
-                                <Button
-                                    variant="outlined"
-                                    onClick={(e) => this.setState({
-                                        controlledValue: dataJsonControlled
-                                    })}
-                                >
-                                    Load controlled Value
-                                </Button>
-                            </div>
-
-                        </CardContent>
-                    </Card>
-                </div>
-
+                  </CardContent>
+                </Card>
+              </div>
             </div>
+
           </div>
         </div>
       </MuiThemeProvider>
