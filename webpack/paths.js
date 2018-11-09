@@ -1,12 +1,13 @@
 const path = require('path');
 
+const root = path.resolve(__dirname, '../');
+
 module.exports = {
-  root: path.resolve(__dirname, '../'),
-  outputPath: path.resolve(__dirname, '../', 'build'),
-  entryPath: path.resolve(__dirname, '../', 'src/index.jsx'),
-  templatePath: path.resolve(__dirname, '../', 'src/template.html'),
-  imagesFolder: 'images',
-  fontsFolder: 'fonts',
-  cssFolder: 'css',
-  jsFolder: 'js',
+  root: root,
+  srcPath: path.join(root, 'src'),
+  buildPath: path.join(root, 'build'),
+  outputPath: path.join(root, 'dist'),
+  examplesPath: path.join(root, 'examples'),
+  entryPath: path.join(root, 'examples', 'run.jsx'),
+  templatePath: path.join(root, 'examples', 'base.html'),
 };
