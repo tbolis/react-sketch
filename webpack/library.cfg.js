@@ -26,6 +26,9 @@ module.exports = {
   entry: {
     src: './src'
   },
+  performance: {
+    hints: false
+  },
   output: {
     path: Paths.outputPath,
     filename: 'index.js',
@@ -57,11 +60,6 @@ module.exports = {
     }),
     new NoEmitOnErrorsPlugin(),
     new OccurrenceOrderPlugin(),
-    new AggressiveMergingPlugin(),
-    new DefinePlugin({
-      'process.env': {
-        'NODE_ENV': JSON.stringify('production')
-      }
-    })
+    new AggressiveMergingPlugin()
   ]
 };

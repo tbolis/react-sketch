@@ -17,6 +17,9 @@ const config = {
   resolve: {
     extensions: ['.js', '.jsx']
   },
+  performance: {
+    hints: false
+  },
   cache: true,
   module: {
     rules: [

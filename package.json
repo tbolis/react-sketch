@@ -23,19 +23,19 @@
   "license": "MIT",
   "main": "./dist",
   "scripts": {
-    "clean": "rimraf dist build",
-    "prebuild": "rimraf dist",
     "build": "webpack --mode production --config webpack/library.cfg.js --display-modules",
     "build:light": "babel ./src --out-dir ./dist",
     "build:examples": "webpack --mode production --config webpack/examples.cfg.js",
+    "clean": "rimraf dist build",
+    "precommit": "lint-staged",
     "prepublish": "npm run test && npm run build",
+    "prebuild": "rimraf dist",
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",
     "start": "node webpack/server.js",
     "start:debug": "weinre --boundHost `my-local-ip` ",
     "test": "jest --coverage",
-    "update": "ncu -a --packageFile package.json",
-    "precommit": "lint-staged"
+    "update": "ncu -a --packageFile package.json"
   },
   "engines": {
     "node": ">= 6"
@@ -67,6 +67,7 @@
     "babel-core": "7.0.0-bridge.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.1.5",
     "@babel/core": "7.0.0",
     "@babel/plugin-proposal-class-properties": "7.0.0",
     "@babel/plugin-proposal-decorators": "7.0.0",

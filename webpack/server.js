@@ -14,6 +14,7 @@ const HotModuleReplacementPlugin = require('webpack/lib/HotModuleReplacementPlug
 const port = 23000;
 
 const config = {
+  mode: 'development',
   entry: {
     examples: [
       // activate HMR for React
