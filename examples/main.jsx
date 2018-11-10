@@ -125,7 +125,7 @@ class SketchFieldDemo extends React.Component {
       shadowWidth: 0,
       shadowOffset: 0,
       tool: Tools.Pencil,
-      enableClearSelected: false,
+      enableRemoveSelected: false,
       fillWithColor: false,
       fillWithBackgroundColor: false,
       drawings: [],
@@ -151,7 +151,7 @@ class SketchFieldDemo extends React.Component {
   _selectTool = event => {
     this.setState({
       tool: event.target.value,
-      enableClearSelected: event.target.value === Tools.Select
+      enableRemoveSelected: event.target.value === Tools.Select
     });
   };
 
@@ -230,8 +230,8 @@ class SketchFieldDemo extends React.Component {
     });
   };
 
-  _clearSelected = () => {
-    this._sketch.clearSelected()
+  _removeSelected = () => {
+    this._sketch.removeSelected()
   };
 
   _onSketchChange = () => {
@@ -398,8 +398,8 @@ class SketchFieldDemo extends React.Component {
                     <div className="col">
                       <IconButton
                         color="primary"
-                        disabled={!this.state.enableClearSelected}
-                        onClick={this._clearSelected}>
+                        disabled={!this.state.enableRemoveSelected}
+                        onClick={this._removeSelected}>
                         <DeleteIcon/>
                       </IconButton>
                     </div>
