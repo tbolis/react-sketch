@@ -520,8 +520,9 @@ class SketchField extends PureComponent {
     let {
       tool,
       value,
+      undoSteps,
       defaultValue,
-      undoSteps
+      backgroundColor
     } = this.props;
 
     let canvas = this._fc = new fabric.Canvas(this._canvas/*, {
@@ -531,6 +532,9 @@ class SketchField extends PureComponent {
          }*/);
 
     this._initTools(canvas);
+
+    // set initial backgroundColor
+    this._backgroundColor(backgroundColor)
 
     let selectedTool = this._tools[tool];
     selectedTool.configureCanvas(this.props);
