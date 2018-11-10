@@ -7,6 +7,6 @@ export {SketchField}
 export {Tools}
 
 export default {
-    SketchField,
-    Tools
+  SketchField,
+  Tools
 };
