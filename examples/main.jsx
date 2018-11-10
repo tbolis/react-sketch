@@ -28,12 +28,13 @@ import color from '@material-ui/core/colors/blueGrey';
 
 import UndoIcon from '@material-ui/icons/Undo';
 import RedoIcon from '@material-ui/icons/Redo';
-import ClearIcon from '@material-ui/icons/Delete';
+import DeleteIcon from '@material-ui/icons/Delete';
 import SaveIcon from '@material-ui/icons/Save';
-import RemoveIcon from '@material-ui/icons/Clear';
+import ClearIcon from '@material-ui/icons/Clear';
 import DownloadIcon from '@material-ui/icons/CloudDownload';
 import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import ZoomOutIcon from '@material-ui/icons/ZoomOut';
+import RemoveIcon from '@material-ui/icons/Remove';
 import dataJson from './data.json';
 import dataJsonControlled from './data.json.controlled';
 import {SketchField, Tools} from '../src';
@@ -124,6 +125,7 @@ class SketchFieldDemo extends React.Component {
       shadowWidth: 0,
       shadowOffset: 0,
       tool: Tools.Pencil,
+      enableClearSelected: false,
       fillWithColor: false,
       fillWithBackgroundColor: false,
       drawings: [],
@@ -146,7 +148,12 @@ class SketchFieldDemo extends React.Component {
     };
   }
 
-  _selectTool = event => this.setState({ tool: event.target.value });
+  _selectTool = event => {
+    this.setState({
+      tool: event.target.value,
+      enableClearSelected: event.target.value === Tools.Select
+    });
+  };
 
   _save = () => {
     let drawings = this.state.drawings;
@@ -181,7 +188,7 @@ class SketchFieldDemo extends React.Component {
         style={styles.gridTile}
         actionIcon={
           <IconButton onTouchTap={c => this._removeMe(index)}>
-            <RemoveIcon color="white"/>
+            <ClearIcon color="white"/>
           </IconButton>
         }>
         <img src={drawing}/>
@@ -221,6 +228,10 @@ class SketchFieldDemo extends React.Component {
       canUndo: this._sketch.canUndo(),
       canRedo: this._sketch.canRedo(),
     });
+  };
+
+  _clearSelected = () => {
+    this._sketch.clearSelected()
   };
 
   _onSketchChange = () => {
@@ -278,6 +289,9 @@ class SketchFieldDemo extends React.Component {
   render = () => {
     let { controlledValue } = this.state;
     const theme = createMuiTheme({
+      typography: {
+        useNextVariants: true,
+      },
       palette: {
         primary: { main: color[500] }, // Purple and green play nicely together.
         secondary: { main: '#11cb5f' }, // This is just green.A700 as hex.
@@ -315,7 +329,7 @@ class SketchFieldDemo extends React.Component {
                 <IconButton
                   color="primary"
                   onClick={this._clear}>
-                  <ClearIcon/>
+                  <DeleteIcon/>
                 </IconButton>
               </Toolbar>
             </AppBar>
@@ -365,19 +379,31 @@ class SketchFieldDemo extends React.Component {
                 }/>
               <Collapse in={this.state.expandTools}>
                 <CardContent>
-                  <TextField
-                    select={true}
-                    label="Canvas Tool"
-                    value={this.state.tool}
-                    onChange={this._selectTool}
-                    helperText="Please select Canvas Tool">
-                    <MenuItem value={Tools.Select} key="Select">Select</MenuItem>
-                    <MenuItem value={Tools.Pencil} key="Pencil">Pencil</MenuItem>
-                    <MenuItem value={Tools.Line} key="Line">Line</MenuItem>
-                    <MenuItem value={Tools.Rectangle} key="Rectangle">Rectangle</MenuItem>
-                    <MenuItem value={Tools.Circle} key="Circle">Circle</MenuItem>
-                    <MenuItem value={Tools.Pan} key="Pan">Pan</MenuItem>
-                  </TextField>
+                  <div className="row">
+                    <div className="col">
+                      <TextField
+                        select={true}
+                        label="Canvas Tool"
+                        value={this.state.tool}
+                        onChange={this._selectTool}
+                        helperText="Please select Canvas Tool">
+                        <MenuItem value={Tools.Select} key="Select">Select</MenuItem>
+                        <MenuItem value={Tools.Pencil} key="Pencil">Pencil</MenuItem>
+                        <MenuItem value={Tools.Line} key="Line">Line</MenuItem>
+                        <MenuItem value={Tools.Rectangle} key="Rectangle">Rectangle</MenuItem>
+                        <MenuItem value={Tools.Circle} key="Circle">Circle</MenuItem>
+                        <MenuItem value={Tools.Pan} key="Pan">Pan</MenuItem>
+                      </TextField>
+                    </div>
+                    <div className="col">
+                      <IconButton
+                        color="primary"
+                        disabled={!this.state.enableClearSelected}
+                        onClick={this._clearSelected}>
+                        <DeleteIcon/>
+                      </IconButton>
+                    </div>
+                  </div>
                   <br/>
                   <br/>
                   <Typography id="slider">Line Weight</Typography>
@@ -544,8 +570,8 @@ class SketchFieldDemo extends React.Component {
                 <CardContent>
                   <div>
                     <TextField
-                      floatingLabelText='Image URL'
-                      hintText='Copy/Paste an image URL'
+                      label='Image URL'
+                      helperText='Copy/Paste an image URL'
                       onChange={(e) => this.setState({ imageUrl: e.target.value })}
                       value={this.state.imageUrl}/>
                     <Button
