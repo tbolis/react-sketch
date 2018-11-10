@@ -45,12 +45,17 @@ class SketchField extends PureComponent {
     widthCorrection: PropTypes.number,
     // Specify some height correction which will be applied on auto resize
     heightCorrection: PropTypes.number,
-
+    // Specify action on change
     onChange: PropTypes.func,
+    // Default initial value
     defaultValue: PropTypes.object,
+    // Sketch width
     width: PropTypes.number,
+    // Sketch height
     height: PropTypes.number,
-    className: PropTypes.object,
+    // Class name to pass to container div of canvas
+    className: PropTypes.string,
+    // Style options to pass to container div of canvas
     style: PropTypes.object,
   };
 
@@ -139,10 +144,10 @@ class SketchField extends PureComponent {
       return
     }
     let obj = e.target;
-    obj.version = 1;
+    obj.__version = 1;
     // record current object state as json and save as originalState
     let objState = obj.toJSON();
-    obj.originalState = objState;
+    obj.__originalState = objState;
     let state = JSON.stringify(objState);
     // object, previous state, current state
     this._history.keep([obj, state, state])
@@ -169,12 +174,27 @@ class SketchField extends PureComponent {
 
   };
 
+  _onObjectModified = (e) => {
+    let obj = e.target;
+    obj.__version += 1;
+    let prevState = JSON.stringify(obj.__originalState);
+    let objState = obj.toJSON();
+    // record current object state as json and update to originalState
+    obj.__originalState = objState;
+    let currState = JSON.stringify(objState);
+    this._history.keep([obj, prevState, currState]);
+  };
+
   /**
    * Action when an object is removed from the canvas
    */
   _onObjectRemoved = (e) => {
     let obj = e.target;
-    obj.version = 0;
+    if (obj.__removed) {
+      obj.__version += 1;
+      return
+    }
+    obj.__version = 0;
   };
 
   /**
@@ -196,6 +216,27 @@ class SketchField extends PureComponent {
    */
   _onMouseOut = (e) => {
     this._selectedTool.doMouseOut(e);
+    if (this.props.onChange) {
+      let onChange = this.props.onChange;
+      setTimeout(() => {
+        onChange(e.e)
+      }, 10)
+    }
+  };
+
+  _onMouseUp = (e) => {
+    this._selectedTool.doMouseUp(e);
+    // Update the final state to new-generated object
+    // Ignore Path object since it would be created after mouseUp
+    // Assumed the last object in canvas.getObjects() in the newest object
+    if (this.props.tool !== Tool.Pencil) {
+      const canvas = this._fc;
+      const objects = canvas.getObjects();
+      const newObj = objects[objects.length - 1];
+      if (newObj && newObj.__version === 1) {
+        newObj.__originalState = newObj.toJSON();
+      }
+    }
     if (this.props.onChange) {
       let onChange = this.props.onChange;
       setTimeout(() => {
@@ -290,12 +331,18 @@ class SketchField extends PureComponent {
     let history = this._history;
     let [obj, prevState, currState] = history.getCurrent();
     history.undo();
-    if (obj.version === 1) {
+    if (obj.__removed) {
+      this.setState({ action: false }, () => {
+        this._fc.add(obj);
+        obj.__version -= 1;
+        obj.__removed = false;
+      });
+    } else if (obj.__version <= 1) {
       this._fc.remove(obj);
     } else {
+      obj.__version -= 1;
       obj.setOptions(JSON.parse(prevState));
       obj.setCoords();
-      obj.version -= 1;
       this._fc.renderAll()
     }
     if (this.props.onChange) {
@@ -306,20 +353,19 @@ class SketchField extends PureComponent {
   /**
    * Perform a redo operation on canvas, if it cannot redo it will leave the canvas intact
    */
-
   redo = () => {
     let history = this._history;
     if (history.canRedo()) {
       let canvas = this._fc;
       //noinspection Eslint
       let [obj, prevState, currState] = history.redo();
-      if (obj.version === 0) {
+      if (obj.__version === 0) {
         this.setState({ action: false }, () => {
           canvas.add(obj);
-          obj.version = 1
+          obj.__version = 1
         })
       } else {
-        obj.version += 1;
+        obj.__version += 1;
         obj.setOptions(JSON.parse(currState))
       }
       obj.setCoords();
@@ -410,6 +456,33 @@ class SketchField extends PureComponent {
     this._history.clear();
     return discarded
   };
+
+  /**
+   * Remove selected object from the canvas
+   */
+  removeSelected = () => {
+    let canvas = this._fc;
+    let activeObj = canvas.getActiveObject();
+    if (activeObj) {
+      let selected = [];
+      if (activeObj.type === 'activeSelection') {
+        activeObj.forEachObject((obj) => [].push(obj));
+      } else {
+        selected.push(activeObj)
+      }
+      selected.forEach(obj => {
+        obj.__removed = true;
+        let objState = obj.toJSON();
+        obj.__originalState = objState;
+        let state = JSON.stringify(objState);
+        this._history.keep([obj, state, state]);
+        canvas.remove(obj);
+      });
+      canvas.discardActiveObject();
+      canvas.requestRenderAll();
+    }
+  };
+
   /**
    * Sets the background from the dataUrl given
    *
@@ -514,38 +587,6 @@ class SketchField extends PureComponent {
 
     if ((this.props.value !== prevProps.value) || (this.props.value && this.props.forceValue)) {
       this.fromJSON(this.props.value);
-    }
-  };
-
-  _onObjectModified = (e) => {
-    let obj = e.target;
-    obj.version += 1;
-    let prevState = JSON.stringify(obj.originalState);
-    let objState = obj.toJSON();
-    // record current object state as json and update to originalState
-    obj.originalState = objState;
-    let currState = JSON.stringify(objState);
-    this._history.keep([obj, prevState, currState]);
-  };
-
-  _onMouseUp = (e) => {
-    this._selectedTool.doMouseUp(e);
-    // Update the final state to new-generated object
-    // Ignore Path object since it would be created after mouseUp
-    // Assumed the last object in canvas.getObjects() in the newest object
-    if (this.props.tool !== Tool.Pencil) {
-      const canvas = this._fc;
-      const objects = canvas.getObjects();
-      const newObj = objects[objects.length - 1];
-      if (newObj && newObj.version === 1) {
-        newObj.originalState = newObj.toJSON();
-      }
-    }
-    if (this.props.onChange) {
-      let onChange = this.props.onChange;
-      setTimeout(() => {
-        onChange(e.e)
-      }, 10)
     }
   };
 
