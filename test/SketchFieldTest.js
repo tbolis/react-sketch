@@ -3,15 +3,10 @@
 /* eslint-env node */
 
 import React from 'react';
-import { mount } from 'enzyme';
+import {mount} from 'enzyme';
 import SketchField from '../src/SketchField';
 
-function objectFromDrag(
-  canvas,
-  from = { x: 0, y: 0 },
-  to = { x: 10, y: 10 },
-  id,
-) {
+function objectFromDrag(canvas, from = { x: 0, y: 0 }, to = { x: 10, y: 10 }, id) {
   function MouseEventPositionGenerator(pos = { x: 0, y: 0 }) {
     const eventX = ['x', 'pageX', 'screenX', 'clientX', 'offsetX'];
     const eventY = ['y', 'pageY', 'screenY', 'clientY', 'offsetY'];
@@ -37,12 +32,12 @@ describe('SketchField', () => {
   });
 
   it('Contains canvas tag', () => {
-    const sketch = mount(<SketchField />);
+    const sketch = mount(<SketchField/>);
     expect(sketch.getDOMNode('canvas')).toBeDefined();
   });
 
   it('Drag to create rectangle', () => {
-    const sketch = mount(<SketchField tool="rectangle" />);
+    const sketch = mount(<SketchField tool="rectangle"/>);
     const canvas = sketch.instance()._fc;
     expect(canvas).toBeDefined();
 
@@ -87,7 +82,7 @@ describe('SketchField', () => {
   });
 
   it('Undo/Redo for multiple rectangles add to canvas', () => {
-    const sketch = mount(<SketchField tool="rectangle" />).instance();
+    const sketch = mount(<SketchField tool="rectangle"/>).instance();
     const canvas = sketch._fc;
     expect(canvas).toBeDefined();
 
@@ -115,65 +110,86 @@ describe('SketchField', () => {
     expect(canvas.getObjects().map(o => o.id)).toEqual(['rect1']);
   });
 
-  // it('Undo/Redo for multiple modification for single rectangle', () => {
-  //   const sketch = shallow(<SketchField tool="rectangle" />);
-  //   const canvas = sketch._fc;
-  //   // expect(canvas).to.exist;
-  //
-  //   const startPt = { x: 10, y: 10 };
-  //   const endPt = { x: 40, y: 50 };
-  //
-  //   // [Action1] Add new rectange object and save its state
-  //   const stateStack = [];
-  //   const rect = objectFromDrag(canvas, startPt, endPt);
-  //   stateStack.push(rect.toJSON());
-  //
-  //   // [Action2] Change rectangle dimension and save its state
-  //   rect.set({ width: 50, height: 60 });
-  //   rect.setCoords();
-  //   canvas.trigger('object:modified', { target: rect });
-  //   stateStack.push(rect.toJSON());
-  //
-  //   // [Action3] Change the position and save its state
-  //   rect.set({ left: 20, top: 70 });
-  //   rect.setCoords();
-  //   canvas.trigger('object:modified', { target: rect });
-  //   stateStack.push(rect.toJSON());
-  //
-  //   // Undo Action3
-  //   sketch.undo();
-  //   void (function() {
-  //     const obj = canvas.getObjects()[0];
-  //     expect(obj.toJSON()).toEqual(stateStack[1]);
-  //   })();
-  //
-  //   // Undo Action2
-  //   sketch.undo();
-  //   void (function() {
-  //     const obj = canvas.getObjects()[0];
-  //     expect(obj.toJSON()).toEqual(stateStack[0]);
-  //   })();
-  //
-  //   // Undo Action1, and then redo Action1
-  //   sketch.undo();
-  //   sketch.redo();
-  //   void (function() {
-  //     const obj = canvas.getObjects()[0];
-  //     expect(obj.toJSON()).toEqual(stateStack[0]);
-  //   })();
-  //
-  //   // redo Action2
-  //   sketch.redo();
-  //   void (function() {
-  //     const obj = canvas.getObjects()[0];
-  //     expect(obj.toJSON()).toEqual(stateStack[1]);
-  //   })();
-  //
-  //   // redo Action3
-  //   sketch.redo();
-  //   void (function() {
-  //     const obj = canvas.getObjects()[0];
-  //     expect(obj.toJSON()).toEqual(stateStack[2]);
-  //   })();
-  // });
+  it('Undo/Redo for multiple modification for single rectangle', () => {
+    const sketch = mount(<SketchField tool="rectangle"/>).instance();
+    const canvas = sketch._fc;
+    expect(canvas).toBeDefined();
+
+    const startPt = { x: 10, y: 10 };
+    const endPt = { x: 40, y: 50 };
+
+    // [Action1] Add new rectange object and save its state
+    const stateStack = [];
+    const rect = objectFromDrag(canvas, startPt, endPt);
+    stateStack.push(rect.toJSON());
+
+    // [Action2] Change rectangle dimension and save its state
+    rect.set({ width: 50, height: 60 });
+    rect.setCoords();
+    canvas.trigger('object:modified', { target: rect });
+    stateStack.push(rect.toJSON());
+
+    // [Action3] Change the position and save its state
+    rect.set({ left: 20, top: 70 });
+    rect.setCoords();
+    canvas.trigger('object:modified', { target: rect });
+    stateStack.push(rect.toJSON());
+
+    // Undo Action3
+    sketch.undo();
+    void (function() {
+      const obj = canvas.getObjects()[0];
+      expect(obj.toJSON()).toEqual(stateStack[1]);
+    })();
+
+    // Undo Action2
+    sketch.undo();
+    void (function() {
+      const obj = canvas.getObjects()[0];
+      expect(obj.toJSON()).toEqual(stateStack[0]);
+    })();
+
+    // Undo Action1, and then redo Action1
+    sketch.undo();
+    sketch.redo();
+    void (function() {
+      const obj = canvas.getObjects()[0];
+      expect(obj.toJSON()).toEqual(stateStack[0]);
+    })();
+
+    // redo Action2
+    sketch.redo();
+    void (function() {
+      const obj = canvas.getObjects()[0];
+      expect(obj.toJSON()).toEqual(stateStack[1]);
+    })();
+
+    // redo Action3
+    sketch.redo();
+    void (function() {
+      const obj = canvas.getObjects()[0];
+      expect(obj.toJSON()).toEqual(stateStack[2]);
+    })();
+  });
+
+  it('Removes selected object', () => {
+    const sketch = mount(<SketchField tool="rectangle"/>).instance();
+    const canvas = sketch._fc;
+    expect(canvas).toBeDefined();
+
+    const startPt = { x: 10, y: 10 };
+    const endPt = { x: 40, y: 50 };
+
+    canvas.renderOnAddRemove = false;
+    objectFromDrag(canvas, startPt, endPt, 'rect1');
+    objectFromDrag(canvas, startPt, endPt, 'rect2');
+    canvas.setActiveObject(canvas.getObjects()[0]);
+
+    sketch.removeSelected();
+    expect(canvas.getObjects().map(o => o.id)).toEqual(['rect2']);
+
+    sketch.undo();
+    expect(canvas.getObjects().map(o => o.id)).toEqual(['rect2', 'rect1']);
+  });
+
 });
