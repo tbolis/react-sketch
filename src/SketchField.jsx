@@ -516,6 +516,22 @@ class SketchField extends PureComponent {
     img.src = dataUrl
   };
 
+  addText = (text, options = {}) => {
+    let canvas = this._fc;
+    let iText = new fabric.IText(text, options);
+    let opts = {
+      left: (canvas.getWidth() - iText.width) * 0.5,
+      top: (canvas.getHeight() - iText.height) * 0.5,
+    };
+    Object.assign(options, opts);
+    iText.set({
+      'left': options.left,
+      'top': options.top
+    });
+
+    canvas.add(iText);
+  };
+
   componentDidMount = () => {
     let {
       tool,
@@ -557,6 +573,22 @@ class SketchField extends PureComponent {
     canvas.on('object:moving', this._onObjectMoving);
     canvas.on('object:scaling', this._onObjectScaling);
     canvas.on('object:rotating', this._onObjectRotating);
+        // Events binding
+        canvas.on('object:added', this._onObjectAdded);
+        canvas.on('object:modified', this._onObjectModified);
+        canvas.on('object:removed', this._onObjectRemoved);
+        canvas.on('mouse:down', this._onMouseDown);
+        canvas.on('mouse:move', this._onMouseMove);
+        canvas.on('mouse:up', this._onMouseUp);
+        canvas.on('mouse:out', this._onMouseOut);
+        canvas.on('object:moving', this._onObjectMoving);
+        canvas.on('object:scaling', this._onObjectScaling);
+        canvas.on('object:rotating', this._onObjectRotating);
+        // IText Events fired on Adding Text
+        // canvas.on("text:event:changed", console.log)
+        // canvas.on("text:selection:changed", console.log)
+        // canvas.on("text:editing:entered", console.log)
+        // canvas.on("text:editing:exited", console.log)
 
     this.disableTouchScroll();
 
