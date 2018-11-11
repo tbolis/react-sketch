@@ -9,9 +9,7 @@ import 'flexboxgrid';
 import './main.css';
 import AppBar from '@material-ui/core/AppBar';
 import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import GridList from '@material-ui/core/GridList';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import CardHeader from '@material-ui/core/CardHeader';
 import GridListTile from '@material-ui/core/GridListTile';
@@ -23,7 +21,7 @@ import TextField from '@material-ui/core/TextField';
 import Switch from '@material-ui/core/Switch';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Collapse from '@material-ui/core/Collapse';
-import {MuiThemeProvider, createMuiTheme} from '@material-ui/core/styles';
+import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
 import color from '@material-ui/core/colors/blueGrey';
 
 import UndoIcon from '@material-ui/icons/Undo';
@@ -31,10 +29,10 @@ import RedoIcon from '@material-ui/icons/Redo';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SaveIcon from '@material-ui/icons/Save';
 import ClearIcon from '@material-ui/icons/Clear';
+import AddIcon from '@material-ui/icons/Add';
 import DownloadIcon from '@material-ui/icons/CloudDownload';
 import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import ZoomOutIcon from '@material-ui/icons/ZoomOut';
-import RemoveIcon from '@material-ui/icons/Remove';
 import dataJson from './data.json';
 import dataJsonControlled from './data.json.controlled';
 import {SketchField, Tools} from '../src';
@@ -145,6 +143,7 @@ class SketchFieldDemo extends React.Component {
       expandBack: false,
       expandImages: false,
       expandControlled: false,
+      text: 'a text, cool!',
     };
   }
 
@@ -262,6 +261,8 @@ class SketchFieldDemo extends React.Component {
       reader.readAsDataURL(accepted[0]);
     }
   };
+
+  _addText = () => this._sketch.addText(this.state.text);
 
   componentDidMount = () => {
     (function(console) {
@@ -427,6 +428,23 @@ class SketchFieldDemo extends React.Component {
                       <ZoomOutIcon/>
                     </IconButton>
                     <br/>
+                    <div className="row">
+                      <div className="col-lg-7">
+                        <TextField
+                          label='Text'
+                          helperText='Add text to Sketch'
+                          onChange={(e) => this.setState({ text: e.target.value })}
+                          value={this.state.text}/>
+                      </div>
+                      <div className="col-lg-3">
+                        <IconButton
+                          color="primary"
+                          onClick={this._addText}>
+                          <AddIcon/>
+                        </IconButton>
+                      </div>
+                    </div>
+
                     <br/>
                     <FormControlLabel
                       control={

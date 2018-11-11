@@ -527,10 +527,10 @@ class SketchField extends PureComponent {
     iText.set({
       'left': options.left,
       'top': options.top
-    })
+    });
 
     canvas.add(iText);
-  }
+  };
 
   componentDidMount = () => {
     let {
