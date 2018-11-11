@@ -30,6 +30,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import SaveIcon from '@material-ui/icons/Save';
 import ClearIcon from '@material-ui/icons/Clear';
 import AddIcon from '@material-ui/icons/Add';
+import CopyIcon from '@material-ui/icons/FileCopy';
+import RemoveIcon from '@material-ui/icons/Remove';
 import DownloadIcon from '@material-ui/icons/CloudDownload';
 import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import ZoomOutIcon from '@material-ui/icons/ZoomOut';
@@ -139,18 +141,21 @@ class SketchFieldDemo extends React.Component {
       originY: 'top',
       imageUrl: 'https://files.gamebanana.com/img/ico/sprays/4ea2f4dad8d6f.png',
       expandTools: false,
+      expandControls: false,
       expandColors: false,
       expandBack: false,
       expandImages: false,
       expandControlled: false,
       text: 'a text, cool!',
+      enableCopyPaste: false,
     };
   }
 
   _selectTool = event => {
     this.setState({
       tool: event.target.value,
-      enableRemoveSelected: event.target.value === Tools.Select
+      enableRemoveSelected: event.target.value === Tools.Select,
+      enableCopyPaste: event.target.value === Tools.Select
     });
   };
 
@@ -381,7 +386,7 @@ class SketchFieldDemo extends React.Component {
               <Collapse in={this.state.expandTools}>
                 <CardContent>
                   <div className="row">
-                    <div className="col">
+                    <div className="col-lg-12">
                       <TextField
                         select={true}
                         label="Canvas Tool"
@@ -395,14 +400,6 @@ class SketchFieldDemo extends React.Component {
                         <MenuItem value={Tools.Circle} key="Circle">Circle</MenuItem>
                         <MenuItem value={Tools.Pan} key="Pan">Pan</MenuItem>
                       </TextField>
-                    </div>
-                    <div className="col">
-                      <IconButton
-                        color="primary"
-                        disabled={!this.state.enableRemoveSelected}
-                        onClick={this._removeSelected}>
-                        <DeleteIcon/>
-                      </IconButton>
                     </div>
                   </div>
                   <br/>
@@ -427,51 +424,89 @@ class SketchFieldDemo extends React.Component {
                       onClick={(e) => this._sketch.zoom(0.8)}>
                       <ZoomOutIcon/>
                     </IconButton>
-                    <br/>
-                    <div className="row">
-                      <div className="col-lg-7">
-                        <TextField
-                          label='Text'
-                          helperText='Add text to Sketch'
-                          onChange={(e) => this.setState({ text: e.target.value })}
-                          value={this.state.text}/>
-                      </div>
-                      <div className="col-lg-3">
-                        <IconButton
-                          color="primary"
-                          onClick={this._addText}>
-                          <AddIcon/>
-                        </IconButton>
-                      </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-lg-7">
+                      <TextField
+                        label='Text'
+                        helperText='Add text to Sketch'
+                        onChange={(e) => this.setState({ text: e.target.value })}
+                        value={this.state.text}/>
                     </div>
-
-                    <br/>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          value={this.state.controlledSize}
-                          onChange={(e) => this.setState({ controlledSize: !this.state.controlledSize })}
-                        />
-                      }
-                      label="Control size"
-                    />
-                    <br/>
-                    <Typography id="xSize">Change Canvas Width</Typography>
-                    <Slider
-                      step={1}
-                      min={10}
-                      max={1000}
-                      value={this.state.sketchWidth}
-                      onChange={(e, v) => this.setState({ sketchWidth: v })}/>
-                    <br/>
-                    <Typography id="ySize">Change Canvas Height</Typography>
-                    <Slider
-                      step={1}
-                      min={10}
-                      max={1000}
-                      value={this.state.sketchHeight}
-                      onChange={(e, v) => this.setState({ sketchHeight: v })}/>
-                    <br/>
+                    <div className="col-lg-3">
+                      <IconButton
+                        color="primary"
+                        onClick={this._addText}>
+                        <AddIcon/>
+                      </IconButton>
+                    </div>
+                  </div>
+                </CardContent>
+              </Collapse>
+            </Card>
+            <Card style={styles.card}>
+              <CardHeader
+                title="Controls"
+                subheader="Copy/Paste etc."
+                action={
+                  <IconButton
+                    onClick={(e) => this.setState({ expandControls: !this.state.expandControls })}>
+                    <ExpandMore/>
+                  </IconButton>
+                }/>
+              <Collapse in={this.state.expandControls}>
+                <CardContent>
+                  <div className="row">
+                    <div className="col-lg-12">
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            value={this.state.controlledSize}
+                            onChange={(e) => this.setState({ controlledSize: !this.state.controlledSize })}
+                          />
+                        }
+                        label="Control size"
+                      />
+                      <br/>
+                      <Typography id="xSize">Change Canvas Width</Typography>
+                      <Slider
+                        step={1}
+                        min={10}
+                        max={1000}
+                        value={this.state.sketchWidth}
+                        onChange={(e, v) => this.setState({ sketchWidth: v })}/>
+                      <br/>
+                      <Typography id="ySize">Change Canvas Height</Typography>
+                      <Slider
+                        step={1}
+                        min={10}
+                        max={1000}
+                        value={this.state.sketchHeight}
+                        onChange={(e, v) => this.setState({ sketchHeight: v })}/>
+                      <br/>
+                    </div>
+                  </div>
+                  <label htmlFor="zoom">Selection Actions (Select an object first!)</label>
+                  <div className="row">
+                    <div className="col">
+                      <IconButton
+                        color="primary"
+                        disabled={!this.state.enableCopyPaste}
+                        onClick={(e) => {
+                          this._sketch.copy();
+                          this._sketch.paste();
+                        }}>
+                        <CopyIcon/>
+                      </IconButton>
+                    </div>
+                    <div className="col">
+                      <IconButton
+                        color="primary"
+                        disabled={!this.state.enableRemoveSelected}
+                        onClick={this._removeSelected}>
+                        <RemoveIcon/>
+                      </IconButton>
+                    </div>
                   </div>
                 </CardContent>
               </Collapse>
