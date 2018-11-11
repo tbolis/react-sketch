@@ -192,4 +192,24 @@ describe('SketchField', () => {
     expect(canvas.getObjects().map(o => o.id)).toEqual(['rect2', 'rect1']);
   });
 
+  it('Copy/Paste selected object', () => {
+    const sketch = mount(<SketchField tool="rectangle"/>).instance();
+    const canvas = sketch._fc;
+    expect(canvas).toBeDefined();
+
+    const startPt = { x: 10, y: 10 };
+    const endPt = { x: 40, y: 50 };
+
+    canvas.renderOnAddRemove = false;
+    objectFromDrag(canvas, startPt, endPt, 'rect1');
+    objectFromDrag(canvas, startPt, endPt, 'rect2');
+    canvas.setActiveObject(canvas.getObjects()[0]);
+
+    expect(canvas.getObjects().length).toEqual(2);
+
+    sketch.copy();
+    sketch.paste();
+
+    expect(canvas.getObjects().length).toEqual(3);
+  });
 });
