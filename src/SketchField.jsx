@@ -466,7 +466,7 @@ class SketchField extends PureComponent {
     if (activeObj) {
       let selected = [];
       if (activeObj.type === 'activeSelection') {
-        activeObj.forEachObject((obj) => [].push(obj));
+        activeObj.forEachObject(obj => selected.push(obj));
       } else {
         selected.push(activeObj)
       }
@@ -603,22 +603,11 @@ class SketchField extends PureComponent {
     canvas.on('object:moving', this._onObjectMoving);
     canvas.on('object:scaling', this._onObjectScaling);
     canvas.on('object:rotating', this._onObjectRotating);
-        // Events binding
-        canvas.on('object:added', this._onObjectAdded);
-        canvas.on('object:modified', this._onObjectModified);
-        canvas.on('object:removed', this._onObjectRemoved);
-        canvas.on('mouse:down', this._onMouseDown);
-        canvas.on('mouse:move', this._onMouseMove);
-        canvas.on('mouse:up', this._onMouseUp);
-        canvas.on('mouse:out', this._onMouseOut);
-        canvas.on('object:moving', this._onObjectMoving);
-        canvas.on('object:scaling', this._onObjectScaling);
-        canvas.on('object:rotating', this._onObjectRotating);
-        // IText Events fired on Adding Text
-        // canvas.on("text:event:changed", console.log)
-        // canvas.on("text:selection:changed", console.log)
-        // canvas.on("text:editing:entered", console.log)
-        // canvas.on("text:editing:exited", console.log)
+    // IText Events fired on Adding Text
+    // canvas.on("text:event:changed", console.log)
+    // canvas.on("text:selection:changed", console.log)
+    // canvas.on("text:editing:entered", console.log)
+    // canvas.on("text:editing:exited", console.log)
 
     this.disableTouchScroll();
 
