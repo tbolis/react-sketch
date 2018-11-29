@@ -2,36 +2,25 @@
   "parser": "babel-eslint",
   "plugins": [
     "react",
+    "jest",
     "eslint-plugin-react"
   ],
   "env": {
-    "browser": true,
-    "amd": true,
     "es6": true,
-    "node": false
+    "jest": true,
+    "amd": true,
+    "browser": true,
+    "node": true
   },
-  "rules": {
-    "comma-dangle": 1,
-    "quotes": [
-      1,
-      "single"
-    ],
-    "no-undef": 1,
-    "global-strict": 0,
-    "no-extra-semi": 1,
-    "no-underscore-dangle": 0,
-    "no-extra-parens": 0,
-    "no-console": 1,
-    "no-unused-vars": 1,
-    "no-trailing-spaces": [
-      1,
-      {
-        "skipBlankLines": true
-      }
-    ],
-    "no-alert": 0,
-    "no-unreachable": 1,
-    "react/jsx-uses-react": 1,
-    "react/jsx-uses-vars": 1
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended"
+  ],
+  "globals": {
+    "React": true,
+    "document": true,
+    "require": true,
+    "window": true,
+    "localStorage": true
   }
 }

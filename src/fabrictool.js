@@ -5,29 +5,29 @@
  * "Abstract" like base class for a Canvas tool
  */
 class FabricCanvasTool {
-    constructor(canvas) {
-        this._canvas = canvas;
-    }
+  constructor(canvas) {
+    this._canvas = canvas;
+  }
 
-    configureCanvas(props) {
+  configureCanvas(props) {
 
-    }
+  }
 
-    doMouseUp(event) {
+  doMouseUp(event) {
 
-    }
+  }
 
-    doMouseDown(event) {
+  doMouseDown(event) {
 
-    }
+  }
 
-    doMouseMove(event) {
+  doMouseMove(event) {
 
-    }
+  }
 
-    doMouseOut(event) {
+  doMouseOut(event) {
 
-    }
+  }
 }
 
 export default FabricCanvasTool;
