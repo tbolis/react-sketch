@@ -1,5 +1,4 @@
 /* eslint no-unused-vars: 0 */
-'use strict';
 
 /**
  * "Abstract" like base class for a Canvas tool

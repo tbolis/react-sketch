@@ -1,7 +1,4 @@
-/*eslint no-unused-vars: 0*/
-/*eslint no-console: 0*/
-
-'use strict';
+/*eslint no-unused-vars: 0, no-console: 0*/
 
 import React from 'react';
 import {CompactPicker} from 'react-color';
