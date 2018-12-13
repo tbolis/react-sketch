@@ -1,5 +1,3 @@
-'use strict';
-
 export default {
   Circle: 'circle',
   Line: 'line',

@@ -19,14 +19,6 @@ export const pointerPosition = (event) => {
   return [(_x || _touchX), (_y || _touchY)];
 };
 
-//function getMouseCoords(canvas, event)
-//{
-//    var pointer = canvas.getPointer(event.e);
-//    var posX = pointer.x;
-//    var posY = pointer.y;
-//    console.log(posX+", "+posY);    // Log to console
-//}
-
 /**
  * Calculate the distance of two x,y points
  *

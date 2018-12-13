@@ -1,5 +1,4 @@
 /*eslint no-unused-vars: 0*/
-'use strict';
 
 import FabricCanvasTool from './fabrictool'
 

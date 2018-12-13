@@ -4,6 +4,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const NoEmitOnErrorsPlugin = require('webpack/lib/NoEmitOnErrorsPlugin');
 const OccurrenceOrderPlugin = require('webpack/lib/optimize/OccurrenceOrderPlugin');
 const AggressiveMergingPlugin = require('webpack/lib/optimize/AggressiveMergingPlugin');
+const ModuleConcatenationPlugin = require('webpack/lib/optimize/ModuleConcatenationPlugin');
 
 function containsObject(obj, list) {
   var i;
@@ -52,6 +53,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new ModuleConcatenationPlugin(),
     new UglifyJsPlugin({
       parallel: true,
       uglifyOptions: {
@@ -60,6 +62,9 @@ module.exports = {
     }),
     new NoEmitOnErrorsPlugin(),
     new OccurrenceOrderPlugin(),
-    new AggressiveMergingPlugin()
+    new AggressiveMergingPlugin(),
+    new DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    })
   ]
 };
