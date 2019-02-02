@@ -132,9 +132,9 @@ declare module 'react-sketch' {
 		 * Returns JSON representation of canvas
 		 *
 		 * @param propertiesToInclude Array <optional> Any properties that you might want to additionally include in the output
-		 * @returns {string} JSON string
+		 * @returns {any} JSON object
 		 */
-		toJSON(propertiesToInclude?: ArrayLike<string>): string
+		toJSON(propertiesToInclude?: ArrayLike<string>): any
 
 		/**
 		 * Populates canvas with data from the specified JSON.
@@ -143,7 +143,7 @@ declare module 'react-sketch' {
 		 *
 		 * @param json JSON string or object
 		 */
-		fromJSON(json: string): void
+		fromJSON(json: any): void
 
 		/**
 		 * Clear the content of the canvas, this will also clear history but will return the canvas content as JSON to be
