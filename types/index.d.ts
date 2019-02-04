@@ -179,6 +179,14 @@ declare module 'react-sketch' {
 		setBackgroundFromDataUrl(dataUrl: string, options?: BackgroundImageOptions): void
 
 		/**
+		 * Sets the background from an Image object
+		 *
+		 * @param image the Image object to be used as a background
+		 * @param options
+		 */
+		setBackgroundFromImage(image: HTMLImageElement, options?: BackgroundImageOptions): void
+		
+		/**
 		 * Sets the background from the url given
 		 *
 		 * @param url the url of the image to be used as a background

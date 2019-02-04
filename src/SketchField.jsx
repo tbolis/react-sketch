@@ -520,6 +520,18 @@ class SketchField extends PureComponent {
    * @param options
    */
   setBackgroundFromDataUrl = (dataUrl, options = {}) => {
+    let img = new Image();
+    img.onload = () => this.setBackgroundFromImage(img);
+    img.src = dataUrl
+  };
+
+  /**
+   * Sets the background from an Image object
+   *
+   * @param image the Image object to be used as a background
+   * @param options
+   */
+  setBackgroundFromImage = (image, options = {}) => {
     let canvas = this._fc;
     if (options.stretched) {
       delete options.stretched;
@@ -540,10 +552,7 @@ class SketchField extends PureComponent {
         height: canvas.height
       })
     }
-    let img = new Image();
-    img.onload = () => canvas.setBackgroundImage(new fabric.Image(img),
-      () => canvas.renderAll(), options);
-    img.src = dataUrl
+    canvas.setBackgroundImage(new fabric.Image(image), () => canvas.renderAll(), options);
   };
 
   /**
