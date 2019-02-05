@@ -462,6 +462,12 @@ class SketchField extends PureComponent {
     return !!canvas.getActiveObject();
   }
 
+  clearSelection = () => {
+    let canvas = this._fc;
+    canvas.discardActiveObject();
+    canvas.requestRenderAll();
+  }
+
   /**
    * Remove selected object from the canvas
    */

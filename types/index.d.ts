@@ -155,7 +155,8 @@ declare module 'react-sketch' {
 		clear(propertiesToInclude?: ArrayLike<string>): string
 
 		hasSelection(): boolean
-		
+		clearSelection(): void
+
 		/**
 		 * Remove selected object from the canvas
 		 */
