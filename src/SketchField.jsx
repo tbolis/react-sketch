@@ -73,7 +73,6 @@ class SketchField extends PureComponent {
   };
 
   state = {
-    parentWidth: 550,
     action: true
   };
   _initTools = (fabricCanvas) => {
@@ -285,9 +284,6 @@ class SketchField extends PureComponent {
       obj.top = tempTop;
       obj.setCoords()
     }
-    this.setState({
-      parentWidth: offsetWidth
-    });
     canvas.renderAll();
     canvas.calcOffset();
   };
@@ -607,8 +603,7 @@ class SketchField extends PureComponent {
   componentWillUnmount = () => window.removeEventListener('resize', this._resize);
 
   componentDidUpdate = (prevProps, prevState) => {
-    if (this.state.parentWidth !== prevState.parentWidth
-      || this.props.width !== prevProps.width
+    if (this.props.width !== prevProps.width
       || this.props.height !== prevProps.height) {
 
       this._resize()
