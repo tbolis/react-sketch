@@ -521,28 +521,14 @@ class SketchField extends PureComponent {
    */
   setBackgroundFromDataUrl = (dataUrl, options = {}) => {
     let canvas = this._fc;
-    if (options.stretched) {
-      delete options.stretched;
-      Object.assign(options, {
-        width: canvas.width,
-        height: canvas.height
-      })
-    }
-    if (options.stretchedX) {
-      delete options.stretchedX;
-      Object.assign(options, {
-        width: canvas.width
-      })
-    }
-    if (options.stretchedY) {
-      delete options.stretchedY;
-      Object.assign(options, {
-        height: canvas.height
-      })
-    }
     let img = new Image();
-    img.onload = () => canvas.setBackgroundImage(new fabric.Image(img),
-      () => canvas.renderAll(), options);
+    const { stretched, stretchedX, stretchedY, ...fabricOptions } = options
+    img.onload = () => {
+      const imgObj = new fabric.Image(img);
+      if (stretched || stretchedX) imgObj.scaleToWidth(canvas.width)
+      if (stretched || stretchedY) imgObj.scaleToHeight(canvas.height)
+      canvas.setBackgroundImage(imgObj, () => canvas.renderAll(), fabricOptions)
+    };
     img.src = dataUrl
   };
 
