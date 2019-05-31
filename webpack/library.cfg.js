@@ -17,11 +17,7 @@ function containsObject(obj, list) {
 }
 
 const externals = [];
-const explicitExternals = [];
 const internals = ['fabric', 'canvas'];
-Object.keys(require('../package.json').devDependencies).forEach(function(k) {
-  if (!containsObject(k, internals)) externals.push(k);
-});
 
 module.exports = {
   entry: {
@@ -35,9 +31,6 @@ module.exports = {
     filename: 'index.js',
     libraryTarget: 'umd'
   },
-  //Every non-relative module is external apart from those given.
-  //externals: [/^(?!fabric|canvas|base64-js|ieee754|isarray|jsdom|xmldom)[a-z\-0-9]+$/],
-  externals: explicitExternals.concat(externals),
   resolve: {
     extensions: ['.js', '.jsx']
   },
