@@ -7,6 +7,7 @@ import {uuid4} from './utils';
 import Select from './select';
 import Pencil from './pencil';
 import Line from './line';
+import Arrow from './arrow';
 import Rectangle from './rectangle';
 import Circle from './circle';
 import Pan from './pan';
@@ -81,6 +82,7 @@ class SketchField extends PureComponent {
     this._tools[Tool.Select] = new Select(fabricCanvas);
     this._tools[Tool.Pencil] = new Pencil(fabricCanvas);
     this._tools[Tool.Line] = new Line(fabricCanvas);
+    this._tools[Tool.Arrow] = new Arrow(fabricCanvas);
     this._tools[Tool.Rectangle] = new Rectangle(fabricCanvas);
     this._tools[Tool.Circle] = new Circle(fabricCanvas);
     this._tools[Tool.Pan] = new Pan(fabricCanvas)
