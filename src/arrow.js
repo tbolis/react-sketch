@@ -28,26 +28,8 @@ class Arrow extends FabricCanvasTool {
       selectable: false,
       evented: false
     });
-    canvas.add(this.line);
-  }
 
-  doMouseMove(o) {
-    if (!this.isDown) return;
-    let canvas = this._canvas;
-    var pointer = canvas.getPointer(o.e);
-    this.line.set({ x2: pointer.x, y2: pointer.y });
-    this.line.setCoords();
-    canvas.renderAll();
-  }
-
-  doMouseUp(o) {
-    this.isDown = false;
-    let canvas = this._canvas;
-    var pointer = canvas.getPointer(o.e);
-    let x_delta = this.line.x2 - this.line.x1;
-    let y_delta = this.line.y2 - this.line.y1;
-
-    let head = new fabric.Triangle({
+    this.head = new fabric.Triangle({
       fill: this._color,
       left: pointer.x,
       top: pointer.y,
@@ -57,10 +39,39 @@ class Arrow extends FabricCanvasTool {
       width: 3 * this._width,
       selectable: false,
       evented: false,
-      angle: 90 + Math.atan2(y_delta, x_delta) * 180/Math.PI,
+      angle: 90
     });
+
+    canvas.add(this.line);
+    canvas.add(this.head);
+  }
+
+  doMouseMove(o) {
+    if (!this.isDown) return;
+    let canvas = this._canvas;
+    var pointer = canvas.getPointer(o.e);
+    this.line.set({ x2: pointer.x, y2: pointer.y });
+    this.line.setCoords();
+
+    let x_delta = pointer.x - this.line.x1;
+    let y_delta = pointer.y - this.line.y1;
+
+    this.head.set({ 
+      left: pointer.x, 
+      top: pointer.y, 
+      angle: 90 + Math.atan2(y_delta, x_delta) * 180/Math.PI 
+    });
+
+    canvas.renderAll();
+  }
+
+  doMouseUp(o) {
+    this.isDown = false;
+    let canvas = this._canvas;
+
     canvas.remove(this.line);
-    let arrow = new fabric.Group([this.line, head]);
+    canvas.remove(this.head);
+    let arrow = new fabric.Group([this.line, this.head]);
     canvas.add(arrow);
   }
 
