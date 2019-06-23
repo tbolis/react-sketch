@@ -1,6 +1,13 @@
 declare module 'react-sketch' {
 	import * as React from 'react'
 
+	export interface BackgroundImageOptions {
+		stretched?: boolean
+		stretchedX?: boolean
+		stretchedY?: boolean
+		[name: string]: any
+	}
+
 	export class SketchField extends React.PureComponent<{
 		// the color of the line
 		lineColor?: string
@@ -169,12 +176,23 @@ declare module 'react-sketch' {
 		 * @param dataUrl the dataUrl to be used as a background
 		 * @param options
 		 */
-		setBackgroundFromDataUrl(dataUrl: string, options?: {
-			stretched?: boolean
-			stretchedX?: boolean
-			stretchedY?: boolean
-			[name: string]: any
-		}): void
+		setBackgroundFromDataUrl(dataUrl: string, options?: BackgroundImageOptions): void
+
+		/**
+		 * Sets the background from an Image object
+		 *
+		 * @param image the Image object to be used as a background
+		 * @param options
+		 */
+		setBackgroundFromImage(image: HTMLImageElement, options?: BackgroundImageOptions): void
+		
+		/**
+		 * Sets the background from the url given
+		 *
+		 * @param url the url of the image to be used as a background
+		 * @param options
+		 */
+		setBackgroundFromUrl(url: string, options?: BackgroundImageOptions): void
 		
 		addText(text: string, options?: {}): void
 		

@@ -522,6 +522,18 @@ class SketchField extends PureComponent {
    * @param options
    */
   setBackgroundFromDataUrl = (dataUrl, options = {}) => {
+    let img = new Image();
+    img.onload = () => this.setBackgroundFromImage(img);
+    img.src = dataUrl
+  };
+
+  /**
+   * Sets the background from an Image object
+   *
+   * @param image the Image object to be used as a background
+   * @param options
+   */
+  setBackgroundFromImage = (image, options = {}) => {
     let canvas = this._fc;
     if (options.stretched) {
       delete options.stretched;
@@ -542,10 +554,37 @@ class SketchField extends PureComponent {
         height: canvas.height
       })
     }
-    let img = new Image();
-    img.onload = () => canvas.setBackgroundImage(new fabric.Image(img),
-      () => canvas.renderAll(), options);
-    img.src = dataUrl
+    canvas.setBackgroundImage(new fabric.Image(image), () => canvas.renderAll(), options);
+  };
+
+  /**
+   * Sets the background from the url given
+   *
+   * @param url the url of the image to be used as a background
+   * @param options
+   */
+  setBackgroundFromUrl = (url, options = {}) => {
+    let canvas = this._fc;
+    if (options.stretched) {
+      delete options.stretched;
+      Object.assign(options, {
+        width: canvas.width,
+        height: canvas.height
+      })
+    }
+    if (options.stretchedX) {
+      delete options.stretchedX;
+      Object.assign(options, {
+        width: canvas.width
+      })
+    }
+    if (options.stretchedY) {
+      delete options.stretchedY;
+      Object.assign(options, {
+        height: canvas.height
+      })
+    }
+    canvas.setBackgroundImage(url, () => canvas.renderAll(), options);
   };
 
   addText = (text, options = {}) => {
