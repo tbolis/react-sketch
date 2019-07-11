@@ -12,6 +12,7 @@ import Rectangle from './rectangle';
 import Circle from './circle';
 import Pan from './pan';
 import Tool from './tools';
+import Highlighter from './highlighter';
 
 const fabric = require('fabric').fabric;
 
@@ -85,7 +86,8 @@ class SketchField extends PureComponent {
     this._tools[Tool.Arrow] = new Arrow(fabricCanvas);
     this._tools[Tool.Rectangle] = new Rectangle(fabricCanvas);
     this._tools[Tool.Circle] = new Circle(fabricCanvas);
-    this._tools[Tool.Pan] = new Pan(fabricCanvas)
+    this._tools[Tool.Pan] = new Pan(fabricCanvas);
+    this._tools[Tool.Highlighter] = new Highlighter(fabricCanvas);
   };
 
   /**

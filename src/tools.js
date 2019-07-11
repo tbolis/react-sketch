@@ -5,5 +5,6 @@ export default {
   Pencil: 'pencil',
   Rectangle: 'rectangle',
   Select: 'select',
-  Pan: 'pan'
+  Pan: 'pan',
+  Highlighter: 'highlighter'
 }
