@@ -556,7 +556,7 @@ class SketchField extends PureComponent {
       left: (canvas.getWidth() - iText.width) * 0.5,
       top: (canvas.getHeight() - iText.height) * 0.5,
     };
-    Object.assign(options, opts);
+    Object.assign(opts, options);
     iText.set({
       'left': options.left,
       'top': options.top
