@@ -31,7 +31,6 @@ class Rectangle extends FabricCanvasTool {
       stroke: this._color,
       strokeWidth: this._width,
       fill: this._fill,
-      //fill: 'rgba(255,0,0,0.5)',
       transparentCorners: false,
       selectable: false,
       evented: false,
