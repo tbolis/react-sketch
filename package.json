@@ -1,5 +1,5 @@
 {
-  "name": "tarik.djurdjevic-react-sketch",
+  "name": "@tarik.djurdjevic/react-sketch",
   "version": "0.5.1",
   "description": "Sketch Element for React based applications, backed-up by fabricjs as its core",
   "keywords": [
