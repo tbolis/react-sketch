@@ -1,5 +1,5 @@
 {
-  "name": "react-sketch",
+  "name": "tarik.djurdjevic-react-sketch",
   "version": "0.5.1",
   "description": "Sketch Element for React based applications, backed-up by fabricjs as its core",
   "keywords": [
@@ -31,7 +31,7 @@
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",
     "precommit": "lint-staged",
-    "prepublish": "npm run test && npm run build",
+    "prepublish": "npm run build",
     "prebuild": "rimraf dist",
     "start": "node webpack/server.js",
     "start:debug": "weinre --boundHost `my-local-ip` ",
