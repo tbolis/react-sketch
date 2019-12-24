@@ -105,7 +105,7 @@
     "eslint-plugin-jsx-a11y": "6.1.2",
     "eslint-plugin-react": "7.11.1",
     "eslint-watch": "4.0.2",
-    "fabric": "2.4.3",
+    "fabric": "^3.5.1",
     "flexboxgrid": "^6.3.1",
     "html-webpack-plugin": "^3.2.0",
     "jasmine-core": "^3.3.0",

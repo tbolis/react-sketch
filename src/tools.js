@@ -4,6 +4,7 @@ export default {
   Arrow: 'arrow',
   Pencil: 'pencil',
   Rectangle: 'rectangle',
+  RectangleLabel: 'rectangle-label',
   Select: 'select',
   Pan: 'pan'
 }
