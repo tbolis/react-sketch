@@ -1,8 +1,7 @@
 /*eslint no-unused-vars: 0*/
 
 import FabricCanvasTool from './fabrictool'
-
-const fabric = require('fabric').fabric;
+import RectangleLabelObject from './rectangle-label-object';
 
 class RectangleLabel extends FabricCanvasTool {
 
@@ -13,6 +12,7 @@ class RectangleLabel extends FabricCanvasTool {
     this._width = props.lineWidth;
     this._color = props.lineColor;
     this._fill = props.fillColor;
+    this._textString = props.text;
     this._maxFontSize = 12;
   }
 
@@ -22,7 +22,7 @@ class RectangleLabel extends FabricCanvasTool {
     let pointer = canvas.getPointer(o.e);
     this.startX = pointer.x;
     this.startY = pointer.y;
-    this.rect = new fabric.Rect({
+    this.rectangleLabel = new RectangleLabelObject(canvas, "New drawing", {
       left: this.startX,
       top: this.startY,
       originX: 'left',
@@ -38,27 +38,33 @@ class RectangleLabel extends FabricCanvasTool {
       strokeUniform: true,
       noScaleCache : false,
       angle: 0
-    });
-
-    this.text = new fabric.Text("New defect",{
+    },{
       left: this.startX,
       top: this.startY - 12,
       originX: 'left',
       originY: 'top',
-      width: pointer.x - this.startX - this._width + 1,
+      width: pointer.x - this.startX - this._width,
       height: canvas.height/3,
       fontSize: this._maxFontSize,
+      noScaleCache: false,
       backgroundColor: this._color,
-      borderColor: this._color,
+      transparentCorners: true,
+      hasControls: false,
       angle: 0
     });
 
-    while (this.text.height >  canvas.height/3) {
-      this.text.set({fontSize: this.text.fontSize-1,top: this.startY - this.text.fontSize - 12,});
+    if(this._objects && this._objects.length > 0)
+      this._objects.push(this.rectangleLabel);
+    else
+      this._objects = [this.rectangleLabel];
+
+    while (this.rectangleLabel._textObj.height >  canvas.height/3) {
+      this.rectangleLabel._textObj.set({fontSize: this.rectangleLabel._textObj.fontSize-1,top: this.startY - this.rectangleLabel._textObj.fontSize - 12,});
     }
 
-    canvas.add(this.rect);
-    canvas.add(this.text);
+    canvas.add(this.rectangleLabel._rectObj);
+    canvas.add(this.rectangleLabel._textObj);
+    canvas.renderAll();
   }
 
   doMouseMove(o) {
@@ -66,18 +72,18 @@ class RectangleLabel extends FabricCanvasTool {
     let canvas = this._canvas;
     let pointer = canvas.getPointer(o.e);
     if (this.startX > pointer.x) {
-      this.rect.set({ left: Math.abs(pointer.x) });
-      this.text.set({ left: Math.abs(pointer.x) });
+      this.rectangleLabel._rectObj.set({ left: Math.abs(pointer.x) });
+      this.rectangleLabel._textObj.set({ left: Math.abs(pointer.x) });
     }
     if (this.startY > pointer.y) {
-      this.rect.set({ left: Math.abs(pointer.x) });
-      this.text.set({ top: Math.abs(pointer.y) });
+      this.rectangleLabel._rectObj.set({ left: Math.abs(pointer.x) });
+      this.rectangleLabel._textObj.set({ top: Math.abs(pointer.y) });
     }
-    this.text.set({ width: Math.abs(this.startX - pointer.x - this._width + 1) });
-    this.text.setCoords();
-    this.rect.set({ width: Math.abs(this.startX - pointer.x) });
-    this.rect.set({ height: Math.abs(this.startY - pointer.y) });
-    this.rect.setCoords();
+    this.rectangleLabel._textObj.setCoords();
+    this.rectangleLabel._rectObj.set({ width: Math.abs(this.startX - pointer.x) });
+    this.rectangleLabel._textObj.set({ width: this.rectangleLabel._rectObj.getScaledWidth() });
+    this.rectangleLabel._rectObj.set({ height: Math.abs(this.startY - pointer.y) });
+    this.rectangleLabel._rectObj.setCoords();
     canvas.renderAll();
   }
 
@@ -85,10 +91,10 @@ class RectangleLabel extends FabricCanvasTool {
     this.isDown = false;
     let canvas = this._canvas;
     
-    var group = new fabric.Group([this.rect,this.text]);
-    canvas.remove(this.rect);
-    canvas.remove(this.text);
-    canvas.add(group);
+    // var group = new fabric.Group([this.rectangleLabel._rectObj,this.rectangleLabel._textObj]);
+    // canvas.remove(this.rectangleLabel._rectObj);
+    // canvas.remove(this.rectangleLabel._textObj);
+    // canvas.add(group);
     canvas.renderAll();
   }
 }
