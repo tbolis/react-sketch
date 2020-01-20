@@ -302,13 +302,13 @@ class SketchField extends PureComponent {
    * @param e the resize event
    * @private
    */
-  _resize = (e) => {
+  _resize = (e, canvasWidth = null, canvasHeight = null) => {
     if (e) e.preventDefault();
     let { widthCorrection, heightCorrection } = this.props;
     let canvas = this._fc;
     let { offsetWidth, clientHeight } = this._container;
-    let prevWidth = canvas.getWidth();
-    let prevHeight = canvas.getHeight();
+    let prevWidth = canvasWidth || canvas.getWidth();
+    let prevHeight = canvasHeight || canvas.getHeight();
     let wfactor = ((offsetWidth - widthCorrection) / prevWidth).toFixed(2);
     let hfactor = ((clientHeight - heightCorrection) / prevHeight).toFixed(2);
     canvas.setWidth(offsetWidth - widthCorrection);
