@@ -6,5 +6,6 @@ export default {
   Rectangle: 'rectangle',
   RectangleLabel: 'rectangle-label',
   Select: 'select',
-  Pan: 'pan'
+  Pan: 'pan',
+  DefaultTool: 'default-tool',
 }

@@ -13,6 +13,7 @@ import Circle from './circle';
 import Pan from './pan';
 import Tool from './tools';
 import RectangleLabel from './rectangle-label';
+import DefaultTool from './defaul-tool';
 
 const fabric = require('fabric').fabric;
 
@@ -118,6 +119,7 @@ class SketchField extends PureComponent {
     this._tools[Tool.RectangleLabel] = new RectangleLabel(fabricCanvas);
     this._tools[Tool.Circle] = new Circle(fabricCanvas);
     this._tools[Tool.Pan] = new Pan(fabricCanvas);
+    this._tools[Tool.DefaultTool] = new DefaultTool(fabricCanvas);
   };
 
   /**
@@ -486,6 +488,10 @@ class SketchField extends PureComponent {
     let canvas = this._fc;
     setTimeout(() => {
       canvas.loadFromJSON(json, () => {
+        if(this.props.tool === Tool.DefaultTool){
+          canvas.isDrawingMode = canvas.selection = false;
+          canvas.forEachObject((o) => o.selectable = o.evented = false);
+        }
         canvas.renderAll();
         if (this.props.onChange) {
           this.props.onChange()
@@ -688,15 +694,11 @@ class SketchField extends PureComponent {
 
     if (this.props.tool !== prevProps.tool) {
       this._selectedTool = this._tools[this.props.tool];
+      //Bring the cursor back to default if it is changed by a tool
+      this._fc.defaultCursor = 'default';
       if(this._selectedTool){
         this._selectedTool.configureCanvas(this.props);
       }
-      else{
-        this._fc.isDrawingMode = false;
-        this._fc.selection = false;
-      }
-      //Bring the cursor back to default if it is changed by a tool
-      this._fc.defaultCursor = 'default';
     }
 
     if (this.props.backgroundColor !== prevProps.backgroundColor) {
