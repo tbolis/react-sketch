@@ -57,7 +57,14 @@ const config = {
         include: [Paths.srcPath, Paths.examplesPath],
         exclude: /(node_modules|bower_components|lib)/,
         loaders: ['babel-loader']
-      }
+      },
+      {
+        test: /\.(png|jpg|gif)$/,
+        loader: 'url-loader',
+        options: {
+          limit: 8192,
+        },
+      },
     ]
   },
   plugins: [
