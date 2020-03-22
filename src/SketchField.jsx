@@ -2,6 +2,7 @@
 
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
+
 import History from './history';
 import {uuid4} from './utils';
 import Select from './select';
@@ -18,6 +19,7 @@ const fabric = require('fabric').fabric;
 /**
  * Sketch Tool based on FabricJS for React Applications
  */
+
 class SketchField extends PureComponent {
 
   static propTypes = {
@@ -60,6 +62,8 @@ class SketchField extends PureComponent {
     style: PropTypes.object,
   };
 
+
+
   static defaultProps = {
     lineColor: 'black',
     lineWidth: 10,
@@ -67,7 +71,7 @@ class SketchField extends PureComponent {
     backgroundColor: 'transparent',
     opacity: 1.0,
     undoSteps: 25,
-    tool: Tool.Pencil,
+    tool: Tool.Circle,
     widthCorrection: 2,
     heightCorrection: 0,
     forceValue: false
@@ -77,6 +81,7 @@ class SketchField extends PureComponent {
     parentWidth: 550,
     action: true
   };
+
   _initTools = (fabricCanvas) => {
     this._tools = {};
     this._tools[Tool.Select] = new Select(fabricCanvas);
@@ -120,7 +125,9 @@ class SketchField extends PureComponent {
    * }
    */
   addImg = (dataUrl, options = {}) => {
+
     let canvas = this._fc;
+
     fabric.Image.fromURL(dataUrl, (oImg) => {
       let opts = {
         left: Math.random() * (canvas.getWidth() - oImg.width * 0.5),
@@ -315,6 +322,8 @@ class SketchField extends PureComponent {
   zoom = (factor) => {
     let canvas = this._fc;
     let objects = canvas.getObjects();
+
+
     for (let i in objects) {
       objects[i].scaleX = objects[i].scaleX * factor;
       objects[i].scaleY = objects[i].scaleY * factor;
@@ -356,6 +365,7 @@ class SketchField extends PureComponent {
    * Perform a redo operation on canvas, if it cannot redo it will leave the canvas intact
    */
   redo = () => {
+
     let history = this._history;
     if (history.canRedo()) {
       let canvas = this._fc;
@@ -396,42 +406,11 @@ class SketchField extends PureComponent {
     return this._history.canRedo()
   };
 
-  /**
-   * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
-   *
-   * Available Options are
-   * <table style="width:100%">
-   *
-   * <tr><td><b>Name</b></td><td><b>Type</b></td><td><b>Argument</b></td><td><b>Default</b></td><td><b>Description</b></td></tr>
-   * <tr><td>format</td> <td>String</td> <td><optional></td><td>png</td><td>The format of the output image. Either "jpeg" or "png"</td></tr>
-   * <tr><td>quality</td><td>Number</td><td><optional></td><td>1</td><td>Quality level (0..1). Only used for jpeg.</td></tr>
-   * <tr><td>multiplier</td><td>Number</td><td><optional></td><td>1</td><td>Multiplier to scale by</td></tr>
-   * <tr><td>left</td><td>Number</td><td><optional></td><td></td><td>Cropping left offset. Introduced in v1.2.14</td></tr>
-   * <tr><td>top</td><td>Number</td><td><optional></td><td></td><td>Cropping top offset. Introduced in v1.2.14</td></tr>
-   * <tr><td>width</td><td>Number</td><td><optional></td><td></td><td>Cropping width. Introduced in v1.2.14</td></tr>
-   * <tr><td>height</td><td>Number</td><td><optional></td><td></td><td>Cropping height. Introduced in v1.2.14</td></tr>
-   *
-   * </table>
-   *
-   * @returns {String} URL containing a representation of the object in the format specified by options.format
-   */
+
   toDataURL = (options) => this._fc.toDataURL(options);
 
-  /**
-   * Returns JSON representation of canvas
-   *
-   * @param propertiesToInclude Array <optional> Any properties that you might want to additionally include in the output
-   * @returns {string} JSON string
-   */
   toJSON = (propertiesToInclude) => this._fc.toJSON(propertiesToInclude);
 
-  /**
-   * Populates canvas with data from the specified JSON.
-   *
-   * JSON format must conform to the one of fabric.Canvas#toDatalessJSON
-   *
-   * @param json JSON string or object
-   */
   fromJSON = (json) => {
     if (!json) return;
     let canvas = this._fc;
@@ -445,13 +424,6 @@ class SketchField extends PureComponent {
     }, 100)
   };
 
-  /**
-   * Clear the content of the canvas, this will also clear history but will return the canvas content as JSON to be
-   * used as needed in order to undo the clear if possible
-   *
-   * @param propertiesToInclude Array <optional> Any properties that you might want to additionally include in the output
-   * @returns {string} JSON string of the canvas just cleared
-   */
   clear = (propertiesToInclude) => {
     let discarded = this.toJSON(propertiesToInclude);
     this._fc.clear();
@@ -459,9 +431,6 @@ class SketchField extends PureComponent {
     return discarded
   };
 
-  /**
-   * Remove selected object from the canvas
-   */
   removeSelected = () => {
     let canvas = this._fc;
     let activeObj = canvas.getActiveObject();
@@ -551,12 +520,17 @@ class SketchField extends PureComponent {
 
   addText = (text, options = {}) => {
     let canvas = this._fc;
+    console.log('canvas')
+    console.log(canvas);
+    console.log('canvas')
     let iText = new fabric.IText(text, options);
+
     let opts = {
       left: (canvas.getWidth() - iText.width) * 0.5,
       top: (canvas.getHeight() - iText.height) * 0.5,
     };
     Object.assign(options, opts);
+
     iText.set({
       'left': options.left,
       'top': options.top
@@ -574,12 +548,7 @@ class SketchField extends PureComponent {
       backgroundColor
     } = this.props;
 
-    let canvas = this._fc = new fabric.Canvas(this._canvas/*, {
-         preserveObjectStacking: false,
-         renderOnAddRemove: false,
-         skipTargetFind: true
-         }*/);
-
+    let canvas = this._fc = new fabric.Canvas(this._canvas);
     this._initTools(canvas);
 
     // set initial backgroundColor
@@ -606,11 +575,7 @@ class SketchField extends PureComponent {
     canvas.on('object:moving', this._onObjectMoving);
     canvas.on('object:scaling', this._onObjectScaling);
     canvas.on('object:rotating', this._onObjectRotating);
-    // IText Events fired on Adding Text
-    // canvas.on("text:event:changed", console.log)
-    // canvas.on("text:selection:changed", console.log)
-    // canvas.on("text:editing:entered", console.log)
-    // canvas.on("text:editing:exited", console.log)
+
 
     this.disableTouchScroll();
 
@@ -659,19 +624,18 @@ class SketchField extends PureComponent {
     let canvasDivStyle = Object.assign({}, style ? style : {},
       width ? { width: width } : {},
       height ? { height: height } : { height: 512 });
-
     return (
-      <div
-        className={className}
-        ref={(c) => this._container = c}
-        style={canvasDivStyle}>
-        <canvas
-          id={uuid4()}
-          ref={(c) => this._canvas = c}>
-          Sorry, Canvas HTML5 element is not supported by your browser
-          :(
-        </canvas>
-      </div>
+          <div
+            className={className}
+            ref={(c) => this._container = c}
+            style={canvasDivStyle}>
+            <canvas
+              id={uuid4()}
+              ref={(c) => this._canvas = c}>
+                Sorry, Canvas HTML5 element is not supported by your browser
+              :(
+            </canvas>
+          </div>
     )
   }
 }

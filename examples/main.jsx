@@ -94,6 +94,7 @@ const styles = {
   }
 };
 
+  console.log(Tools)
 /**
  * Helper function to manually fire an event
  *
@@ -111,6 +112,7 @@ function eventFire(el, etype) {
 }
 
 class SketchFieldDemo extends React.Component {
+
   constructor(props) {
     super(props);
 
@@ -121,7 +123,7 @@ class SketchFieldDemo extends React.Component {
       backgroundColor: 'transparent',
       shadowWidth: 0,
       shadowOffset: 0,
-      tool: Tools.Pencil,
+      tool: Tools.Select,
       enableRemoveSelected: false,
       fillWithColor: false,
       fillWithBackgroundColor: false,
@@ -143,7 +145,7 @@ class SketchFieldDemo extends React.Component {
       expandBack: false,
       expandImages: false,
       expandControlled: false,
-      text: 'a text, cool!',
+      text: 'Testing!',
       enableCopyPaste: false,
     };
   }
@@ -163,14 +165,8 @@ class SketchFieldDemo extends React.Component {
   };
 
   _download = () => {
-    console.save(this._sketch.toDataURL(), 'toDataURL.txt');
-    console.save(JSON.stringify(this._sketch.toJSON()), 'toDataJSON.txt');
-
-    /*eslint-enable no-console*/
-
     let { imgDown } = this.refs;
     let event = new Event('click', {});
-
     imgDown.href = this._sketch.toDataURL();
     imgDown.download = 'toPNG.png';
     imgDown.dispatchEvent(event);
@@ -267,6 +263,7 @@ class SketchFieldDemo extends React.Component {
   _addText = () => this._sketch.addText(this.state.text);
 
   componentDidMount = () => {
+    console.log('here');
     (function(console) {
       console.save = function(data, filename) {
         if (!data) {
@@ -300,6 +297,9 @@ class SketchFieldDemo extends React.Component {
         secondary: { main: '#11cb5f' }, // This is just green.A700 as hex.
       },
     });
+
+
+
     return (
       <MuiThemeProvider theme={theme}>
         <div className="row">
@@ -339,7 +339,9 @@ class SketchFieldDemo extends React.Component {
           </div>
         </div>
         <div className="row">
+
           <div className="col-xs-7 col-sm-7 col-md-9 col-lg-9">
+
             <SketchField
               name="sketch"
               className="canvas-area"
@@ -610,13 +612,13 @@ class SketchFieldDemo extends React.Component {
             <Card style={styles.card}>
               <CardHeader
                 title="Images"
-                subheader="Upload Images as drawing"
+                subheader="Upload Images as drawing "
                 action={
-                  <IconButton
-                    onClick={(e) => this.setState({ expandImages: !this.state.expandImages })}>
+                  <IconButton  onClick={(e) => this.setState({ expandImages: !this.state.expandImages })}>
                     <ExpandMore/>
                   </IconButton>
                 }/>
+
               <Collapse in={this.state.expandImages}>
                 <CardContent>
                   <div>
@@ -627,9 +629,7 @@ class SketchFieldDemo extends React.Component {
                       value={this.state.imageUrl}/>
                     <Button
                       variant="outlined"
-                      onClick={(e) => {
-                        this._sketch.addImg(this.state.imageUrl)
-                      }}>
+                      onClick={(e) => { this._sketch.addImg(this.state.imageUrl) }}>
                       Load Image from URL
                     </Button>
                   </div>
@@ -642,6 +642,8 @@ class SketchFieldDemo extends React.Component {
                 </CardContent>
               </Collapse>
             </Card>
+
+
             <Card style={styles.card}>
               <CardHeader
                 title="Controlled value"
@@ -668,10 +670,7 @@ class SketchFieldDemo extends React.Component {
         </div>
         <div style={{ width: 0 }}>
           <div className="col-xs-7 col-sm-7 col-md-9 col-lg-9">
-            {/* Sketch area */}
-
             <div className="col-xs-5 col-sm-5 col-md-3 col-lg-3">
-
 
             </div>
           </div>
