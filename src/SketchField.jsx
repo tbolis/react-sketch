@@ -1,6 +1,6 @@
 /*eslint no-unused-vars: 0*/
 
-import React, {PureComponent} from 'react';
+import React, {PureComponent, useEffect} from 'react';
 import PropTypes from 'prop-types';
 
 import History from './history';
@@ -540,28 +540,18 @@ class SketchField extends PureComponent {
   };
 
   componentDidMount = () => {
-    let {
-      tool,
-      value,
-      undoSteps,
-      defaultValue,
-      backgroundColor
-    } = this.props;
+    let {  tool,  value, undoSteps, defaultValue, backgroundColor } = this.props;
 
     let canvas = this._fc = new fabric.Canvas(this._canvas);
     this._initTools(canvas);
-
-    // set initial backgroundColor
     this._backgroundColor(backgroundColor)
-
     let selectedTool = this._tools[tool];
+
     selectedTool.configureCanvas(this.props);
     this._selectedTool = selectedTool;
-
-    // Control resize
     window.addEventListener('resize', this._resize, false);
+    window.addEventListener("keydown", this.deleteKey, false);
 
-    // Initialize History, with maximum number of undo steps
     this._history = new History(undoSteps);
 
     // Events binding
@@ -578,15 +568,15 @@ class SketchField extends PureComponent {
 
 
     this.disableTouchScroll();
-
     this._resize();
-
-    // initialize canvas with controlled value if exists
     (value || defaultValue) && this.fromJSON(value || defaultValue);
-
   };
 
-  componentWillUnmount = () => window.removeEventListener('resize', this._resize);
+  componentWillUnmount = () => {
+     window.removeEventListener('resize', this._resize);
+     window.addEventListener("keydown", this.deleteKey, false);
+
+   }
 
   componentDidUpdate = (prevProps, prevState) => {
     if (this.state.parentWidth !== prevState.parentWidth
@@ -595,11 +585,9 @@ class SketchField extends PureComponent {
 
       this._resize()
     }
-
     if (this.props.tool !== prevProps.tool) {
       this._selectedTool = this._tools[this.props.tool] || this._tools[Tool.Pencil]
     }
-
     //Bring the cursor back to default if it is changed by a tool
     this._fc.defaultCursor = 'default';
     this._selectedTool.configureCanvas(this.props);
@@ -613,13 +601,14 @@ class SketchField extends PureComponent {
     }
   };
 
+  deleteKey = (event) =>{
+     if(event.code == "Delete"){
+       this.props.removeItem()
+     }
+   }
+
   render = () => {
-    let {
-      className,
-      style,
-      width,
-      height
-    } = this.props;
+    let { className,  style, width, height } = this.props;
 
     let canvasDivStyle = Object.assign({}, style ? style : {},
       width ? { width: width } : {},

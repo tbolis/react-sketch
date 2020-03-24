@@ -147,6 +147,7 @@ class SketchFieldDemo extends React.Component {
       expandControlled: false,
       text: 'Testing!',
       enableCopyPaste: false,
+      isOpen: false
     };
   }
 
@@ -160,9 +161,16 @@ class SketchFieldDemo extends React.Component {
 
   _save = () => {
     let drawings = this.state.drawings;
+    console.log(drawings)
     drawings.push(this._sketch.toDataURL());
-    this.setState({ drawings: drawings });
+    this.setState({ drawings: drawings, isOpen: true });
   };
+
+  _open = () =>{
+      if(this.state.isOpen == true){
+        this.setState({drawings: drawings })
+      }
+  }
 
   _download = () => {
     let { imgDown } = this.refs;
@@ -307,6 +315,14 @@ class SketchFieldDemo extends React.Component {
             <AppBar title="Sketch Tool" position="static" style={styles.appBar}>
               <Toolbar>
                 <Typography variant="h6" color="inherit" style={{ flexGrow: 1 }}>Sketch Tool</Typography>
+
+                <IconButton
+                  color="primary"
+                  disabled={!this.state.canUndo}
+                  onClick={this._undo}>
+                  <UndoIcon/>
+                </IconButton>
+
                 <IconButton
                   color="primary"
                   disabled={!this.state.canUndo}
@@ -348,6 +364,7 @@ class SketchFieldDemo extends React.Component {
               ref={c => (this._sketch = c)}
               lineColor={this.state.lineColor}
               lineWidth={this.state.lineWidth}
+              removeItem={this._removeSelected}
               fillColor={
                 this.state.fillWithColor
                   ? this.state.fillColor
