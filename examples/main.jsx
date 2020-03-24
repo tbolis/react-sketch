@@ -121,7 +121,7 @@ class SketchFieldDemo extends React.Component {
       backgroundColor: 'transparent',
       shadowWidth: 0,
       shadowOffset: 0,
-      tool: Tools.Pencil,
+      tool: Tools.Select,
       enableRemoveSelected: false,
       fillWithColor: false,
       fillWithBackgroundColor: false,
