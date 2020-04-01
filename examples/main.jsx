@@ -94,7 +94,6 @@ const styles = {
   }
 };
 
-  console.log(Tools)
 /**
  * Helper function to manually fire an event
  *
@@ -102,6 +101,7 @@ const styles = {
  * @param etype the event type
  */
 function eventFire(el, etype) {
+
   if (el.fireEvent) {
     el.fireEvent('on' + etype);
   } else {
@@ -131,7 +131,7 @@ class SketchFieldDemo extends React.Component {
       canUndo: false,
       canRedo: false,
       controlledSize: false,
-      sketchWidth: 600,
+      sketchWidth: 800,
       sketchHeight: 600,
       stretched: true,
       stretchedX: false,
@@ -147,7 +147,8 @@ class SketchFieldDemo extends React.Component {
       expandControlled: false,
       text: 'Testing!',
       enableCopyPaste: false,
-      isOpen: false
+      isOpen: true,
+      dataJson: dataJson,
     };
   }
 
@@ -160,25 +161,124 @@ class SketchFieldDemo extends React.Component {
   };
 
   _save = () => {
-    let drawings = this.state.drawings;
-    console.log(drawings)
-    drawings.push(this._sketch.toDataURL());
-    this.setState({ drawings: drawings, isOpen: true });
+    var array = []
+    var stObject =  this._sketch._fc._objects;
+    for (var key in stObject) {
+      var obArray = []
+      var orgState = stObject[key].__originalState;
+      if(orgState){
+        if(orgState.objects){
+          for(var j = 0; j < orgState.objects.length; j++){
+            var newHash =  this._getHash(orgState.objects[j]);
+            obArray.push(newHash);
+          }
+        }
+        var hash = this._getHash(stObject[key].__originalState, obArray);
+        array.push(hash)
+      }
+    }
+    var objects = {
+      "objects": array,
+      "background": "red",
+    }
+
+    // var backgroundImage = this._sketch._fc.backgroundImage._element.src;
+    this.setState({isOpen: true , objects: objects});
   };
 
-  _open = () =>{
-      if(this.state.isOpen == true){
-        this.setState({drawings: drawings })
-      }
+  _open = () => {
+    // this._setBackGround(this.state.backgroundImage)
+     this._sketch.fromJSON(this.state.objects)
+
   }
 
   _download = () => {
-    let { imgDown } = this.refs;
-    let event = new Event('click', {});
-    imgDown.href = this._sketch.toDataURL();
-    imgDown.download = 'toPNG.png';
-    imgDown.dispatchEvent(event);
+    this._sketch.download();
   };
+
+ //  Start Setting Background
+  _setBackGround =(src)=>{
+      let sketch = this._sketch;
+      let { stretched, stretchedX, stretchedY, originX, originY } = this.state;
+      sketch.setBackgroundFromDataUrl(src, {
+        stretched: true,
+        stretchedX: true,
+        stretchedY: true,
+        originX: originX,
+        originY: originY
+    })
+
+  }
+ // End
+
+
+
+ // Start
+ //
+ // Process
+
+ _getHash = (obj, obArray) => {
+    console.log(obj);
+      var hash = {
+                  type: obj.type,
+                  version: obj.version,
+                  originX: obj.originX,
+                  originY: obj.originY,
+                  left: obj.left,
+                  top: obj.top,
+                  width: obj.width,
+                  height: obj.height,
+                  fill: obj.fill,
+                  stroke: obj.stroke,
+                  strokeWidth: obj.strokeWidth,
+                  strokeDashArray: obj.strokeDashArray,
+                  strokeLineCap: obj.strokeLineCap,
+                  strokeLineJoin: obj.strokeLineJoin,
+                  strokeMiterLimit: obj.strokeMiterLimit,
+                  scaleX: obj.scaleX,
+                  scaleY: obj.scaleY,
+                  angle: obj.angle,
+                  flipX: obj.flipX,
+                  flipY: obj.flipY,
+                  opacity: obj.opacity,
+                  shadow: obj.shadow,
+                  visible: obj.visible,
+                  clipTo: obj.clipTo,
+                  backgroundColor: obj.backgroundColor,
+                  fillRule: obj.fillRule,
+                  paintFirst: obj.paintFirst,
+                  globalCompositeOperation: obj.globalCompositeOperation,
+                  transformMatrix: obj.transformMatrix,
+                  skewX: obj.skewX,
+                  skewY: obj.skewY,
+                  path: obj.path,
+                  x1: obj.x1,
+                  x2: obj.x2,
+                  y1: obj.y1,
+                  y2: obj.y2,
+                  objects: obArray,
+                  radius: obj.radius,
+                  startAngle: obj.startAngle,
+                  endAngle: obj.endAngle,
+                  text:  obj.text,
+                  fontSize: obj.fontSize,
+                  fontWeight: obj.fontWeight,
+                  fontFamily: obj.fontFamily,
+                  fontStyle: obj.fontStyle,
+                  lineHeight: obj.lineHeight,
+                  underline: obj.underline,
+                  overline: obj.overline,
+                  linethrough: obj.linethrough,
+                  textAlign: obj.textAlign,
+                  textBackgroundColor: obj.textBackgroundColor,
+                  charSpacing: obj.charSpacing,
+                  crossOrigin: "",
+                  cropX: obj.cropX,
+                  cropY: obj.cropY,
+                  src: obj.src,
+                }
+               return hash;
+ }
 
   _renderTile = (drawing, index) => {
     return (
@@ -248,19 +348,16 @@ class SketchFieldDemo extends React.Component {
   };
 
   _onBackgroundImageDrop = (accepted /*, rejected*/) => {
+    console.log(accepted)
     if (accepted && accepted.length > 0) {
       let sketch = this._sketch;
       let reader = new FileReader();
+
       let { stretched, stretchedX, stretchedY, originX, originY } = this.state;
       reader.addEventListener(
         'load',
-        () =>
-          sketch.setBackgroundFromDataUrl(reader.result, {
-            stretched: stretched,
-            stretchedX: stretchedX,
-            stretchedY: stretchedY,
-            originX: originX,
-            originY: originY,
+        () =>sketch.setBackgroundFromDataUrl(reader.result, {
+
           }),
         false,
       );
@@ -271,11 +368,10 @@ class SketchFieldDemo extends React.Component {
   _addText = () => this._sketch.addText(this.state.text);
 
   componentDidMount = () => {
-    console.log('here');
     (function(console) {
       console.save = function(data, filename) {
+
         if (!data) {
-          console.error('Console.save: No data');
           return;
         }
         if (!filename) filename = 'console.json';
@@ -312,41 +408,47 @@ class SketchFieldDemo extends React.Component {
       <MuiThemeProvider theme={theme}>
         <div className="row">
           <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-            <AppBar title="Sketch Tool" position="static" style={styles.appBar}>
+            <AppBar position="static" style={styles.appBar}>
               <Toolbar>
                 <Typography variant="h6" color="inherit" style={{ flexGrow: 1 }}>Sketch Tool</Typography>
 
                 <IconButton
                   color="primary"
-                  disabled={!this.state.canUndo}
-                  onClick={this._undo}>
-                  <UndoIcon/>
+                  title="Open"
+                  disabled={!this.state.isOpen}
+                  onClick={this._open}>
+                  <AddIcon/>
                 </IconButton>
 
                 <IconButton
                   color="primary"
+                  title="Undo"
                   disabled={!this.state.canUndo}
                   onClick={this._undo}>
                   <UndoIcon/>
                 </IconButton>
                 <IconButton
                   color="primary"
+                  title="Redo"
                   disabled={!this.state.canRedo}
                   onClick={this._redo}>
                   <RedoIcon/>
                 </IconButton>
                 <IconButton
                   color="primary"
+                  title="Save"
                   onClick={this._save}>
                   <SaveIcon/>
                 </IconButton>
                 <IconButton
                   color="primary"
+                  title="Download"
                   onClick={this._download}>
                   <DownloadIcon/>
                 </IconButton>
                 <IconButton
                   color="primary"
+                  title="Delete All"
                   onClick={this._clear}>
                   <DeleteIcon/>
                 </IconButton>
@@ -381,7 +483,7 @@ class SketchFieldDemo extends React.Component {
               height={
                 this.state.controlledSize ? this.state.sketchHeight : null
               }
-              defaultValue={dataJson}
+              defaultValue={this.state.dataJson}
               value={controlledValue}
               forceValue
               onChange={this._onSketchChange}

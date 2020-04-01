@@ -2,7 +2,7 @@
  * Maintains the history of an object
  */
 class History {
-  constructor(undoLimit = 10, debug = false) {
+  constructor(undoLimit = 1000, debug = false) {
     this.undoLimit = undoLimit;
     this.undoList = [];
     this.redoList = [];
@@ -35,18 +35,20 @@ class History {
    *
    * @param obj
    */
+
+
   keep(obj) {
+
     try {
-      this.redoList = [];
-      if (this.current) {
-        this.undoList.push(this.current);
-      }
-      if (this.undoList.length > this.undoLimit) {
-        this.undoList.shift();
-      }
-      this.current = obj;
+          if (this.current) {
+            this.undoList.push(this.current);
+          }
+          if (this.undoList.length > this.undoLimit) {
+            this.undoList.shift();
+          }
+          this.current = obj;
     } finally {
-      this.print();
+        this.print();
     }
   }
 
@@ -119,6 +121,33 @@ class History {
     this.current = null;
     this.print();
   }
+
+  /**
+     * Save actions to a json file
+     *
+     *
+     */
+  saveToFile() {
+    var allElement = this.undoList;
+    if(this.current){
+      if(this.redoList.length == 0){
+        allElement = this.current
+      }
+    }
+
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(allElement, null, 4)], {
+        type: "text/plain"
+      }));
+      a.setAttribute("download", "image.txt");
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+  }
+
+  /**
+  * print object
+  */
 
   print() {
     if (this.debug) {

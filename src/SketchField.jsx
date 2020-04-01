@@ -1,9 +1,10 @@
-/*eslint no-unused-vars: 0*/
+ /*eslint no-unused-vars: 0*/
 
 import React, {PureComponent, useEffect} from 'react';
 import PropTypes from 'prop-types';
 
 import History from './history';
+
 import {uuid4} from './utils';
 import Select from './select';
 import Pencil from './pencil';
@@ -79,7 +80,8 @@ class SketchField extends PureComponent {
 
   state = {
     parentWidth: 550,
-    action: true
+    action: true,
+    save: null,
   };
 
   _initTools = (fabricCanvas) => {
@@ -186,11 +188,13 @@ class SketchField extends PureComponent {
   _onObjectModified = (e) => {
     let obj = e.target;
     obj.__version += 1;
+
     let prevState = JSON.stringify(obj.__originalState);
     let objState = obj.toJSON();
-    // record current object state as json and update to originalState
+
     obj.__originalState = objState;
     let currState = JSON.stringify(objState);
+
     this._history.keep([obj, prevState, currState]);
   };
 
@@ -236,8 +240,7 @@ class SketchField extends PureComponent {
   _onMouseUp = (e) => {
     this._selectedTool.doMouseUp(e);
     // Update the final state to new-generated object
-    // Ignore Path object since it would be created after mouseUp
-    // Assumed the last object in canvas.getObjects() in the newest object
+
     if (this.props.tool !== Tool.Pencil) {
       const canvas = this._fc;
       const objects = canvas.getObjects();
@@ -369,7 +372,6 @@ class SketchField extends PureComponent {
     let history = this._history;
     if (history.canRedo()) {
       let canvas = this._fc;
-      //noinspection Eslint
       let [obj, prevState, currState] = history.redo();
       if (obj.__version === 0) {
         this.setState({ action: false }, () => {
@@ -406,12 +408,14 @@ class SketchField extends PureComponent {
     return this._history.canRedo()
   };
 
-
-  toDataURL = (options) => this._fc.toDataURL(options);
+  toDataURL = (options) => {
+    this._fc.toDataURL(options);
+  }
 
   toJSON = (propertiesToInclude) => this._fc.toJSON(propertiesToInclude);
 
   fromJSON = (json) => {
+
     if (!json) return;
     let canvas = this._fc;
     setTimeout(() => {
@@ -456,7 +460,7 @@ class SketchField extends PureComponent {
 
   copy = () => {
     let canvas = this._fc;
-    canvas.getActiveObject().clone(cloned => this._clipboard = cloned);
+
   };
 
   paste = () => {
@@ -491,11 +495,14 @@ class SketchField extends PureComponent {
    * @param options
    */
   setBackgroundFromDataUrl = (dataUrl, options = {}) => {
+    console.log(dataUrl);
+
+    
     let canvas = this._fc;
     if (options.stretched) {
       delete options.stretched;
       Object.assign(options, {
-        width: canvas.width,
+        width: canvas.width ,
         height: canvas.height
       })
     }
@@ -520,9 +527,6 @@ class SketchField extends PureComponent {
 
   addText = (text, options = {}) => {
     let canvas = this._fc;
-    console.log('canvas')
-    console.log(canvas);
-    console.log('canvas')
     let iText = new fabric.IText(text, options);
 
     let opts = {
@@ -541,7 +545,6 @@ class SketchField extends PureComponent {
 
   componentDidMount = () => {
     let {  tool,  value, undoSteps, defaultValue, backgroundColor } = this.props;
-
     let canvas = this._fc = new fabric.Canvas(this._canvas);
     this._initTools(canvas);
     this._backgroundColor(backgroundColor)
@@ -575,8 +578,7 @@ class SketchField extends PureComponent {
   componentWillUnmount = () => {
      window.removeEventListener('resize', this._resize);
      window.addEventListener("keydown", this.deleteKey, false);
-
-   }
+  }
 
   componentDidUpdate = (prevProps, prevState) => {
     if (this.state.parentWidth !== prevState.parentWidth
@@ -601,10 +603,46 @@ class SketchField extends PureComponent {
     }
   };
 
+  /**
+  * Delete key Commands for selection deleted.
+  * @event params
+  */
   deleteKey = (event) =>{
-     if(event.code == "Delete"){
+     if(event.code == "Delete" || event.code == "BackSpace"){
        this.props.removeItem()
      }
+   }
+
+   /**
+   * Download Content
+   */
+   download = () => {
+     this._history.saveToFile();
+   }
+
+   /**
+   * Save Current Index
+   */
+
+   save = () => {
+     let canvas = this._fc;
+     let objects = canvas.getObjects();
+     let stObjects = JSON.stringify(objects)
+     this.setState({save: stObjects})
+   }
+
+   /**
+   * Open Current Saved
+   */
+
+   open = () => {
+      let canvas = this._fc;
+
+      let objects = this.state.save;
+
+
+
+      this.setState({isView: true})
    }
 
   render = () => {
