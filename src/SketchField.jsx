@@ -415,17 +415,17 @@ class SketchField extends PureComponent {
   toJSON = (propertiesToInclude) => this._fc.toJSON(propertiesToInclude);
 
   fromJSON = (json) => {
-
+    var canvas = this._fc;
     if (!json) return;
-    let canvas = this._fc;
-    setTimeout(() => {
+    //setTimeout(() => {
       canvas.loadFromJSON(json, () => {
         canvas.renderAll();
         if (this.props.onChange) {
-          this.props.onChange()
+         //  this.props.onChange()
         }
       })
-    }, 100)
+  //  }, 100)
+
   };
 
   clear = (propertiesToInclude) => {
@@ -495,9 +495,6 @@ class SketchField extends PureComponent {
    * @param options
    */
   setBackgroundFromDataUrl = (dataUrl, options = {}) => {
-    console.log(dataUrl);
-
-    
     let canvas = this._fc;
     if (options.stretched) {
       delete options.stretched;
@@ -524,6 +521,20 @@ class SketchField extends PureComponent {
       () => canvas.renderAll(), options);
     img.src = dataUrl
   };
+
+  changeBackground = (imgData) =>{
+      let canvas = this._fc;
+      setTimeout(() => {
+      var img = new Image();
+      img.onload = function() {
+          // this is syncronous
+          var f_img = new fabric.Image(img);
+          canvas.setBackgroundImage(f_img);
+          canvas.renderAll();
+      };
+      img.src = imgData;
+    }, 3000)
+  }
 
   addText = (text, options = {}) => {
     let canvas = this._fc;

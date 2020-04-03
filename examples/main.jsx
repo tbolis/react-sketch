@@ -149,6 +149,7 @@ class SketchFieldDemo extends React.Component {
       enableCopyPaste: false,
       isOpen: true,
       dataJson: dataJson,
+      url: dataUrl
     };
   }
 
@@ -162,7 +163,8 @@ class SketchFieldDemo extends React.Component {
 
   _save = () => {
     var array = []
-    var stObject =  this._sketch._fc._objects;
+    let canvas =  this._sketch._fc;
+    var stObject =  canvas._objects;
     for (var key in stObject) {
       var obArray = []
       var orgState = stObject[key].__originalState;
@@ -177,51 +179,35 @@ class SketchFieldDemo extends React.Component {
         array.push(hash)
       }
     }
-    var objects = {
-      "objects": array,
-      "background": "red",
-    }
 
-    // var backgroundImage = this._sketch._fc.backgroundImage._element.src;
+    var objects = {   "objects": array , background: canvas.backgroundColor  }
+
+    if(canvas.backgroundImage){
+      var url = canvas.backgroundImage._element.src;
+      this.setState({url: url})
+    }
     this.setState({isOpen: true , objects: objects});
   };
 
   _open = () => {
-    // this._setBackGround(this.state.backgroundImage)
-     this._sketch.fromJSON(this.state.objects)
-
+      this._sketch.changeBackground(this.state.url)
+      if(this.state.objects.objects.length > 0){
+        this._sketch.fromJSON(this.state.objects);
+      }
   }
 
   _download = () => {
     this._sketch.download();
   };
 
- //  Start Setting Background
-  _setBackGround =(src)=>{
-      let sketch = this._sketch;
-      let { stretched, stretchedX, stretchedY, originX, originY } = this.state;
-      sketch.setBackgroundFromDataUrl(src, {
-        stretched: true,
-        stretchedX: true,
-        stretchedY: true,
-        originX: originX,
-        originY: originY
-    })
-
-  }
- // End
-
-
-
  // Start
  //
  // Process
 
  _getHash = (obj, obArray) => {
-    console.log(obj);
+
       var hash = {
                   type: obj.type,
-                  version: obj.version,
                   originX: obj.originX,
                   originY: obj.originY,
                   left: obj.left,
@@ -347,8 +333,7 @@ class SketchFieldDemo extends React.Component {
     }
   };
 
-  _onBackgroundImageDrop = (accepted /*, rejected*/) => {
-    console.log(accepted)
+  _onBackgroundImageDrop = (accepted) => {
     if (accepted && accepted.length > 0) {
       let sketch = this._sketch;
       let reader = new FileReader();
@@ -357,8 +342,13 @@ class SketchFieldDemo extends React.Component {
       reader.addEventListener(
         'load',
         () =>sketch.setBackgroundFromDataUrl(reader.result, {
-
+            stretched: stretched,
+            stretchedX: stretchedX,
+            stretchedY: stretchedY,
+            originX: originX,
+            originY: originY,
           }),
+
         false,
       );
       reader.readAsDataURL(accepted[0]);
