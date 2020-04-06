@@ -82,15 +82,20 @@ class History {
    * @returns the new current value after the redo operation, or null if no redo operation was possible
    */
   redo() {
+    console.log('heres')
     try {
+      console.log('checking is here')
+      console.log(this.redoList)
       if (this.redoList.length > 0) {
+
         if (this.current) this.undoList.push(this.current);
         this.current = this.redoList.pop();
         return this.current;
       }
+
       return null;
     } finally {
-      this.print();
+      //this.print();
     }
   }
 
@@ -128,15 +133,22 @@ class History {
      *
      */
   saveToFile() {
-    var allElement = this.undoList;
-    if(this.current){
-      if(this.redoList.length == 0){
-        allElement = this.current
-      }
-    }
+      let dataArray = [];
 
+      if(this.current){
+        if(this.undoList.length == 0){
+          allElement = this.current[0]
+          dataArray.push(this.current[0])
+        } else {
+          for(let i = 0; i < this.undoList.length; i++){
+            dataArray.push(this.undoList[i][0])
+          }
+        }
+      }
+
+      var hash = {"objects": dataArray}
       const a = document.createElement("a");
-      a.href = URL.createObjectURL(new Blob([JSON.stringify(allElement, null, 4)], {
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(hash, null, 4)], {
         type: "text/plain"
       }));
       a.setAttribute("download", "image.txt");

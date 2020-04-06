@@ -32,6 +32,8 @@ import RemoveIcon from '@material-ui/icons/Remove';
 import DownloadIcon from '@material-ui/icons/CloudDownload';
 import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import ZoomOutIcon from '@material-ui/icons/ZoomOut';
+import UploadIcon from '@material-ui/icons/Backup';
+
 import dataJson from './data.json';
 import dataJsonControlled from './data.json.controlled';
 import {SketchField, Tools} from '../src';
@@ -91,7 +93,7 @@ const styles = {
   },
   card: {
     margin: '10px 10px 5px 0'
-  }
+  },
 };
 
 /**
@@ -111,6 +113,9 @@ function eventFire(el, etype) {
   }
 }
 
+
+
+
 class SketchFieldDemo extends React.Component {
 
   constructor(props) {
@@ -124,7 +129,7 @@ class SketchFieldDemo extends React.Component {
       shadowWidth: 0,
       shadowOffset: 0,
       tool: Tools.Select,
-      enableRemoveSelected: false,
+      enableRemoveSelected: true,
       fillWithColor: false,
       fillWithBackgroundColor: false,
       drawings: [],
@@ -200,9 +205,6 @@ class SketchFieldDemo extends React.Component {
     this._sketch.download();
   };
 
- // Start
- //
- // Process
 
  _getHash = (obj, obArray) => {
 
@@ -341,7 +343,7 @@ class SketchFieldDemo extends React.Component {
       let { stretched, stretchedX, stretchedY, originX, originY } = this.state;
       reader.addEventListener(
         'load',
-        () =>sketch.setBackgroundFromDataUrl(reader.result, {
+        () => sketch.setBackgroundFromDataUrl(reader.result, {
             stretched: stretched,
             stretchedX: stretchedX,
             stretchedY: stretchedY,
@@ -356,6 +358,20 @@ class SketchFieldDemo extends React.Component {
   };
 
   _addText = () => this._sketch.addText(this.state.text);
+
+  _readFile = (event) => {
+      let sketch = this._sketch;
+      let file = event.target.files[0]
+      if(file){
+          let reader = new FileReader();
+          reader.onload = function (e) {
+              let data = e.target.result;
+              console.log(data);
+              sketch.fromJSON(data);
+          }
+          reader.readAsText(file);
+      }
+  }
 
   componentDidMount = () => {
     (function(console) {
@@ -378,7 +394,10 @@ class SketchFieldDemo extends React.Component {
         a.dispatchEvent(e);
       };
     })(console);
+
   };
+
+
 
   render = () => {
     let { controlledValue } = this.state;
@@ -430,12 +449,23 @@ class SketchFieldDemo extends React.Component {
                   onClick={this._save}>
                   <SaveIcon/>
                 </IconButton>
+                <Button
+                      style={{background: 'none', border: 'none', color: '#607d8b', boxShadow: 'none'}}
+                      variant="contained"
+                      component="label"
+                      title="Upload"  >
+                      <UploadIcon />
+                      <input   type="file"
+                        onChange={(e) => this._readFile(e)}
+                        style={{ display: "none" }}  />
+                    </Button>
                 <IconButton
                   color="primary"
                   title="Download"
                   onClick={this._download}>
                   <DownloadIcon/>
                 </IconButton>
+
                 <IconButton
                   color="primary"
                   title="Delete All"
