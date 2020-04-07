@@ -306,13 +306,31 @@ class SketchField extends PureComponent {
    */
   _resize = (e, canvasWidth = null, canvasHeight = null) => {
     if (e) e.preventDefault();
-    let { widthCorrection, heightCorrection } = this.props;
+
+    let { widthCorrection, heightCorrection, width, height } = this.props;
+    
+
+
     let canvas = this._fc;
-    let { offsetWidth, clientHeight } = this._container;
-    let prevWidth = canvasWidth || canvas.getWidth();
-    let prevHeight = canvasHeight || canvas.getHeight();
+    let offsetWidth, clientHeight;
+
+      if(this._container){
+        offsetWidth = this._container.offsetWidth;
+        clientHeight = this._container.clientHeight;
+      }
+
+    offsetWidth = width || offsetWidth;
+    clientHeight = height || clientHeight;
+
+    let prevWidth =  canvas.getWidth();
+    let prevHeight =  canvas.getHeight();
+
+
+    
     let wfactor = ((offsetWidth - widthCorrection) / prevWidth).toFixed(2);
     let hfactor = ((clientHeight - heightCorrection) / prevHeight).toFixed(2);
+    
+
     canvas.setWidth(offsetWidth - widthCorrection);
     canvas.setHeight(clientHeight - heightCorrection);
     if (canvas.backgroundImage) {
@@ -332,11 +350,13 @@ class SketchField extends PureComponent {
       let tempScaleY = scaleY * hfactor;
       let tempLeft = left * wfactor;
       let tempTop = top * hfactor;
-      obj.scaleX = tempScaleX;
-      obj.scaleY = tempScaleY;
-      obj.left = tempLeft;
-      obj.top = tempTop;
-      obj.setCoords()
+      
+      objects[i].scaleX = tempScaleX;
+      objects[i].scaleY = tempScaleY;
+      objects[i].left = tempLeft;
+      objects[i].top = tempTop;
+      objects[i].setCoords()
+
     }
     this.setState({
       parentWidth: offsetWidth
@@ -486,7 +506,7 @@ class SketchField extends PureComponent {
   fromJSON = (json) => {
     if (!json) return;
     let canvas = this._fc;
-    setTimeout(() => {
+    // setTimeout(() => {
       canvas.loadFromJSON(json, () => {
         if(this.props.tool === Tool.DefaultTool){
           canvas.isDrawingMode = canvas.selection = false;
@@ -497,7 +517,7 @@ class SketchField extends PureComponent {
           this.props.onChange()
         }
       })
-    }, 100)
+    // }, 200)
   };
 
   /**
@@ -508,10 +528,11 @@ class SketchField extends PureComponent {
    * @returns {string} JSON string of the canvas just cleared
    */
   clear = (propertiesToInclude) => {
-    let discarded = this.toJSON(propertiesToInclude);
-    this._fc.clear();
-    this._history.clear();
-    return discarded
+    setTimeout(() => {
+      let discarded = this.toJSON(propertiesToInclude);
+      this._fc.clear();
+      this._history.clear();
+    },0)
   };
 
   /**
@@ -651,7 +672,7 @@ class SketchField extends PureComponent {
     this._selectedTool = selectedTool;
 
     // Control resize
-    window.addEventListener('resize', this._resize, false);
+    window.addEventListener('resize', (e, width, height) => this._resize(e, width, height), false);
 
     // Initialize History, with maximum number of undo steps
     this._history = new History(undoSteps);
@@ -667,11 +688,6 @@ class SketchField extends PureComponent {
     canvas.on('object:moving', e => this.callEvent(e, this._onObjectMoving));
     canvas.on('object:scaling', e => this.callEvent(e, this._onObjectScaling));
     canvas.on('object:rotating', e => this.callEvent(e, this._onObjectRotating));
-    // IText Events fired on Adding Text
-    // canvas.on("text:event:changed", console.log)
-    // canvas.on("text:selection:changed", console.log)
-    // canvas.on("text:editing:entered", console.log)
-    // canvas.on("text:editing:exited", console.log)
 
     this.disableTouchScroll();
 
@@ -685,12 +701,15 @@ class SketchField extends PureComponent {
   componentWillUnmount = () => window.removeEventListener('resize', this._resize);
 
   componentDidUpdate = (prevProps, prevState) => {
-    if (this.state.parentWidth !== prevState.parentWidth
-      || this.props.width !== prevProps.width
-      || this.props.height !== prevProps.height) {
+    const { width, height } = this.props;
+    
+      if (this.state.parentWidth !== prevState.parentWidth
+        || width !== prevProps.width
+        || height !== prevProps.height) {
 
-      this._resize()
-    }
+        this._resize();
+      }
+
 
     if (this.props.tool !== prevProps.tool) {
       this._selectedTool = this._tools[this.props.tool];
@@ -703,10 +722,6 @@ class SketchField extends PureComponent {
 
     if (this.props.backgroundColor !== prevProps.backgroundColor) {
       this._backgroundColor(this.props.backgroundColor)
-    }
-
-    if ((this.props.value !== prevProps.value) || (this.props.value && this.props.forceValue)) {
-      this.fromJSON(this.props.value);
     }
   };
 
