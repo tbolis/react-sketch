@@ -90,7 +90,7 @@ class SketchField extends PureComponent {
     opacity: 1.0,
     undoSteps: 25,
     tool: null,
-    widthCorrection: 2,
+    widthCorrection: 0,
     heightCorrection: 0,
     forceValue: false,
     onObjectAdded:()=>null,
