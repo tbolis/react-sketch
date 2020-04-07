@@ -12,6 +12,8 @@ import Rectangle from './rectangle';
 import Circle from './circle';
 import Pan from './pan';
 import Tool from './tools';
+import RectangleLabel from './rectangle-label';
+import DefaultTool from './defaul-tool';
 
 const fabric = require('fabric').fabric;
 
@@ -88,7 +90,7 @@ class SketchField extends PureComponent {
     opacity: 1.0,
     undoSteps: 25,
     tool: null,
-    widthCorrection: 2,
+    widthCorrection: 0,
     heightCorrection: 0,
     forceValue: false,
     onObjectAdded:()=>null,
@@ -114,8 +116,10 @@ class SketchField extends PureComponent {
     this._tools[Tool.Line] = new Line(fabricCanvas);
     this._tools[Tool.Arrow] = new Arrow(fabricCanvas);
     this._tools[Tool.Rectangle] = new Rectangle(fabricCanvas);
+    this._tools[Tool.RectangleLabel] = new RectangleLabel(fabricCanvas);
     this._tools[Tool.Circle] = new Circle(fabricCanvas);
     this._tools[Tool.Pan] = new Pan(fabricCanvas);
+    this._tools[Tool.DefaultTool] = new DefaultTool(fabricCanvas);
   };
 
   /**
@@ -300,13 +304,13 @@ class SketchField extends PureComponent {
    * @param e the resize event
    * @private
    */
-  _resize = (e) => {
+  _resize = (e, canvasWidth = null, canvasHeight = null) => {
     if (e) e.preventDefault();
     let { widthCorrection, heightCorrection } = this.props;
     let canvas = this._fc;
     let { offsetWidth, clientHeight } = this._container;
-    let prevWidth = canvas.getWidth();
-    let prevHeight = canvas.getHeight();
+    let prevWidth = canvasWidth || canvas.getWidth();
+    let prevHeight = canvasHeight || canvas.getHeight();
     let wfactor = ((offsetWidth - widthCorrection) / prevWidth).toFixed(2);
     let hfactor = ((clientHeight - heightCorrection) / prevHeight).toFixed(2);
     canvas.setWidth(offsetWidth - widthCorrection);
@@ -484,6 +488,10 @@ class SketchField extends PureComponent {
     let canvas = this._fc;
     setTimeout(() => {
       canvas.loadFromJSON(json, () => {
+        if(this.props.tool === Tool.DefaultTool){
+          canvas.isDrawingMode = canvas.selection = false;
+          canvas.forEachObject((o) => o.selectable = o.evented = false);
+        }
         canvas.renderAll();
         if (this.props.onChange) {
           this.props.onChange()
@@ -686,15 +694,11 @@ class SketchField extends PureComponent {
 
     if (this.props.tool !== prevProps.tool) {
       this._selectedTool = this._tools[this.props.tool];
+      //Bring the cursor back to default if it is changed by a tool
+      this._fc.defaultCursor = 'default';
       if(this._selectedTool){
         this._selectedTool.configureCanvas(this.props);
       }
-      else{
-        this._fc.isDrawingMode = false;
-        this._fc.selection = false;
-      }
-      //Bring the cursor back to default if it is changed by a tool
-      this._fc.defaultCursor = 'default';
     }
 
     if (this.props.backgroundColor !== prevProps.backgroundColor) {
