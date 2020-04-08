@@ -304,6 +304,14 @@ class SketchField extends PureComponent {
     canvas.calcOffset();
   };
 
+  _canvansSize = () =>{
+    let canvas = this._fc;
+    console.log(canvas);
+    canvas.height = 500;
+    canvas.renderAll()
+    console.log(canvas)
+  }
+
   /**
    * Sets the background color for this sketch
    * @param color in rgba or hex format
@@ -460,7 +468,6 @@ class SketchField extends PureComponent {
 
   copy = () => {
     let canvas = this._fc;
-
   };
 
   paste = () => {
@@ -628,33 +635,17 @@ class SketchField extends PureComponent {
    * Download Content
    */
    download = () => {
-     this._history.saveToFile();
+     var url = null;
+     if(this._fc.backgroundImage){
+       url = this._fc.backgroundImage._element.src;
+     }
+     let hash = {  height: this._fc.height, width: this._fc.width,
+        backgroundColor: this._fc.backgroundColor, viewportTransform:  this._fc.viewportTransform,
+        backImg: url,
+     }
+     this._history.saveToFile(hash);
    }
 
-   /**
-   * Save Current Index
-   */
-
-   save = () => {
-     let canvas = this._fc;
-     let objects = canvas.getObjects();
-     let stObjects = JSON.stringify(objects)
-     this.setState({save: stObjects})
-   }
-
-   /**
-   * Open Current Saved
-   */
-
-   open = () => {
-      let canvas = this._fc;
-
-      let objects = this.state.save;
-
-
-
-      this.setState({isView: true})
-   }
 
   render = () => {
     let { className,  style, width, height } = this.props;

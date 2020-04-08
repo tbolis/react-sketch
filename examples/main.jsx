@@ -136,8 +136,8 @@ class SketchFieldDemo extends React.Component {
       canUndo: false,
       canRedo: false,
       controlledSize: false,
-      sketchWidth: 800,
-      sketchHeight: 600,
+      sketchWidth: (window.innerWidth - 400),
+      sketchHeight: (window.innerHeight - 200),
       stretched: true,
       stretchedX: false,
       stretchedY: false,
@@ -154,7 +154,9 @@ class SketchFieldDemo extends React.Component {
       enableCopyPaste: false,
       isOpen: true,
       dataJson: dataJson,
-      url: dataUrl
+      url: dataUrl,
+      maxHeight: (window.innerHeight + 800),
+      isCanvas: false
     };
   }
 
@@ -191,6 +193,7 @@ class SketchFieldDemo extends React.Component {
       var url = canvas.backgroundImage._element.src;
       this.setState({url: url})
     }
+
     this.setState({isOpen: true , objects: objects});
   };
 
@@ -360,16 +363,28 @@ class SketchFieldDemo extends React.Component {
   _addText = () => this._sketch.addText(this.state.text);
 
   _readFile = (event) => {
-      let sketch = this._sketch;
-      let file = event.target.files[0]
+
+      this._clear();
+      let file = event.target.files[0];
+
       if(file){
           let reader = new FileReader();
-          reader.onload = function (e) {
-              let data = e.target.result;
-              console.log(data);
-              sketch.fromJSON(data);
-          }
+          reader.addEventListener(
+            'load',
+            () => this._loadData(reader.result),  false,
+          );
           reader.readAsText(file);
+      }
+  }
+
+  _loadData = (data) =>{
+      data = JSON.parse(data);
+      this.setState({height: data.height, width: data.width})
+      let sketch = this._sketch;
+      sketch.fromJSON(data);
+      sketch._backgroundColor(data.backgroundColor);
+      if(data.backImg){
+        sketch.changeBackground(data.backImg)
       }
   }
 
@@ -449,6 +464,7 @@ class SketchFieldDemo extends React.Component {
                   onClick={this._save}>
                   <SaveIcon/>
                 </IconButton>
+
                 <Button
                       style={{background: 'none', border: 'none', color: '#607d8b', boxShadow: 'none'}}
                       variant="contained"
@@ -458,7 +474,7 @@ class SketchFieldDemo extends React.Component {
                       <input   type="file"
                         onChange={(e) => this._readFile(e)}
                         style={{ display: "none" }}  />
-                    </Button>
+                </Button>
                 <IconButton
                   color="primary"
                   title="Download"
@@ -479,7 +495,6 @@ class SketchFieldDemo extends React.Component {
         <div className="row">
 
           <div className="col-xs-7 col-sm-7 col-md-9 col-lg-9">
-
             <SketchField
               name="sketch"
               className="canvas-area"
@@ -498,10 +513,10 @@ class SketchFieldDemo extends React.Component {
                   : 'transparent'
               }
               width={
-                this.state.controlledSize ? this.state.sketchWidth : null
+                this.state.controlledSize ? this.state.sketchWidth : this.state.width
               }
               height={
-                this.state.controlledSize ? this.state.sketchHeight : null
+                this.state.controlledSize ? this.state.sketchHeight : this.state.height
               }
               defaultValue={this.state.dataJson}
               value={controlledValue}
@@ -510,6 +525,7 @@ class SketchFieldDemo extends React.Component {
               tool={this.state.tool}
             />
           </div>
+          
           <div className="col-xs-5 col-sm-5 col-md-3 col-lg-3">
             <Card style={styles.card}>
               <CardHeader
