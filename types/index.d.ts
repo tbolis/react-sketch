@@ -159,6 +159,8 @@ declare module 'react-sketch' {
 		 */
 		removeSelected(): void
 
+		colorObjectAtIndex(): void
+
 		copy(): void
 
 		paste(): void

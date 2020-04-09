@@ -298,13 +298,16 @@ class SketchField extends PureComponent {
     onMouseUp(e);
   };
 
+
+
+
   /**
    * Track the resize of the window and update our state
    *
    * @param e the resize event
    * @private
    */
-  _resize = (e, canvasWidth = null, canvasHeight = null) => {
+  _resize = (e) => {
     if (e) e.preventDefault();
 
     let { widthCorrection, heightCorrection, width, height } = this.props;
@@ -561,6 +564,18 @@ class SketchField extends PureComponent {
     }
   };
 
+  colorObjectAtIndex = (color, index) => {
+    let canvas = this._fc;
+   
+    let objects = canvas.getObjects();
+
+    objects[index].set({
+      stroke: color
+    })
+    canvas.requestRenderAll();
+    
+  };
+
   copy = () => {
     let canvas = this._fc;
     canvas.getActiveObject().clone(cloned => this._clipboard = cloned);
@@ -672,7 +687,7 @@ class SketchField extends PureComponent {
     this._selectedTool = selectedTool;
 
     // Control resize
-    window.addEventListener('resize', (e, width, height) => this._resize(e, width, height), false);
+    window.addEventListener('resize', this._resize, false);
 
     // Initialize History, with maximum number of undo steps
     this._history = new History(undoSteps);
