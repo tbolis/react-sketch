@@ -571,8 +571,9 @@ class SketchField extends PureComponent {
     selectedTool.configureCanvas(this.props);
     this._selectedTool = selectedTool;
     window.addEventListener('resize', this._resize, false);
-    window.addEventListener("keydown", this.deleteKey, false);
-
+    window.addEventListener('keydown', this.deleteKey, false)
+    
+    // Initialize History, with maximum number of undo steps
     this._history = new History(undoSteps);
 
     // Events binding
@@ -593,9 +594,10 @@ class SketchField extends PureComponent {
     (value || defaultValue) && this.fromJSON(value || defaultValue);
   };
 
-  componentWillUnmount = () => {
-     window.removeEventListener('resize', this._resize);
-     window.addEventListener("keydown", this.deleteKey, false);
+
+  componentWillUnmount = () =>  {
+    window.removeEventListener('resize', this._resize); 
+    window.removeEventListener('keydown', this.deleteKey, false)
   }
 
   componentDidUpdate = (prevProps, prevState) => {
