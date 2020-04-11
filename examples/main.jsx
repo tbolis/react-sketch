@@ -42,6 +42,10 @@ import DropZone from 'react-dropzone';
 import Toolbar from '@material-ui/core/Toolbar/Toolbar';
 import Typography from '@material-ui/core/Typography/Typography';
 
+import { makeStyles } from '@material-ui/core/styles';
+import Modal from '@material-ui/core/Modal';
+
+
 const styles = {
   root: {
     padding: '3px',
@@ -94,6 +98,11 @@ const styles = {
   card: {
     margin: '10px 10px 5px 0'
   },
+  modal: {
+    top: '40%',
+    left: '50%',
+    transform: 'translate(50%, 50%)'
+  }
 };
 
 /**
@@ -156,7 +165,7 @@ class SketchFieldDemo extends React.Component {
       dataJson: dataJson,
       url: dataUrl,
       maxHeight: (window.innerHeight + 800),
-      isCanvas: false
+      isOpen: true
     };
   }
 
@@ -412,7 +421,25 @@ class SketchFieldDemo extends React.Component {
 
   };
 
+  _handleClose = () =>{
+      this.setState({isOpen: false})
+  }
 
+  _setInput1 = (event) =>{
+    this.setState({newHeight: event.target.value})
+  }
+  _setInput2 = (event) =>{
+    this.setState({newWidth: event.target.value})
+  }
+
+  _saveClick = () =>{
+
+      if(this.state.newWidth && this.state.newHeight){
+        this.setState({ height: parseInt(this.state.newHeight), width: parseInt(this.state.newWidth)})
+      }
+      this.setState({isOpen: false})
+      console.log(this.state.height)
+  }
 
   render = () => {
     let { controlledValue } = this.state;
@@ -427,11 +454,11 @@ class SketchFieldDemo extends React.Component {
     });
 
 
-
     return (
       <MuiThemeProvider theme={theme}>
         <div className="row">
           <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+
             <AppBar position="static" style={styles.appBar}>
               <Toolbar>
                 <Typography variant="h6" color="inherit" style={{ flexGrow: 1 }}>Sketch Tool</Typography>
@@ -492,8 +519,39 @@ class SketchFieldDemo extends React.Component {
             </AppBar>
           </div>
         </div>
-        <div className="row">
 
+        <div className="row">
+              <Modal
+                  open={this.state.isOpen}
+                  onClose={() => this._handleClose()}
+                  aria-labelledby="simple-modal-title"
+                  aria-describedby="simple-modal-description">
+                  <div className="row" style={{ background: '#fff', width: '30%', position: 'absolute', top: '25%', left: '25%', height: 300}}>
+                    <div className="text-center" style={{ textAlign: 'center', width: '100%', height: '0px'}}>
+                      <h2> Select Size</h2>
+                    </div>
+
+                    <div className="col-md-4">
+                        <label> Height </label>
+                        <input type="text" value={this.state.height} onChange={this._setInput1} style={{ padding: 10, marginTop: 5}}/>
+                    </div>
+                    <div className="col-md-2"></div>
+
+                    <div className="col-md-4">
+                        <label> Width </label>
+                        <input type="text" value={this.state.width} onChange={this._setInput2} style={{ padding: 10, marginTop: 5}}/>
+                    </div>
+
+                    <div className="col-md-12" style={{ textAlign: 'center', marginTop: 0}}>
+                      <Button variant="contained" color="primary" onClick={this._saveClick}>
+                          Save
+                      </Button>
+                    </div>
+                  </div>
+              </Modal>
+        </div>
+
+        <div className="row">
           <div className="col-xs-7 col-sm-7 col-md-9 col-lg-9">
             <SketchField
               name="sketch"
@@ -525,7 +583,7 @@ class SketchFieldDemo extends React.Component {
               tool={this.state.tool}
             />
           </div>
-          
+
           <div className="col-xs-5 col-sm-5 col-md-3 col-lg-3">
             <Card style={styles.card}>
               <CardHeader
