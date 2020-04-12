@@ -628,7 +628,7 @@ class SketchField extends PureComponent {
   * @event params
   */
   deleteKey = (event) =>{
-     if(event.code == "Delete" || event.code == "BackSpace"){
+     if(event.code == "Delete" || event.code == "Backspace"){
        this.props.removeItem()
      }
    }
@@ -649,10 +649,10 @@ class SketchField extends PureComponent {
    }
 
 
+
   render = () => {
     let { className,  style, width, height } = this.props;
-    console.log(height);
-    console.log(width);
+
 
     let canvasDivStyle = Object.assign({}, style ? style : {},
       width ? { width: width } : {},
