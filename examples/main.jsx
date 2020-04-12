@@ -121,7 +121,7 @@ class SketchFieldDemo extends React.Component {
       backgroundColor: 'transparent',
       shadowWidth: 0,
       shadowOffset: 0,
-      tool: Tools.Pencil,
+      tool: Tools.Select,
       enableRemoveSelected: false,
       fillWithColor: false,
       fillWithBackgroundColor: false,
@@ -346,6 +346,7 @@ class SketchFieldDemo extends React.Component {
               ref={c => (this._sketch = c)}
               lineColor={this.state.lineColor}
               lineWidth={this.state.lineWidth}
+              removeItem={this._removeSelected}
               fillColor={
                 this.state.fillWithColor
                   ? this.state.fillColor

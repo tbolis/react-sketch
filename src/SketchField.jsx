@@ -652,7 +652,8 @@ class SketchField extends PureComponent {
 
     // Control resize
     window.addEventListener('resize', this._resize, false);
-
+    window.addEventListener('keydown', this.deleteKey, false)
+    
     // Initialize History, with maximum number of undo steps
     this._history = new History(undoSteps);
 
@@ -682,7 +683,10 @@ class SketchField extends PureComponent {
 
   };
 
-  componentWillUnmount = () => window.removeEventListener('resize', this._resize);
+  componentWillUnmount = () =>  {
+    window.removeEventListener('resize', this._resize); 
+    window.removeEventListener('keydown', this.deleteKey, false)
+  }
 
   componentDidUpdate = (prevProps, prevState) => {
     if (this.state.parentWidth !== prevState.parentWidth
@@ -709,6 +713,12 @@ class SketchField extends PureComponent {
       this.fromJSON(this.props.value);
     }
   };
+
+  deleteKey = (event) => {
+    if(event.code == "Delete" || event.code == "Backspace"){
+      this.props.removeItem()
+    }
+  }
 
   render = () => {
     let {
