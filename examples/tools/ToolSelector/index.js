@@ -15,6 +15,17 @@ import Tools from "../../../src/tools";
 import Typography from '@material-ui/core/Typography';
 import './index.css'
 
+
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
+import Slider from '@material-ui/core/Slider';
+import ExposureNeg1Icon from '@material-ui/icons/ExposureNeg1';
+import ExposurePlus1Icon from '@material-ui/icons/ExposurePlus1';
+
+import Grid from '@material-ui/core/Grid';
 export default props => {
 
   const toolset = [
@@ -39,12 +50,17 @@ export default props => {
   ];
 
   return (
-    <React.Fragment>
-      <Typography variant="overline" gutterBottom>
-        Canvas Tool &nbsp;
-      </Typography>
-      <Chip variant="outlined" color="primary" size="small" label={props.selected}/>
-      <div>
+    <ExpansionPanel>
+      <ExpansionPanelSummary
+        expandIcon={<ExpandMoreIcon/>}
+        aria-controls="panel1a-content"
+        id="panel1a-header">
+        <Typography variant="overline" gutterBottom>
+          Canvas Tool &nbsp;
+        </Typography>
+        <Chip variant="outlined" color="primary" size="small" label={props.selected}/>
+      </ExpansionPanelSummary>
+      <ExpansionPanelDetails style={{display: 'block'}}>
         <ToggleButtonGroup
           exclusive
           size="large"
@@ -53,7 +69,18 @@ export default props => {
           onChange={props.onChange}>
           {toolset}
         </ToggleButtonGroup>
-      </div>
-    </React.Fragment>
+        <Grid container spacing={1}>
+          <Grid item>
+            <ExposureNeg1Icon />
+          </Grid>
+          <Grid item xs>
+            <Slider  aria-labelledby="continuous-slider" />
+          </Grid>
+          <Grid item>
+            <ExposurePlus1Icon />
+          </Grid>
+        </Grid>
+      </ExpansionPanelDetails>
+    </ExpansionPanel>
   )
 }

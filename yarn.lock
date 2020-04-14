@@ -2413,14 +2413,12 @@ caniuse-lite@^1.0.30000984:
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000984.tgz#dc96c3c469e9bcfc6ad5bdd24c77ec918ea76fe0"
   integrity sha512-n5tKOjMaZ1fksIpQbjERuqCyfgec/m9pferkFQbLmWtqLUdmt12hNhjSwsmPdqeiG2NkITOQhr1VYIwWSAceiA==
 
-canvas@^2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/canvas/-/canvas-2.5.0.tgz#cf0ef59d4790575689c0d50e59c7b8023a11f38a"
-  integrity sha512-wwRz2cLMgb9d+rnotOJCoc04Bzj3aJMpWc6JxAD6lP7bYz0ldcn0sKddoZ0vhD5T8HBxrK+XmRDJb68/2VqARw==
+canvas@^1.6.12:
+  version "1.6.13"
+  resolved "https://registry.yarnpkg.com/canvas/-/canvas-1.6.13.tgz#8cb4e9abbea9e615a377890ffac50277a1167c73"
+  integrity sha512-XAfzfEOHZ3JIPjEV+WSI6PpISgUta3dgmndWbsajotz+0TQOX/jDpp2kawjRERatOGv9sMMzk5auB3GKEKA6hg==
   dependencies:
-    nan "^2.13.2"
-    node-pre-gyp "^0.11.0"
-    simple-get "^3.0.3"
+    nan "^2.10.0"
 
 canvas@^2.6.0:
   version "2.6.0"
@@ -4216,11 +4214,6 @@ fabric@^3.3.2:
   optionalDependencies:
     canvas "^2.6.0"
     jsdom "^15.1.0"
-
-fabricjs@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/fabricjs/-/fabricjs-1.0.0.tgz#1b2ba066716d683fae80d9a8aebace1a4fedec07"
-  integrity sha512-yrGBr1bfm+yfrygbyVAJW51tWUv36J8+gEpC66aJVdSyGRrmzNcVsYUp3nma8sEdCZjIsWxyMX2vgXrkcOBW7A==
 
 fast-deep-equal@^2.0.1:
   version "2.0.1"
@@ -7350,7 +7343,7 @@ my-local-ip@^1.0.0:
   resolved "https://registry.yarnpkg.com/my-local-ip/-/my-local-ip-1.0.0.tgz#37585555a4ff1985309edac7c2a045a466be6c32"
   integrity sha1-N1hVVaT/GYUwntrHwqBFpGa+bDI=
 
-nan@^2.12.1, nan@^2.13.2, nan@^2.14.0:
+nan@^2.10.0, nan@^2.12.1, nan@^2.14.0:
   version "2.14.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
   integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==

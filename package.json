@@ -93,7 +93,7 @@
     "babel-jest": "^24.8.0",
     "babel-loader": "^8.0.6",
     "babel-plugin-lodash": "3.3.4",
-    "canvas": "^2.5.0",
+    "canvas": "^1.6.12",
     "cross-env": "^5.2.0",
     "css-loader": "^3.0.0",
     "enzyme": "^3.10.0",
@@ -135,7 +135,6 @@
     "weinre": "^2.0.0-pre-I0Z7U9OV"
   },
   "dependencies": {
-    "fabricjs": "^1.0.0",
     "prop-types": "^15.6.2",
     "react": "^16.6.1",
     "react-dom": "^16.6.1"
