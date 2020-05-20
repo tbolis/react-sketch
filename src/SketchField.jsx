@@ -168,7 +168,7 @@ class SketchField extends PureComponent {
         'top': opts.top
       });
       canvas.add(oImg);
-    });
+    }, { crossOrigin: 'Anonymous' });
   };
 
   /**
