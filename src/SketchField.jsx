@@ -43,8 +43,6 @@ class SketchField extends PureComponent {
     value: PropTypes.object,
     // Set to true if you wish to force load the given value, even if it is  the same
     forceValue: PropTypes.bool,
-    // overrides for the canvas prop
-    canvasProps: PropTypes.object,
     // Specify some width correction which will be applied on auto resize
     widthCorrection: PropTypes.number,
     // Specify some height correction which will be applied on auto resize
@@ -77,6 +75,8 @@ class SketchField extends PureComponent {
     onObjectScaling: PropTypes.func,
     // event object rotating
     onObjectRotating: PropTypes.func,
+    // event key down
+    onKeyDown: PropTypes.func,
     // Class name to pass to container div of canvas
     className: PropTypes.string,
     // Style options to pass to container div of canvas
@@ -94,7 +94,6 @@ class SketchField extends PureComponent {
     widthCorrection: 0,
     heightCorrection: 0,
     forceValue: false,
-    canvasProps: {},
     onObjectAdded: () => null,
     onObjectModified: () => null,
     onObjectRemoved: () => null,
@@ -723,7 +722,7 @@ class SketchField extends PureComponent {
   };
 
   render = () => {
-    let { className, style, width, height, canvasProps } = this.props;
+    let { className, style, width, height, onKeyDown } = this.props;
 
     let canvasDivStyle = Object.assign(
       {},
@@ -733,16 +732,13 @@ class SketchField extends PureComponent {
     );
     return (
       <div
+        tabIndex="0"
         className={className}
         ref={(c) => (this._container = c)}
         style={canvasDivStyle}
+        onKeyDown={onKeyDown}
       >
-        <canvas
-          tabIndex="1"
-          id={uuid4()}
-          ref={(c) => (this._canvas = c)}
-          {...canvasProps}
-        >
+        <canvas id={uuid4()} ref={(c) => (this._canvas = c)}>
           Sorry, Canvas HTML5 element is not supported by your browser :(
         </canvas>
       </div>
