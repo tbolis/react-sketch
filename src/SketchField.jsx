@@ -248,8 +248,12 @@ class SketchField extends PureComponent {
    */
   _onMouseDown = (e) => {
     const { onMouseDown } = this.props;
-    this._selectedTool.doMouseDown(e);
-    onMouseDown(e);
+    let canvas = this._fc;
+    let activeObj = canvas.getActiveObject();
+    if (!activeObj) {
+      this._selectedTool.doMouseDown(e);
+      onMouseDown(e);
+    }
   };
 
   /**
@@ -257,8 +261,12 @@ class SketchField extends PureComponent {
    */
   _onMouseMove = (e) => {
     const { onMouseMove } = this.props;
-    this._selectedTool.doMouseMove(e);
-    onMouseMove(e);
+    let canvas = this._fc;
+    let activeObj = canvas.getActiveObject();
+    if (!activeObj) {
+      this._selectedTool.doMouseMove(e);
+      onMouseMove(e);
+    }
   };
 
   /**
@@ -278,25 +286,29 @@ class SketchField extends PureComponent {
 
   _onMouseUp = (e) => {
     const { onMouseUp } = this.props;
-    this._selectedTool.doMouseUp(e);
-    // Update the final state to new-generated object
-    // Ignore Path object since it would be created after mouseUp
-    // Assumed the last object in canvas.getObjects() in the newest object
-    if (this.props.tool !== Tool.Pencil) {
-      const canvas = this._fc;
-      const objects = canvas.getObjects();
-      const newObj = objects[objects.length - 1];
-      if (newObj && newObj.__version === 1) {
-        newObj.__originalState = newObj.toJSON();
+    let canvas = this._fc;
+    let activeObj = canvas.getActiveObject();
+    if (!activeObj) {
+      this._selectedTool.doMouseUp(e);
+      // Update the final state to new-generated object
+      // Ignore Path object since it would be created after mouseUp
+      // Assumed the last object in canvas.getObjects() in the newest object
+      if (this.props.tool !== Tool.Pencil) {
+        const canvas = this._fc;
+        const objects = canvas.getObjects();
+        const newObj = objects[objects.length - 1];
+        if (newObj && newObj.__version === 1) {
+          newObj.__originalState = newObj.toJSON();
+        }
       }
+      if (this.props.onChange) {
+        let onChange = this.props.onChange;
+        setTimeout(() => {
+          onChange(e.e);
+        }, 10);
+      }
+      onMouseUp(e);
     }
-    if (this.props.onChange) {
-      let onChange = this.props.onChange;
-      setTimeout(() => {
-        onChange(e.e);
-      }, 10);
-    }
-    onMouseUp(e);
   };
 
   /**
