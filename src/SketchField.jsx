@@ -14,6 +14,7 @@ import Pan from './pan';
 import Tool from './tools';
 import RectangleLabel from './rectangle-label';
 import DefaultTool from './defaul-tool';
+import { nanoid } from 'nanoid'
 
 const fabric = require('fabric').fabric;
 
@@ -175,20 +176,22 @@ class SketchField extends PureComponent {
    * Action when an object is added to the canvas
    */
   _onObjectAdded = (e) => {
-    const {onObjectAdded} = this.props;
+    const {onObjectAdded, username='default'} = this.props;
     if (!this.state.action) {
       this.setState({ action: true });
       return
     }
     let obj = e.target;
     obj.__version = 1;
+    obj.id = nanoid()
     // record current object state as json and save as originalState
     let objState = obj.toJSON();
     obj.__originalState = objState;
     let state = JSON.stringify(objState);
     // object, previous state, current state
     this._history.keep([obj, state, state])
-    onObjectAdded(e);
+    console.log("ddd state", state)
+    onObjectAdded(e, username);
   };
 
   /**
@@ -216,7 +219,7 @@ class SketchField extends PureComponent {
   };
 
   _onObjectModified = (e) => {
-    const {onObjectModified} = this.props;
+    const {onObjectModified, username='default'} = this.props;
     let obj = e.target;
     obj.__version += 1;
     let prevState = JSON.stringify(obj.__originalState);
@@ -225,7 +228,7 @@ class SketchField extends PureComponent {
     obj.__originalState = objState;
     let currState = JSON.stringify(objState);
     this._history.keep([obj, prevState, currState]);
-    onObjectModified(e);
+    onObjectModified(e, username);
   };
 
   /**
@@ -539,6 +542,69 @@ class SketchField extends PureComponent {
       canvas.requestRenderAll();
     }
   };
+
+  /**
+   * Set object as selected on the canvas
+   */
+  setSelected = (id) => {
+    let canvas = this._fc;
+    var objToSelect = canvas.getObjects().find((o) => {
+      return id == o.id;
+    });
+    canvas.setActiveObject(objToSelect);
+    canvas.requestRenderAll();
+  };
+
+  /**
+   * Add object to the canvas
+   */
+  addObject = (obj) => {
+
+    let canvas = this._fc;
+    let shapeData = JSON.parse(obj);
+
+    let shape = null;
+    const type = this._capsFirstLetter(shapeData.type);
+    if (type == 'Path') {
+      let string_path = '';
+      shapeData.path.forEach((x) => {
+        string_path += x.join(' ');
+      });
+
+      shape = new fabric.Path(string_path);
+      delete shapeData.path;
+      shape.set(shapeData);
+    } else if (type == 'I-text') {
+      shape = new fabric.Text(shapeData.text); 
+      delete shapeData.text;
+      shape.set(shapeData);
+    } else {
+      // for Rectangle and Circle objects
+      shape = new fabric[type](shapeData);
+    }
+
+    canvas.add(shape);
+  }
+
+  /**
+   * Modify object on the canvas
+   */
+  modifyObject = (obj) => {
+
+    let objData = JSON.parse(obj);
+    let canvas = this._fc;
+
+    var objToModify = canvas.getObjects().find((o) => {
+      return objData.id == o.id;
+    });
+    objToModify.set(objData); // update the object
+    objToModify.setCoords(); // useful if the object's coordinates in the canvas also changed (usually by moving)
+    canvas.requestRenderAll(); // refresh the canvas so changes will appear
+  }
+
+  _capsFirstLetter = (str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
 
   copy = () => {
     let canvas = this._fc;

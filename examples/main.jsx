@@ -243,6 +243,41 @@ class SketchFieldDemo extends React.Component {
     }
   };
 
+  _onSketchObjectAdd = (e, username) => {
+    console.log("object added", e, username)
+  }
+
+  _onSketchObjectModified = (e) => {
+    console.log("ggggg", e)
+  }
+
+  _onSketchObjectMoving = (e) => {
+    console.log("moving", e)
+  }
+
+  _onSketchObjectScaling = (e) => {
+    console.log("scaling", e)
+  }
+
+  _onSketchMouseDown = (e) => {
+    // console.log("ddddown", e)
+  }
+
+  _onSketchMouseMove = (e) => {
+    // console.log("mmmmmove", e)
+  }
+
+  _onSketchMouseUp = (e) => {
+    // console.log("uuuuuup", e)
+  }
+
+  _onAddObject = () => {
+    const obj = {"type":"path","version":"3.5.1","originX":"left","originY":"top","left":378.99,"top":137,"width":85.02,"height":0,"fill":null,"stroke":"black","strokeWidth":10,"strokeDashArray":null,"strokeLineCap":"round","strokeDashOffset":0,"strokeLineJoin":"round","strokeMiterLimit":10,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","paintFirst":"fill","globalCompositeOperation":"source-over","transformMatrix":null,"skewX":0,"skewY":0,"path":[["M",383.99,142],["Q",384,142,385,142],["Q",386,142,388.5,142],["Q",391,142,393.5,142],["Q",396,142,398.5,142],["Q",401,142,404,142],["Q",407,142,411,142],["Q",415,142,419.5,142],["Q",424,142,427.5,142],["Q",431,142,433,142],["Q",435,142,439,142],["Q",443,142,446,142],["Q",449,142,452,142],["Q",455,142,456,142],["Q",457,142,459,142],["Q",461,142,462.5,142],["Q",464,142,465,142],["Q",466,142,466.5,142],["Q",467,142,467.5,142],["Q",468,142,468.5,142],["L",469.01,142]]}
+    const objStr = JSON.stringify(obj)
+    let sketch = this._sketch;
+    sketch.addObject(objStr)
+  }
+
   _onBackgroundImageDrop = (accepted /*, rejected*/) => {
     if (accepted && accepted.length > 0) {
       let sketch = this._sketch;
@@ -306,7 +341,7 @@ class SketchFieldDemo extends React.Component {
           <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <AppBar title="Sketch Tool" position="static" style={styles.appBar}>
               <Toolbar>
-                <Typography variant="h6" color="inherit" style={{ flexGrow: 1 }}>Sketch Tool</Typography>
+                <Typography variant="h6" color="inherit" style={{ flexGrow: 1 }}>Sketch Toolk</Typography>
                 <IconButton
                   color="primary"
                   disabled={!this.state.canUndo}
@@ -366,9 +401,19 @@ class SketchFieldDemo extends React.Component {
               value={controlledValue}
               forceValue
               onChange={this._onSketchChange}
+              onObjectAdded={this._onSketchObjectAdd}
+              onObjectModified={this._onSketchObjectModified}
+              onObjectMoving={this._onSketchObjectMoving}
+              onObjectScaling={this._onSketchObjectScaling}
+              onMouseDown={this._onSketchMouseDown}
+              onMouseMove={this._onSketchMouseMove}
+              onMouseUp={this._onSketchMouseUp}
               tool={this.state.tool}
             />
           </div>
+          
+          <button onClick={this._onAddObject}>Add object</button>
+
           <div className="col-xs-5 col-sm-5 col-md-3 col-lg-3">
             <Card style={styles.card}>
               <CardHeader

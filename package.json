@@ -1,6 +1,6 @@
 {
-  "name": "@tarik.djurdjevic/react-sketch",
-  "version": "0.5.6",
+  "name": "react-sketch-whiteboard",
+  "version": "1.0.0",
   "description": "Sketch Element for React based applications, backed-up by fabricjs as its core",
   "keywords": [
     "react",
@@ -15,10 +15,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tbolis/react-sketch.git"
+    "url": "https://github.com/nakusyat/react-sketch.git"
   },
   "bugs": {
-    "url": "https://github.com/tbolis/react-sketch/issues"
+    "url": "https://github.com/nakusyat/react-sketch/issues"
   },
   "license": "MIT",
   "main": "./dist",
@@ -132,6 +132,7 @@
     "weinre": "^2.0.0-pre-I0Z7U9OV"
   },
   "dependencies": {
+    "nanoid": "^3.1.16",
     "prop-types": "^15.6.2",
     "react": "^16.6.1",
     "react-dom": "^16.6.1"
