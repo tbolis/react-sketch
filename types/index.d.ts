@@ -27,6 +27,10 @@ declare module '@kiddom/react-sketch' {
 		lineColor?: string
 		// The width of the line
 		lineWidth?: number
+		// the color of the text
+		textColor: PropTypes.string,
+		// the size of the text
+		textSize: PropTypes.number,
 		// the fill color of the shape when applicable
 		fillColor?: string
 		// the background color of the sketch
