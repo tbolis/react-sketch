@@ -1,4 +1,4 @@
-declare module 'react-sketch' {
+declare module '@kiddom/react-sketch' {
 	import * as React from 'react'
 	
 	export const  Tools: {
