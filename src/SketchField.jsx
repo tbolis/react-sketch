@@ -15,6 +15,7 @@ import Tool from './tools';
 import Highlighter from './highlighter';
 import RectangleLabel from './rectangle-label';
 import DefaultTool from './defaul-tool';
+import Text from './add-text';
 
 const fabric = require('fabric').fabric;
 
@@ -28,6 +29,10 @@ class SketchField extends PureComponent {
     lineColor: PropTypes.string,
     // The width of the line
     lineWidth: PropTypes.number,
+    // the color of the text
+    textColor: PropTypes.string,
+    // the size of the text
+    textSize: PropTypes.number,
     // the fill color of the shape when applicable
     fillColor: PropTypes.string,
     // the background color of the sketch
@@ -86,6 +91,8 @@ class SketchField extends PureComponent {
   static defaultProps = {
     lineColor: 'black',
     lineWidth: 10,
+    textColor: 'black',
+    textSize: 16,
     fillColor: 'transparent',
     backgroundColor: 'transparent',
     opacity: 1.0,
@@ -121,6 +128,7 @@ class SketchField extends PureComponent {
     this._tools[Tool.Pan] = new Pan(fabricCanvas);
     this._tools[Tool.Highlighter] = new Highlighter(fabricCanvas);
     this._tools[Tool.DefaultTool] = new DefaultTool(fabricCanvas);
+    this._tools[Tool.Text] = new Text(fabricCanvas);
   };
 
   /**
@@ -693,6 +701,10 @@ class SketchField extends PureComponent {
       if(this._selectedTool){
         this._selectedTool.configureCanvas(this.props);
       }
+    }
+
+    if (this._selectedTool) {
+      this._selectedTool.configureCanvas(this.props)
     }
 
     if (this.props.backgroundColor !== prevProps.backgroundColor) {

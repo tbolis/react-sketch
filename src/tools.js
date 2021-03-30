@@ -9,4 +9,5 @@ export default {
   Pan: 'pan',
   Highlighter: 'highlighter',
   DefaultTool: 'default-tool',
+  Text: 'text'
 }
