@@ -1,15 +1,14 @@
 /*eslint no-unused-vars: 0*/
 
-import FabricCanvasTool from './fabrictool'
+import FabricCanvasTool from "../fabrictool";
 
-const fabric = require('fabric').fabric;
+const fabric = require("fabric").fabric;
 
 class Line extends FabricCanvasTool {
-
   configureCanvas(props) {
     let canvas = this._canvas;
     canvas.isDrawingMode = canvas.selection = false;
-    canvas.forEachObject((o) => o.selectable = o.evented = false);
+    canvas.forEachObject((o) => (o.selectable = o.evented = false));
     this._width = props.lineWidth;
     this._color = props.lineColor;
   }
@@ -23,10 +22,10 @@ class Line extends FabricCanvasTool {
       strokeWidth: this._width,
       fill: this._color,
       stroke: this._color,
-      originX: 'center',
-      originY: 'center',
+      originX: "center",
+      originY: "center",
       selectable: false,
-      evented: false
+      evented: false,
     });
     canvas.add(this.line);
   }

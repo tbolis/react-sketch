@@ -8,25 +8,15 @@ class FabricCanvasTool {
     this._canvas = canvas;
   }
 
-  configureCanvas(props) {
+  configureCanvas(props) {}
 
-  }
+  doMouseUp(event) {}
 
-  doMouseUp(event) {
+  doMouseDown(event) {}
 
-  }
+  doMouseMove(event) {}
 
-  doMouseDown(event) {
-
-  }
-
-  doMouseMove(event) {
-
-  }
-
-  doMouseOut(event) {
-
-  }
+  doMouseOut(event) {}
 }
 
 export default FabricCanvasTool;

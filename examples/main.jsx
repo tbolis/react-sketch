@@ -1,97 +1,97 @@
 /*eslint no-unused-vars: 0, no-console: 0*/
 
-import React from 'react';
-import {CompactPicker} from 'react-color';
-import 'flexboxgrid';
-import './main.css';
-import AppBar from '@material-ui/core/AppBar';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import ExpandMore from '@material-ui/icons/ExpandMore';
-import CardHeader from '@material-ui/core/CardHeader';
-import GridListTile from '@material-ui/core/GridListTile';
-import IconButton from '@material-ui/core/IconButton';
-import MenuItem from '@material-ui/core/MenuItem';
-import Button from '@material-ui/core/Button';
-import Slider from '@material-ui/lab/Slider';
-import TextField from '@material-ui/core/TextField';
-import Switch from '@material-ui/core/Switch';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Collapse from '@material-ui/core/Collapse';
-import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
-import color from '@material-ui/core/colors/blueGrey';
+import React from "react";
+import { CompactPicker } from "react-color";
+import "flexboxgrid";
+import "./main.css";
+import AppBar from "@material-ui/core/AppBar";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import ExpandMore from "@material-ui/icons/ExpandMore";
+import CardHeader from "@material-ui/core/CardHeader";
+import GridListTile from "@material-ui/core/GridListTile";
+import IconButton from "@material-ui/core/IconButton";
+import MenuItem from "@material-ui/core/MenuItem";
+import Button from "@material-ui/core/Button";
+import Slider from "@material-ui/lab/Slider";
+import TextField from "@material-ui/core/TextField";
+import Switch from "@material-ui/core/Switch";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Collapse from "@material-ui/core/Collapse";
+import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
+import color from "@material-ui/core/colors/blueGrey";
 
-import UndoIcon from '@material-ui/icons/Undo';
-import RedoIcon from '@material-ui/icons/Redo';
-import DeleteIcon from '@material-ui/icons/Delete';
-import SaveIcon from '@material-ui/icons/Save';
-import ClearIcon from '@material-ui/icons/Clear';
-import AddIcon from '@material-ui/icons/Add';
-import CopyIcon from '@material-ui/icons/FileCopy';
-import RemoveIcon from '@material-ui/icons/Remove';
-import DownloadIcon from '@material-ui/icons/CloudDownload';
-import ZoomInIcon from '@material-ui/icons/ZoomIn';
-import ZoomOutIcon from '@material-ui/icons/ZoomOut';
-import dataJson from './data.json';
-import dataJsonControlled from './data.json.controlled';
-import {SketchField, Tools} from '../src';
-import dataUrl from './data.url';
-import DropZone from 'react-dropzone';
-import Toolbar from '@material-ui/core/Toolbar/Toolbar';
-import Typography from '@material-ui/core/Typography/Typography';
+import UndoIcon from "@material-ui/icons/Undo";
+import RedoIcon from "@material-ui/icons/Redo";
+import DeleteIcon from "@material-ui/icons/Delete";
+import SaveIcon from "@material-ui/icons/Save";
+import ClearIcon from "@material-ui/icons/Clear";
+import AddIcon from "@material-ui/icons/Add";
+import CopyIcon from "@material-ui/icons/FileCopy";
+import RemoveIcon from "@material-ui/icons/Remove";
+import DownloadIcon from "@material-ui/icons/CloudDownload";
+import ZoomInIcon from "@material-ui/icons/ZoomIn";
+import ZoomOutIcon from "@material-ui/icons/ZoomOut";
+import dataJson from "./data.json";
+import dataJsonControlled from "./data.json.controlled";
+import { SketchField, Tools } from "../src";
+import dataUrl from "./data.url";
+import DropZone from "react-dropzone";
+import Toolbar from "@material-ui/core/Toolbar/Toolbar";
+import Typography from "@material-ui/core/Typography/Typography";
 
 const styles = {
   root: {
-    padding: '3px',
-    display: 'flex',
-    flexWrap: 'wrap',
-    margin: '10px 10px 5px 10px',
-    justifyContent: 'space-around',
+    padding: "3px",
+    display: "flex",
+    flexWrap: "wrap",
+    margin: "10px 10px 5px 10px",
+    justifyContent: "space-around",
   },
   gridList: {
-    width: '100%',
-    overflowY: 'auto',
-    marginBottom: '24px',
+    width: "100%",
+    overflowY: "auto",
+    marginBottom: "24px",
   },
   gridTile: {
-    backgroundColor: '#fcfcfc',
+    backgroundColor: "#fcfcfc",
   },
   appBar: {
-    backgroundColor: '#333',
+    backgroundColor: "#333",
   },
   radioButton: {
-    marginTop: '3px',
-    marginBottom: '3px',
+    marginTop: "3px",
+    marginBottom: "3px",
   },
   separator: {
-    height: '42px',
-    backgroundColor: 'white',
+    height: "42px",
+    backgroundColor: "white",
   },
   iconButton: {
-    fill: 'white',
-    width: '42px',
-    height: '42px',
+    fill: "white",
+    width: "42px",
+    height: "42px",
   },
   dropArea: {
-    width: '100%',
-    height: '64px',
-    border: '2px dashed rgb(102, 102, 102)',
-    borderStyle: 'dashed',
-    borderRadius: '5px',
-    textAlign: 'center',
-    paddingTop: '20px',
+    width: "100%",
+    height: "64px",
+    border: "2px dashed rgb(102, 102, 102)",
+    borderStyle: "dashed",
+    borderRadius: "5px",
+    textAlign: "center",
+    paddingTop: "20px",
   },
   activeStyle: {
-    borderStyle: 'solid',
-    backgroundColor: '#eee',
+    borderStyle: "solid",
+    backgroundColor: "#eee",
   },
   rejectStyle: {
-    borderStyle: 'solid',
-    backgroundColor: '#ffdddd',
+    borderStyle: "solid",
+    backgroundColor: "#ffdddd",
   },
   card: {
-    margin: '10px 10px 5px 0'
-  }
+    margin: "10px 10px 5px 0",
+  },
 };
 
 /**
@@ -102,9 +102,9 @@ const styles = {
  */
 function eventFire(el, etype) {
   if (el.fireEvent) {
-    el.fireEvent('on' + etype);
+    el.fireEvent("on" + etype);
   } else {
-    var evObj = document.createEvent('Events');
+    var evObj = document.createEvent("Events");
     evObj.initEvent(etype, true, false);
     el.dispatchEvent(evObj);
   }
@@ -116,9 +116,9 @@ class SketchFieldDemo extends React.Component {
 
     this.state = {
       lineWidth: 10,
-      lineColor: 'black',
-      fillColor: '#68CCCA',
-      backgroundColor: 'transparent',
+      lineColor: "black",
+      fillColor: "#68CCCA",
+      backgroundColor: "transparent",
       shadowWidth: 0,
       shadowOffset: 0,
       tool: Tools.Pencil,
@@ -134,25 +134,25 @@ class SketchFieldDemo extends React.Component {
       stretched: true,
       stretchedX: false,
       stretchedY: false,
-      originX: 'left',
-      originY: 'top',
-      imageUrl: 'https://files.gamebanana.com/img/ico/sprays/4ea2f4dad8d6f.png',
+      originX: "left",
+      originY: "top",
+      imageUrl: "https://files.gamebanana.com/img/ico/sprays/4ea2f4dad8d6f.png",
       expandTools: false,
       expandControls: false,
       expandColors: false,
       expandBack: false,
       expandImages: false,
       expandControlled: false,
-      text: 'a text, cool!',
+      text: "a text, cool!",
       enableCopyPaste: false,
     };
   }
 
-  _selectTool = event => {
+  _selectTool = (event) => {
     this.setState({
       tool: event.target.value,
       enableRemoveSelected: event.target.value === Tools.Select,
-      enableCopyPaste: event.target.value === Tools.Select
+      enableCopyPaste: event.target.value === Tools.Select,
     });
   };
 
@@ -163,16 +163,16 @@ class SketchFieldDemo extends React.Component {
   };
 
   _download = () => {
-    console.save(this._sketch.toDataURL(), 'toDataURL.txt');
-    console.save(JSON.stringify(this._sketch.toJSON()), 'toDataJSON.txt');
+    console.save(this._sketch.toDataURL(), "toDataURL.txt");
+    console.save(JSON.stringify(this._sketch.toJSON()), "toDataJSON.txt");
 
     /*eslint-enable no-console*/
 
     let { imgDown } = this.refs;
-    let event = new Event('click', {});
+    let event = new Event("click", {});
 
     imgDown.href = this._sketch.toDataURL();
-    imgDown.download = 'toPNG.png';
+    imgDown.download = "toPNG.png";
     imgDown.dispatchEvent(event);
   };
 
@@ -188,16 +188,17 @@ class SketchFieldDemo extends React.Component {
         rows={1}
         style={styles.gridTile}
         actionIcon={
-          <IconButton onTouchTap={c => this._removeMe(index)}>
-            <ClearIcon color="white"/>
+          <IconButton onTouchTap={(c) => this._removeMe(index)}>
+            <ClearIcon color="white" />
           </IconButton>
-        }>
-        <img src={drawing}/>
+        }
+      >
+        <img src={drawing} />
       </GridListTile>
     );
   };
 
-  _removeMe = index => {
+  _removeMe = (index) => {
     let drawings = this.state.drawings;
     drawings.splice(index, 1);
     this.setState({ drawings: drawings });
@@ -221,10 +222,10 @@ class SketchFieldDemo extends React.Component {
 
   _clear = () => {
     this._sketch.clear();
-    this._sketch.setBackgroundFromDataUrl('');
+    this._sketch.setBackgroundFromDataUrl("");
     this.setState({
       controlledValue: null,
-      backgroundColor: 'transparent',
+      backgroundColor: "transparent",
       fillWithBackgroundColor: false,
       canUndo: this._sketch.canUndo(),
       canRedo: this._sketch.canRedo(),
@@ -232,7 +233,7 @@ class SketchFieldDemo extends React.Component {
   };
 
   _removeSelected = () => {
-    this._sketch.removeSelected()
+    this._sketch.removeSelected();
   };
 
   _onSketchChange = () => {
@@ -249,7 +250,7 @@ class SketchFieldDemo extends React.Component {
       let reader = new FileReader();
       let { stretched, stretchedX, stretchedY, originX, originY } = this.state;
       reader.addEventListener(
-        'load',
+        "load",
         () =>
           sketch.setBackgroundFromDataUrl(reader.result, {
             stretched: stretched,
@@ -258,7 +259,7 @@ class SketchFieldDemo extends React.Component {
             originX: originX,
             originY: originY,
           }),
-        false,
+        false
       );
       reader.readAsDataURL(accepted[0]);
     }
@@ -267,23 +268,39 @@ class SketchFieldDemo extends React.Component {
   _addText = () => this._sketch.addText(this.state.text);
 
   componentDidMount = () => {
-    (function(console) {
-      console.save = function(data, filename) {
+    (function (console) {
+      console.save = function (data, filename) {
         if (!data) {
-          console.error('Console.save: No data');
+          console.error("Console.save: No data");
           return;
         }
-        if (!filename) filename = 'console.json';
-        if (typeof data === 'object') {
+        if (!filename) filename = "console.json";
+        if (typeof data === "object") {
           data = JSON.stringify(data, undefined, 4);
         }
-        var blob = new Blob([data], { type: 'text/json' }),
-          e = document.createEvent('MouseEvents'),
-          a = document.createElement('a');
+        var blob = new Blob([data], { type: "text/json" }),
+          e = document.createEvent("MouseEvents"),
+          a = document.createElement("a");
         a.download = filename;
         a.href = window.URL.createObjectURL(blob);
-        a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-        e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        a.dataset.downloadurl = ["text/json", a.download, a.href].join(":");
+        e.initMouseEvent(
+          "click",
+          true,
+          false,
+          window,
+          0,
+          0,
+          0,
+          0,
+          0,
+          false,
+          false,
+          false,
+          false,
+          0,
+          null
+        );
         a.dispatchEvent(e);
       };
     })(console);
@@ -297,7 +314,7 @@ class SketchFieldDemo extends React.Component {
       },
       palette: {
         primary: { main: color[500] }, // Purple and green play nicely together.
-        secondary: { main: '#11cb5f' }, // This is just green.A700 as hex.
+        secondary: { main: "#11cb5f" }, // This is just green.A700 as hex.
       },
     });
     return (
@@ -306,33 +323,35 @@ class SketchFieldDemo extends React.Component {
           <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <AppBar title="Sketch Tool" position="static" style={styles.appBar}>
               <Toolbar>
-                <Typography variant="h6" color="inherit" style={{ flexGrow: 1 }}>Sketch Tool</Typography>
+                <Typography
+                  variant="h6"
+                  color="inherit"
+                  style={{ flexGrow: 1 }}
+                >
+                  Sketch Tool
+                </Typography>
                 <IconButton
                   color="primary"
                   disabled={!this.state.canUndo}
-                  onClick={this._undo}>
-                  <UndoIcon/>
+                  onClick={this._undo}
+                >
+                  <UndoIcon />
                 </IconButton>
                 <IconButton
                   color="primary"
                   disabled={!this.state.canRedo}
-                  onClick={this._redo}>
-                  <RedoIcon/>
+                  onClick={this._redo}
+                >
+                  <RedoIcon />
                 </IconButton>
-                <IconButton
-                  color="primary"
-                  onClick={this._save}>
-                  <SaveIcon/>
+                <IconButton color="primary" onClick={this._save}>
+                  <SaveIcon />
                 </IconButton>
-                <IconButton
-                  color="primary"
-                  onClick={this._download}>
-                  <DownloadIcon/>
+                <IconButton color="primary" onClick={this._download}>
+                  <DownloadIcon />
                 </IconButton>
-                <IconButton
-                  color="primary"
-                  onClick={this._clear}>
-                  <DeleteIcon/>
+                <IconButton color="primary" onClick={this._clear}>
+                  <DeleteIcon />
                 </IconButton>
               </Toolbar>
             </AppBar>
@@ -343,22 +362,18 @@ class SketchFieldDemo extends React.Component {
             <SketchField
               name="sketch"
               className="canvas-area"
-              ref={c => (this._sketch = c)}
+              ref={(c) => (this._sketch = c)}
               lineColor={this.state.lineColor}
               lineWidth={this.state.lineWidth}
               fillColor={
-                this.state.fillWithColor
-                  ? this.state.fillColor
-                  : 'transparent'
+                this.state.fillWithColor ? this.state.fillColor : "transparent"
               }
               backgroundColor={
                 this.state.fillWithBackgroundColor
                   ? this.state.backgroundColor
-                  : 'transparent'
+                  : "transparent"
               }
-              width={
-                this.state.controlledSize ? this.state.sketchWidth : null
-              }
+              width={this.state.controlledSize ? this.state.sketchWidth : null}
               height={
                 this.state.controlledSize ? this.state.sketchHeight : null
               }
@@ -376,10 +391,14 @@ class SketchFieldDemo extends React.Component {
                 subheader="Available tools"
                 action={
                   <IconButton
-                    onClick={(e) => this.setState({ expandTools: !this.state.expandTools })}>
-                    <ExpandMore/>
+                    onClick={(e) =>
+                      this.setState({ expandTools: !this.state.expandTools })
+                    }
+                  >
+                    <ExpandMore />
                   </IconButton>
-                }/>
+                }
+              />
               <Collapse in={this.state.expandTools}>
                 <CardContent>
                   <div className="row">
@@ -389,55 +408,73 @@ class SketchFieldDemo extends React.Component {
                         label="Canvas Tool"
                         value={this.state.tool}
                         onChange={this._selectTool}
-                        helperText="Please select Canvas Tool">
-                        <MenuItem value={Tools.Select} key="Select">Select</MenuItem>
-                        <MenuItem value={Tools.Pencil} key="Pencil">Pencil</MenuItem>
-                        <MenuItem value={Tools.Line} key="Line">Line</MenuItem>
-                        <MenuItem value={Tools.Arrow} key="Arrow">Arrow</MenuItem>
-                        <MenuItem value={Tools.Rectangle} key="Rectangle">Rectangle</MenuItem>
-                        <MenuItem value={Tools.Circle} key="Circle">Circle</MenuItem>
-                        <MenuItem value={Tools.Pan} key="Pan">Pan</MenuItem>
-                        <MenuItem value={Tools.Highlighter} key="Highlighter">Highlighter</MenuItem>
-                        <MenuItem value={Tools.RectangleLabel} key="Pan">RectangleLabel</MenuItem>
+                        helperText="Please select Canvas Tool"
+                      >
+                        <MenuItem value={Tools.Select} key="Select">
+                          Select
+                        </MenuItem>
+                        <MenuItem value={Tools.Pencil} key="Pencil">
+                          Pencil
+                        </MenuItem>
+                        <MenuItem value={Tools.Line} key="Line">
+                          Line
+                        </MenuItem>
+                        <MenuItem value={Tools.Arrow} key="Arrow">
+                          Arrow
+                        </MenuItem>
+                        <MenuItem value={Tools.Rectangle} key="Rectangle">
+                          Rectangle
+                        </MenuItem>
+                        <MenuItem value={Tools.Circle} key="Circle">
+                          Circle
+                        </MenuItem>
+                        <MenuItem value={Tools.Pan} key="Pan">
+                          Pan
+                        </MenuItem>
+                        <MenuItem value={Tools.Highlighter} key="Highlighter">
+                          Highlighter
+                        </MenuItem>
+                        <MenuItem value={Tools.RectangleLabel} key="Pan">
+                          RectangleLabel
+                        </MenuItem>
                       </TextField>
                     </div>
                   </div>
-                  <br/>
-                  <br/>
+                  <br />
+                  <br />
                   <Typography id="slider">Line Weight</Typography>
                   <Slider
-                    step={1} min={0} max={100}
+                    step={1}
+                    min={0}
+                    max={100}
                     aria-labelledby="slider"
                     value={this.state.lineWidth}
-                    onChange={(e, v) =>
-                      this.setState({ lineWidth: v })
-                    }
+                    onChange={(e, v) => this.setState({ lineWidth: v })}
                   />
-                  <br/>
+                  <br />
                   <label htmlFor="zoom">Zoom</label>
                   <div>
-                    <IconButton
-                      onClick={(e) => this._sketch.zoom(1.25)}>
-                      <ZoomInIcon/>
+                    <IconButton onClick={(e) => this._sketch.zoom(1.25)}>
+                      <ZoomInIcon />
                     </IconButton>
-                    <IconButton
-                      onClick={(e) => this._sketch.zoom(0.8)}>
-                      <ZoomOutIcon/>
+                    <IconButton onClick={(e) => this._sketch.zoom(0.8)}>
+                      <ZoomOutIcon />
                     </IconButton>
                   </div>
                   <div className="row">
                     <div className="col-lg-7">
                       <TextField
-                        label='Text'
-                        helperText='Add text to Sketch'
-                        onChange={(e) => this.setState({ text: e.target.value })}
-                        value={this.state.text}/>
+                        label="Text"
+                        helperText="Add text to Sketch"
+                        onChange={(e) =>
+                          this.setState({ text: e.target.value })
+                        }
+                        value={this.state.text}
+                      />
                     </div>
                     <div className="col-lg-3">
-                      <IconButton
-                        color="primary"
-                        onClick={this._addText}>
-                        <AddIcon/>
+                      <IconButton color="primary" onClick={this._addText}>
+                        <AddIcon />
                       </IconButton>
                     </div>
                   </div>
@@ -450,10 +487,16 @@ class SketchFieldDemo extends React.Component {
                 subheader="Copy/Paste etc."
                 action={
                   <IconButton
-                    onClick={(e) => this.setState({ expandControls: !this.state.expandControls })}>
-                    <ExpandMore/>
+                    onClick={(e) =>
+                      this.setState({
+                        expandControls: !this.state.expandControls,
+                      })
+                    }
+                  >
+                    <ExpandMore />
                   </IconButton>
-                }/>
+                }
+              />
               <Collapse in={this.state.expandControls}>
                 <CardContent>
                   <div className="row">
@@ -462,31 +505,39 @@ class SketchFieldDemo extends React.Component {
                         control={
                           <Switch
                             value={this.state.controlledSize}
-                            onChange={(e) => this.setState({ controlledSize: !this.state.controlledSize })}
+                            onChange={(e) =>
+                              this.setState({
+                                controlledSize: !this.state.controlledSize,
+                              })
+                            }
                           />
                         }
                         label="Control size"
                       />
-                      <br/>
+                      <br />
                       <Typography id="xSize">Change Canvas Width</Typography>
                       <Slider
                         step={1}
                         min={10}
                         max={1000}
                         value={this.state.sketchWidth}
-                        onChange={(e, v) => this.setState({ sketchWidth: v })}/>
-                      <br/>
+                        onChange={(e, v) => this.setState({ sketchWidth: v })}
+                      />
+                      <br />
                       <Typography id="ySize">Change Canvas Height</Typography>
                       <Slider
                         step={1}
                         min={10}
                         max={1000}
                         value={this.state.sketchHeight}
-                        onChange={(e, v) => this.setState({ sketchHeight: v })}/>
-                      <br/>
+                        onChange={(e, v) => this.setState({ sketchHeight: v })}
+                      />
+                      <br />
                     </div>
                   </div>
-                  <label htmlFor="zoom">Selection Actions (Select an object first!)</label>
+                  <label htmlFor="zoom">
+                    Selection Actions (Select an object first!)
+                  </label>
                   <div className="row">
                     <div className="col">
                       <IconButton
@@ -495,16 +546,18 @@ class SketchFieldDemo extends React.Component {
                         onClick={(e) => {
                           this._sketch.copy();
                           this._sketch.paste();
-                        }}>
-                        <CopyIcon/>
+                        }}
+                      >
+                        <CopyIcon />
                       </IconButton>
                     </div>
                     <div className="col">
                       <IconButton
                         color="primary"
                         disabled={!this.state.enableRemoveSelected}
-                        onClick={this._removeSelected}>
-                        <RemoveIcon/>
+                        onClick={this._removeSelected}
+                      >
+                        <RemoveIcon />
                       </IconButton>
                     </div>
                   </div>
@@ -517,30 +570,46 @@ class SketchFieldDemo extends React.Component {
                 subheader="Put some color on your drawing"
                 action={
                   <IconButton
-                    onClick={(e) => this.setState({ expandColors: !this.state.expandColors })}>
-                    <ExpandMore/>
+                    onClick={(e) =>
+                      this.setState({ expandColors: !this.state.expandColors })
+                    }
+                  >
+                    <ExpandMore />
                   </IconButton>
-                }/>
+                }
+              />
               <Collapse in={this.state.expandColors}>
                 <CardContent>
-                  <label htmlFor='lineColor'>Line</label>
-                  <br/>
+                  <label htmlFor="lineColor">Line</label>
+                  <br />
                   <CompactPicker
-                    id='lineColor' color={this.state.lineColor}
-                    onChange={(color) => this.setState({ lineColor: color.hex })}/>
-                  <br/>
-                  <br/>
+                    id="lineColor"
+                    color={this.state.lineColor}
+                    onChange={(color) =>
+                      this.setState({ lineColor: color.hex })
+                    }
+                  />
+                  <br />
+                  <br />
                   <FormControlLabel
                     control={
                       <Switch
                         value={this.state.fillWithColor}
-                        onChange={(e) => this.setState({ fillWithColor: !this.state.fillWithColor })}/>
+                        onChange={(e) =>
+                          this.setState({
+                            fillWithColor: !this.state.fillWithColor,
+                          })
+                        }
+                      />
                     }
                     label="Fill"
                   />
                   <CompactPicker
                     color={this.state.fillColor}
-                    onChange={(color) => this.setState({ fillColor: color.hex })}/>
+                    onChange={(color) =>
+                      this.setState({ fillColor: color.hex })
+                    }
+                  />
                 </CardContent>
               </Collapse>
             </Card>
@@ -550,10 +619,14 @@ class SketchFieldDemo extends React.Component {
                 subheader="Background of drawing"
                 action={
                   <IconButton
-                    onClick={(e) => this.setState({ expandBack: !this.state.expandBack })}>
-                    <ExpandMore/>
+                    onClick={(e) =>
+                      this.setState({ expandBack: !this.state.expandBack })
+                    }
+                  >
+                    <ExpandMore />
                   </IconButton>
-                }/>
+                }
+              />
               <Collapse in={this.state.expandBack}>
                 <CardContent>
                   <FormControlLabel
@@ -561,48 +634,71 @@ class SketchFieldDemo extends React.Component {
                     control={
                       <Switch
                         value={this.state.fillWithBackgroundColor}
-                        onChange={(e) => this.setState({
-                          fillWithBackgroundColor: !this.state.fillWithBackgroundColor
-                        })}/>
-                    }/>
+                        onChange={(e) =>
+                          this.setState({
+                            fillWithBackgroundColor: !this.state
+                              .fillWithBackgroundColor,
+                          })
+                        }
+                      />
+                    }
+                  />
                   <CompactPicker
                     color={this.state.backgroundColor}
-                    onChange={(color) => this.setState({ backgroundColor: color.hex })}/>
-                  <br/>
-                  <br/>
-                  <label htmlFor='lineColor'>Set Image Background</label>
-                  <br/>
+                    onChange={(color) =>
+                      this.setState({ backgroundColor: color.hex })
+                    }
+                  />
+                  <br />
+                  <br />
+                  <label htmlFor="lineColor">Set Image Background</label>
+                  <br />
                   <FormControlLabel
                     label="Fit canvas (X,Y)"
                     control={
                       <Switch
                         value={this.state.stretched}
-                        onChange={(e) => this.setState({ stretched: !this.state.stretched })}/>
-                    }/>
+                        onChange={(e) =>
+                          this.setState({ stretched: !this.state.stretched })
+                        }
+                      />
+                    }
+                  />
                   <FormControlLabel
                     label="Fit canvas (X)"
                     control={
                       <Switch
                         value={this.state.stretchedX}
-                        onChange={(e) => this.setState({ stretchedX: !this.state.stretchedX })}/>
-                    }/>
+                        onChange={(e) =>
+                          this.setState({ stretchedX: !this.state.stretchedX })
+                        }
+                      />
+                    }
+                  />
                   <FormControlLabel
                     label="Fit canvas (Y)"
                     control={
                       <Switch
                         value={this.state.stretchedY}
-                        onChange={(e) => this.setState({ stretchedY: !this.state.stretchedY })}/>
-                    }/>
+                        onChange={(e) =>
+                          this.setState({ stretchedY: !this.state.stretchedY })
+                        }
+                      />
+                    }
+                  />
                   <div>
                     <DropZone
-                      accept='image/*'
+                      accept="image/*"
                       multiple={false}
                       style={styles.dropArea}
                       activeStyle={styles.activeStyle}
                       rejectStyle={styles.rejectStyle}
-                      onDrop={this._onBackgroundImageDrop}>
-                      Try dropping an image here,<br/>
-                      or click<br/>
+                      onDrop={this._onBackgroundImageDrop}
+                    >
+                      Try dropping an image here,
+                      <br />
+                      or click
+                      <br />
                       to select image as background.
                     </DropZone>
                   </div>
@@ -615,30 +711,39 @@ class SketchFieldDemo extends React.Component {
                 subheader="Upload Images as drawing"
                 action={
                   <IconButton
-                    onClick={(e) => this.setState({ expandImages: !this.state.expandImages })}>
-                    <ExpandMore/>
+                    onClick={(e) =>
+                      this.setState({ expandImages: !this.state.expandImages })
+                    }
+                  >
+                    <ExpandMore />
                   </IconButton>
-                }/>
+                }
+              />
               <Collapse in={this.state.expandImages}>
                 <CardContent>
                   <div>
                     <TextField
-                      label='Image URL'
-                      helperText='Copy/Paste an image URL'
-                      onChange={(e) => this.setState({ imageUrl: e.target.value })}
-                      value={this.state.imageUrl}/>
+                      label="Image URL"
+                      helperText="Copy/Paste an image URL"
+                      onChange={(e) =>
+                        this.setState({ imageUrl: e.target.value })
+                      }
+                      value={this.state.imageUrl}
+                    />
                     <Button
                       variant="outlined"
                       onClick={(e) => {
-                        this._sketch.addImg(this.state.imageUrl)
-                      }}>
+                        this._sketch.addImg(this.state.imageUrl);
+                      }}
+                    >
                       Load Image from URL
                     </Button>
                   </div>
-                  <br/>
+                  <br />
                   <Button
                     variant="outlined"
-                    onClick={(e) => this._sketch.addImg(dataUrl)}>
+                    onClick={(e) => this._sketch.addImg(dataUrl)}
+                  >
                     Load Image from Data URL
                   </Button>
                 </CardContent>
@@ -650,17 +755,26 @@ class SketchFieldDemo extends React.Component {
                 subheader="Control Component externally"
                 action={
                   <IconButton
-                    onClick={(e) => this.setState({ expandControlled: !this.state.expandControlled })}>
-                    <ExpandMore/>
+                    onClick={(e) =>
+                      this.setState({
+                        expandControlled: !this.state.expandControlled,
+                      })
+                    }
+                  >
+                    <ExpandMore />
                   </IconButton>
-                }/>
+                }
+              />
               <Collapse in={this.state.expandControlled}>
                 <CardContent>
                   <Button
                     variant="outlined"
-                    onClick={(e) => this.setState({
-                      controlledValue: dataJsonControlled
-                    })}>
+                    onClick={(e) =>
+                      this.setState({
+                        controlledValue: dataJsonControlled,
+                      })
+                    }
+                  >
                     Load controlled Value
                   </Button>
                 </CardContent>
@@ -672,12 +786,8 @@ class SketchFieldDemo extends React.Component {
           <div className="col-xs-7 col-sm-7 col-md-9 col-lg-9">
             {/* Sketch area */}
 
-            <div className="col-xs-5 col-sm-5 col-md-3 col-lg-3">
-
-
-            </div>
+            <div className="col-xs-5 col-sm-5 col-md-3 col-lg-3"></div>
           </div>
-
         </div>
       </MuiThemeProvider>
     );

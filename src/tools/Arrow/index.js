@@ -1,15 +1,14 @@
 /*eslint no-unused-vars: 0*/
 
-import FabricCanvasTool from './fabrictool'
+import FabricCanvasTool from "../fabrictool";
 
-const fabric = require('fabric').fabric;
+const fabric = require("fabric").fabric;
 
-class Arrow extends FabricCanvasTool {
-
+class Index extends FabricCanvasTool {
   configureCanvas(props) {
     let canvas = this._canvas;
     canvas.isDrawingMode = canvas.selection = false;
-    canvas.forEachObject((o) => o.selectable = o.evented = false);
+    canvas.forEachObject((o) => (o.selectable = o.evented = false));
     this._width = props.lineWidth;
     this._color = props.lineColor;
   }
@@ -23,23 +22,23 @@ class Arrow extends FabricCanvasTool {
       strokeWidth: this._width,
       fill: this._color,
       stroke: this._color,
-      originX: 'center',
-      originY: 'center',
+      originX: "center",
+      originY: "center",
       selectable: false,
-      evented: false
+      evented: false,
     });
 
     this.head = new fabric.Triangle({
       fill: this._color,
       left: pointer.x,
       top: pointer.y,
-      originX: 'center',
-      originY: 'center',
+      originX: "center",
+      originY: "center",
       height: 3 * this._width,
       width: 3 * this._width,
       selectable: false,
       evented: false,
-      angle: 90
+      angle: 90,
     });
 
     canvas.add(this.line);
@@ -56,10 +55,10 @@ class Arrow extends FabricCanvasTool {
     let x_delta = pointer.x - this.line.x1;
     let y_delta = pointer.y - this.line.y1;
 
-    this.head.set({ 
-      left: pointer.x, 
-      top: pointer.y, 
-      angle: 90 + Math.atan2(y_delta, x_delta) * 180/Math.PI 
+    this.head.set({
+      left: pointer.x,
+      top: pointer.y,
+      angle: 90 + (Math.atan2(y_delta, x_delta) * 180) / Math.PI,
     });
 
     canvas.renderAll();
@@ -80,4 +79,4 @@ class Arrow extends FabricCanvasTool {
   }
 }
 
-export default Arrow;
+export default Index;

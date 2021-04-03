@@ -1,8 +1,6 @@
-
-import FabricCanvasTool from './fabrictool'
+import FabricCanvasTool from "../fabrictool";
 
 class Pencil extends FabricCanvasTool {
-
   configureCanvas(props) {
     this._canvas.isDrawingMode = true;
     this._canvas.freeDrawingBrush.width = props.lineWidth;

@@ -6,7 +6,7 @@
 
 # Linux trash folder which might appear on any partition or disk
 .Trash-*
-
+dist/
 
 ### JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio

@@ -125,8 +125,8 @@ class History {
       /* eslint-disable no-console */
       console.log(
         this.undoList,
-        ' -> ' + this.current + ' <- ',
-        this.redoList.slice(0).reverse(),
+        " -> " + this.current + " <- ",
+        this.redoList.slice(0).reverse()
       );
     }
   }
