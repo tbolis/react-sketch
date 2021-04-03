@@ -31,7 +31,6 @@
     "format": "prettier --write \"./**\"",
     "precommit": "lint-staged",
     "prepublish": "npm run build",
-    "prebuild": "rimraf dist",
     "start": "node webpack/server.js",
     "start:debug": "weinre --boundHost `my-local-ip` ",
     "test": "jest --coverage"
@@ -72,6 +71,7 @@
     "babel-loader": "8.0.4",
     "babel-plugin-lodash": "3.3.4",
     "canvas": "^2.6.0",
+    "clean-webpack-plugin": "^3.0.0",
     "cross-env": "^5.2.0",
     "css-loader": "^1.0.1",
     "enzyme": "3.7.0",
