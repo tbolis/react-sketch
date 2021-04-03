@@ -1,9 +1,8 @@
 /*eslint no-unused-vars: 0*/
 
-import FabricCanvasTool from '../fabrictool'
+import FabricCanvasTool from "../fabrictool";
 
 class Select extends FabricCanvasTool {
-
   configureCanvas(props) {
     let canvas = this._canvas;
     canvas.isDrawingMode = false;
@@ -14,4 +13,4 @@ class Select extends FabricCanvasTool {
   }
 }
 
-export default Select
+export default Select;

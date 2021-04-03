@@ -1,10 +1,10 @@
-const Paths = require('./paths');
-const DefinePlugin = require('webpack/lib/DefinePlugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const NoEmitOnErrorsPlugin = require('webpack/lib/NoEmitOnErrorsPlugin');
-const OccurrenceOrderPlugin = require('webpack/lib/optimize/OccurrenceOrderPlugin');
-const AggressiveMergingPlugin = require('webpack/lib/optimize/AggressiveMergingPlugin');
-const ModuleConcatenationPlugin = require('webpack/lib/optimize/ModuleConcatenationPlugin');
+const Paths = require("./paths");
+const DefinePlugin = require("webpack/lib/DefinePlugin");
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const NoEmitOnErrorsPlugin = require("webpack/lib/NoEmitOnErrorsPlugin");
+const OccurrenceOrderPlugin = require("webpack/lib/optimize/OccurrenceOrderPlugin");
+const AggressiveMergingPlugin = require("webpack/lib/optimize/AggressiveMergingPlugin");
+const ModuleConcatenationPlugin = require("webpack/lib/optimize/ModuleConcatenationPlugin");
 
 function containsObject(obj, list) {
   var i;
@@ -17,22 +17,22 @@ function containsObject(obj, list) {
 }
 
 const externals = [];
-const internals = ['fabric', 'canvas'];
+const internals = ["fabric", "canvas"];
 
 module.exports = {
   entry: {
-    src: './src'
+    src: "./src",
   },
   performance: {
-    hints: false
+    hints: false,
   },
   output: {
     path: Paths.outputPath,
-    filename: 'index.js',
-    libraryTarget: 'umd'
+    filename: "index.js",
+    libraryTarget: "umd",
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: [".js", ".jsx"],
   },
   cache: true,
   module: {
@@ -41,23 +41,23 @@ module.exports = {
         test: /\.(js|jsx)$/,
         include: [Paths.srcPath],
         exclude: /(node_modules|bower_components|lib)/,
-        loaders: ['babel-loader']
-      }
-    ]
+        loaders: ["babel-loader"],
+      },
+    ],
   },
   plugins: [
     new ModuleConcatenationPlugin(),
     new UglifyJsPlugin({
       parallel: true,
       uglifyOptions: {
-        warnings: false
-      }
+        warnings: false,
+      },
     }),
     new NoEmitOnErrorsPlugin(),
     new OccurrenceOrderPlugin(),
     new AggressiveMergingPlugin(),
     new DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('production')
-    })
-  ]
+      "process.env.NODE_ENV": JSON.stringify("production"),
+    }),
+  ],
 };
