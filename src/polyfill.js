@@ -5,16 +5,17 @@
 
 if (typeof Object.assign != "function") {
   Object.defineProperty(Object, "assign", {
+    // eslint-disable-next-line no-unused-vars
     value: function assign(target, varArgs) {
       "use strict";
       if (target == null) {
         throw new TypeError("Cannot convert undefined or null to object");
       }
-      var to = Object(target);
-      for (var index = 1; index < arguments.length; index++) {
-        var nextSource = arguments[index];
+      let to = Object(target);
+      for (let index = 1; index < arguments.length; index++) {
+        let nextSource = arguments[index];
         if (nextSource != null) {
-          for (var nextKey in nextSource) {
+          for (let nextKey in nextSource) {
             if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
               to[nextKey] = nextSource[nextKey];
             }

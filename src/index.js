@@ -1,5 +1,5 @@
 import "./polyfill";
-import SketchField from "./SketchField";
+import SketchField from "./components/SketchField";
 import Tools from "./tools";
 
 export { SketchField };

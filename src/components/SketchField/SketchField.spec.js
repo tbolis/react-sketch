@@ -4,7 +4,7 @@
 
 import React from "react";
 import { mount } from "enzyme";
-import SketchField from "../src/SketchField";
+import SketchField from "./index";
 
 function objectFromDrag(
   canvas,

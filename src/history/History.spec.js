@@ -1,11 +1,11 @@
 /* eslint no-console: 0 */
 /* eslint-env node, mocha */
 
-import History from "../src/history";
+import History from "./index";
 
 describe("History", () => {
   it("Loads Normally", () => {
-    require("../src/history");
+    require("./index");
   });
 
   it("Undo limit is set", () => {
