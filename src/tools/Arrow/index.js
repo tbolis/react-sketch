@@ -1,10 +1,10 @@
 /*eslint no-unused-vars: 0*/
 
-import FabricCanvasTool from './fabrictool'
+import FabricCanvasTool from '../fabrictool'
 
 const fabric = require('fabric').fabric;
 
-class Arrow extends FabricCanvasTool {
+class Index extends FabricCanvasTool {
 
   configureCanvas(props) {
     let canvas = this._canvas;
@@ -80,4 +80,4 @@ class Arrow extends FabricCanvasTool {
   }
 }
 
-export default Arrow;
+export default Index;

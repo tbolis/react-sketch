@@ -1,7 +1,7 @@
 /*eslint no-unused-vars: 0*/
 
-import FabricCanvasTool from './fabrictool'
-import {linearDistance} from './utils';
+import FabricCanvasTool from '../fabrictool'
+import {linearDistance} from '../../utils';
 
 const fabric = require('fabric').fabric;
 

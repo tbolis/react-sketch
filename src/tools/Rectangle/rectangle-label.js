@@ -1,6 +1,6 @@
 /*eslint no-unused-vars: 0*/
 
-import FabricCanvasTool from './fabrictool'
+import FabricCanvasTool from '../fabrictool'
 import RectangleLabelObject from './rectangle-label-object';
 
 class RectangleLabel extends FabricCanvasTool {

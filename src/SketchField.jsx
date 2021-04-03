@@ -4,17 +4,9 @@ import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import History from './history';
 import {uuid4} from './utils';
-import Select from './select';
-import Pencil from './pencil';
-import Line from './line';
-import Arrow from './arrow';
-import Rectangle from './rectangle';
-import Circle from './circle';
-import Pan from './pan';
+import { Arrow, Circle, Line,Select ,Pencil,Rectangle,Pan,Highlighter, RectangleLabel} from './tools';
 import Tool from './tools';
-import Highlighter from './highlighter';
-import RectangleLabel from './rectangle-label';
-import DefaultTool from './defaul-tool';
+import DefaultTool from './tools/defaul-tool';
 
 const fabric = require('fabric').fabric;
 

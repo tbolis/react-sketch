@@ -1,6 +1,6 @@
 /*eslint no-unused-vars: 0*/
 
-import FabricCanvasTool from './fabrictool'
+import FabricCanvasTool from '../fabrictool'
 
 const fabric = require('fabric').fabric;
 

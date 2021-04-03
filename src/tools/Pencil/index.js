@@ -1,5 +1,5 @@
 
-import FabricCanvasTool from './fabrictool'
+import FabricCanvasTool from '../fabrictool'
 
 class Pencil extends FabricCanvasTool {
 
