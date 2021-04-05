@@ -18,7 +18,6 @@ import Pan from "./../../tools/Pan";
 import Highlighter from "./../../tools/Highlighter";
 import { fabric } from "fabric";
 
-
 /**
  * Sketch Tool based on FabricJS for React Applications
  */

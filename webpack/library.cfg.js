@@ -5,7 +5,7 @@ const NoEmitOnErrorsPlugin = require("webpack/lib/NoEmitOnErrorsPlugin");
 const OccurrenceOrderPlugin = require("webpack/lib/optimize/OccurrenceOrderPlugin");
 const AggressiveMergingPlugin = require("webpack/lib/optimize/AggressiveMergingPlugin");
 const ModuleConcatenationPlugin = require("webpack/lib/optimize/ModuleConcatenationPlugin");
-const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 function containsObject(obj, list) {
   var i;

@@ -1,5 +1,4 @@
-import SketchField from "./SketchField"
+import SketchField from "./SketchField";
 
-
-export {SketchField}
-export default SketchField
+export { SketchField };
+export default SketchField;

@@ -31,7 +31,7 @@
     "format": "prettier --write \"./**\"",
     "precommit": "lint-staged",
     "prepublish": "npm run build",
-    "start": "node webpack/server.js",
+    "start": "webpack-dev-server --open --mode development --config webpack/server.cfg.js",
     "start:debug": "weinre --boundHost `my-local-ip` ",
     "test": "jest --coverage"
   },
