@@ -1,4 +1,5 @@
 /*eslint no-unused-vars: 0*/
+// @ts-nocheck
 
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
@@ -15,8 +16,8 @@ import RectangleLabel from "./../../tools/Rectangle/rectangle-label";
 import Circle from "./../../tools/Circle";
 import Pan from "./../../tools/Pan";
 import Highlighter from "./../../tools/Highlighter";
+import { fabric } from "fabric";
 
-const fabric = require("fabric").fabric;
 
 /**
  * Sketch Tool based on FabricJS for React Applications

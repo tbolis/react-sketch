@@ -33,7 +33,7 @@ function objectFromDrag(
 
 describe("SketchField", () => {
   it("Loads Normally", () => {
-    require("../src/SketchField");
+    require("./index");
   });
 
   it("Contains canvas tag", () => {
