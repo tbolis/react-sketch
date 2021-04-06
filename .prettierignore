@@ -12,3 +12,4 @@ LICENSE
 .DS_Store
 .npmignore
 .gitignore
+*.log
