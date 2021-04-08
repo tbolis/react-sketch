@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Sketch Component Showcase",
   "scripts": {
-    "start": "webpack serve --mode development"
+    "start": "webpack serve --mode development --open"
   },
   "devDependencies": {
     "html-webpack-plugin": "^5.3.1",

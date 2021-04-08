@@ -1,4 +1,5 @@
-declare module "react-sketch" {
+// @ts-nocheck
+declare module "react-sketch123123" {
   import * as React from "react";
 
   export const Tools: {

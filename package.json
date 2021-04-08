@@ -26,8 +26,7 @@
   ],
   "license": "MIT",
   "scripts": {
-    "compile": "tsc --build --force tsconfig.json",
-    "start": "yarn workspace showcase start",
+    "start": "wsrun start",
     "lint": "eslint --fix ./packages/**/src",
     "format": "prettier --write \"./**\""
   },
@@ -44,10 +43,9 @@
     "prettier": "^2.2.1",
     "source-map-loader": "^2.0.1",
     "typescript": "^4.2.3",
-    "webpack": "^5.30.0"
+    "webpack": "^5.30.0",
+    "wsrun": "^5.2.4"
   },
   "dependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
   }
 }

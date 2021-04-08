@@ -15,13 +15,9 @@ module.exports = {
     filename: "bundle.js",
   },
   devServer: {
-    historyApiFallback: true,
+    contentBase: path.join(__dirname, "src"),
     stats: { colors: true },
-    publicPath: "/",
-    noInfo: false,
-    lazy: false,
     port: port,
-    hot: true,
   },
   module: {
     rules: [
@@ -35,8 +31,12 @@ module.exports = {
         loader: "source-map-loader",
       },
       {
-        test: /\.css$/,
-        loader: "css-loader",
+        test: /\.(css|scss)$/,
+        use: ["style-loader", "css-loader"],
+      },
+      {
+        test: /\.(jpg|jpeg|png|gif|mp3|svg)$/,
+        use: ["file-loader"],
       },
     ],
   },

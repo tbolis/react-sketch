@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "target": "es2015",
+    "module": "commonjs",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "strict": true,
+    "composite": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "typeRoots": [
+      "./types",
+      "node_modules/@types"
+    ],
+    "lib": [ "es2015", "dom" ],
+  },
+  "exclude": ["dist", "node_modules", "types"]
+}

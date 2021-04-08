@@ -32,7 +32,5 @@
     ] /* List of folders to include type definitions from. */,
     "strictNullChecks": true /* Enable strict null checks. */,
     "allowJs": true /* Allow javascript files to be compiled. */
-  },
-  "exclude": ["lib", "node_modules", "types"],
-  "include": ["packages/**/*.tsx"]
+  }
 }
