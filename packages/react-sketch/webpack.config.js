@@ -2,11 +2,9 @@ const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
-// https://github.com/Hotell/typescript-lib-starter
-
 module.exports = {
   entry: {
-    "index": "./src/index.ts",
+    index: "./src/index.ts",
   },
   performance: {
     hints: false,
@@ -16,10 +14,10 @@ module.exports = {
     minimizer: [new TerserPlugin()],
   },
   output: {
-    path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
-    libraryTarget: "umd",
     library: "ReactSketch",
+    libraryTarget: "umd",
+    path: path.resolve(__dirname, "dist"),
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js"],

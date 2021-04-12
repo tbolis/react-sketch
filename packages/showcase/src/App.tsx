@@ -1,13 +1,27 @@
+import "./App.css";
 import * as React from "react";
-import { SketchField } from "react-sketch";
+import Grid from "@material-ui/core/Grid";
+import ThemeProvider from "./layout/theme";
+import Header from "./layout/header";
 
-export interface HelloWorldProps {
-  userName: string;
-  lang: string;
-}
-export const App = (props: HelloWorldProps) => (
-  <h1>
-    <SketchField tool={"pencil"}/>
-    Hi {props.userName} from React! Welcome to {props.lang}!
-  </h1>
-);
+/**
+ * Export a simple showcase application to demonstrate React SketchField
+ * capabilities
+ */
+export const App = (): JSX.Element => {
+  return (
+    <ThemeProvider>
+      <Grid container spacing={1}>
+        <Grid item xs={12}>
+          <Header/>
+        </Grid>
+        <Grid item xs={12} sm={12} md={8} lg={7}>
+          SketchCanvas
+        </Grid>
+        <Grid item xs={12} sm={12} md={4} lg={5}>
+          SketchTools
+        </Grid>
+      </Grid>
+    </ThemeProvider>
+  );
+};

@@ -10,11 +10,8 @@
     "composite": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "typeRoots": [
-      "./types",
-      "node_modules/@types"
-    ],
-    "lib": [ "es2015", "dom" ],
+    "typeRoots": ["./types", "node_modules/@types"],
+    "lib": ["es2015", "dom"]
   },
   "exclude": ["dist", "node_modules", "types"]
 }

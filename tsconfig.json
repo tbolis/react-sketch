@@ -33,6 +33,6 @@
     "strictNullChecks": true /* Enable strict null checks. */,
     "allowJs": true /* Allow javascript files to be compiled. */
   },
-  "exclude": ["lib", "node_modules", "types"],
+  "exclude": ["lib", "node_modules", "types", "examples"],
   "include": ["packages/**/*.tsx"]
 }
