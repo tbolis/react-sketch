@@ -3,6 +3,8 @@ import * as React from "react";
 import Grid from "@material-ui/core/Grid";
 import ThemeProvider from "./layout/theme";
 import Header from "./layout/header";
+import SketchCanvas from "./layout/canvas";
+import SketchTools from "./layout/tools";
 
 /**
  * Export a simple showcase application to demonstrate React SketchField
@@ -13,13 +15,13 @@ export const App = (): JSX.Element => {
     <ThemeProvider>
       <Grid container spacing={1}>
         <Grid item xs={12}>
-          <Header/>
+          <Header />
         </Grid>
         <Grid item xs={12} sm={12} md={8} lg={7}>
-          SketchCanvas
+          <SketchCanvas />
         </Grid>
         <Grid item xs={12} sm={12} md={4} lg={5}>
-          SketchTools
+          <SketchTools />
         </Grid>
       </Grid>
     </ThemeProvider>

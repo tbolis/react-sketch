@@ -1,7 +1,23 @@
 import * as React from "react";
 import { PureComponent } from "react";
 import PropTypes from "prop-types";
-import { SketchProperties, SketchState } from "./types";
+import * as CSS from "csstype";
+
+interface SketchProperties {
+  className?: string;
+  style?: CSS.Properties;
+  height?: number;
+  width?: number;
+  tool: string;
+  lineColor?: string;
+}
+
+interface SketchState {
+  action: boolean;
+}
+
+export { SketchState };
+export { SketchProperties };
 
 /**
  * Sketch Tool based on FabricJS for React Applications

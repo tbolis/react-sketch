@@ -25,6 +25,6 @@ const Header = (): JSX.Element => {
       </Toolbar>
     </AppBar>
   );
-}
+};
 
 export default Header;
