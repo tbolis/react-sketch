@@ -1,7 +1,9 @@
 import * as React from "react";
-import { PureComponent } from "react";
-import PropTypes from "prop-types";
 import * as CSS from "csstype";
+import { fabric } from "fabric";
+import PropTypes from "prop-types";
+import { PureComponent } from "react";
+import { FabricCanvasTool, initialize_tool } from "./tools";
 
 interface SketchProperties {
   className?: string;
@@ -23,16 +25,21 @@ export { SketchProperties };
  * Sketch Tool based on FabricJS for React Applications
  */
 class SketchField extends PureComponent<SketchProperties, SketchState> {
-  private canvas: HTMLCanvasElement | null;
-  private container: HTMLDivElement | null;
+  private canvas: fabric.Canvas | null;
+  private canvasEl: HTMLCanvasElement | null;
+  private containerEl: HTMLDivElement | null;
+  private tool: any | null;
 
   constructor(props: SketchProperties) {
     super(props);
     this.canvas = null;
-    this.container = null;
+    this.canvasEl = null;
+    this.containerEl = null;
+    this.tool = null;
   }
 
   static propTypes = {
+    tool: PropTypes.string,
     lineColor: PropTypes.string,
   };
 
@@ -42,6 +49,12 @@ class SketchField extends PureComponent<SketchProperties, SketchState> {
 
   state = {
     action: true,
+  };
+
+  componentDidMount = (): void => {
+    const { tool } = this.props;
+    this.canvas = new fabric.Canvas(this.canvasEl);
+    this.tool = initialize_tool(this.canvas, this.props, tool);
   };
 
   render = (): JSX.Element => {
@@ -57,10 +70,10 @@ class SketchField extends PureComponent<SketchProperties, SketchState> {
     return (
       <div
         className={className}
-        // style={canvasDivStyle}
-        ref={(c) => (this.container = c)}
+        style={canvasDivStyle}
+        ref={(c) => (this.containerEl = c)}
       >
-        <canvas ref={(c) => (this.canvas = c)}>
+        <canvas ref={(c) => (this.canvasEl = c)}>
           Sorry, Canvas HTML5 element is not supported by your browser :(
         </canvas>
       </div>

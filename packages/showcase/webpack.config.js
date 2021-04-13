@@ -19,6 +19,7 @@ module.exports = {
     stats: { colors: true },
     port: port,
   },
+  devtool: "source-map",
   module: {
     rules: [
       {

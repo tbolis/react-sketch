@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "csstype": "^3.0.7",
+    "fabric": "^4.4.0",
     "prop-types": "^15.6.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
@@ -36,6 +37,7 @@
   "devDependencies": {
     "@babel/preset-react": "^7.13.13",
     "@babel/preset-typescript": "^7.13.0",
+    "@types/fabric": "^4.2.5",
     "@types/node": "^14.14.37",
     "clean-webpack-plugin": "^3.0.0",
     "concurrently": "^6.0.1",
