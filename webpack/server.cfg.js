@@ -47,8 +47,7 @@ module.exports = {
     new NoEmitOnErrorsPlugin(),
     new HtmlWebpackPlugin({
       chunks: ["examples"],
-      description:
-        "Sketch Component for React applications, backed-up by fabricjs",
+      description: "Sketch Component for React applications, backed-up by fabricjs",
       inject: "body",
       filename: "index.html",
       keywords: ["react", "canvas", "sketch", "fabricjs", "fabric.js"],

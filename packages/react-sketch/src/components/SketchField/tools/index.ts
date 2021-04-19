@@ -1,9 +1,9 @@
 /*eslint @typescript-eslint/no-unused-vars: 0,@typescript-eslint/no-empty-function: 0*/
 
 import { fabric } from "fabric";
-import { SketchProperties } from "../SketchField";
 import { IEvent } from "fabric/fabric-impl";
 import { Pencil } from "./Pencil";
+import { SketchProperties } from "../../../types";
 
 /**
  * "Abstract" like base class for a Canvas tool

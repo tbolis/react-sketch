@@ -8,10 +8,7 @@
     }
   },
   "plugins": ["@typescript-eslint", "react-hooks", "prettier"],
-  "extends": [
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
+  "extends": ["plugin:react/recommended", "plugin:@typescript-eslint/recommended"],
   "rules": {
     "@typescript-eslint/no-var-requires": 0,
     "react-hooks/rules-of-hooks": "error",

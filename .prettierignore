@@ -13,3 +13,4 @@ LICENSE
 .npmignore
 .gitignore
 *.log
+*.ico

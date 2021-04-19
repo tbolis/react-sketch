@@ -43,13 +43,13 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      description:
-        "Sketch Component for React applications, backed-up by fabricjs",
+      title: "React-Sketch Showcase",
+      description: "Sketch Component for React applications, backed-up by fabricjs",
+      keywords: ["react", "canvas", "sketch", "fabricjs", "fabric.js"],
       inject: "body",
       filename: "index.html",
-      keywords: ["react", "canvas", "sketch", "fabricjs", "fabric.js"],
-      template: "./src/base.html",
-      title: "React-Sketch Showcase",
+      template: "./public/base.html",
+      favicon: "./public/favicon.ico",
     }),
   ],
 };

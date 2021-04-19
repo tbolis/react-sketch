@@ -5,7 +5,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
 
-import Logo from "../static/react-sketch-logo.jpg";
+import Logo from "./react-sketch-logo.jpg";
 
 const useStyles = makeStyles((theme) => ({
   avatar: {
@@ -27,4 +27,5 @@ const Header = (): JSX.Element => {
   );
 };
 
+export { Header };
 export default Header;

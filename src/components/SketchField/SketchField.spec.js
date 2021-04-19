@@ -6,12 +6,7 @@ import React from "react";
 import { mount } from "enzyme";
 import SketchField from "./index";
 
-function objectFromDrag(
-  canvas,
-  from = { x: 0, y: 0 },
-  to = { x: 10, y: 10 },
-  id
-) {
+function objectFromDrag(canvas, from = { x: 0, y: 0 }, to = { x: 10, y: 10 }, id) {
   function MouseEventPositionGenerator(pos = { x: 0, y: 0 }) {
     const eventX = ["x", "pageX", "screenX", "clientX", "offsetX"];
     const eventY = ["y", "pageY", "screenY", "clientY", "offsetY"];
