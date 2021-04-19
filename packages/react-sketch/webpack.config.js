@@ -19,6 +19,16 @@ module.exports = {
     libraryTarget: "umd",
     path: path.resolve(__dirname, "dist"),
   },
+  externals: {
+    jsdom: "null",
+    canvas: "undefined",
+    "canvas-prebuilt": "undefined",
+    xmldom: JSON.stringify({ DOMParser: null }),
+    "jsdom/lib/jsdom/utils": JSON.stringify({ Canvas: null }),
+    "jsdom/lib/jsdom/living/generated/utils": JSON.stringify({
+      implForWrapper: null,
+    }),
+  },
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
   },
