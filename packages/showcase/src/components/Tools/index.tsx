@@ -1,8 +1,8 @@
 import * as React from "react";
 import ToolSelector from "./ToolSelector";
-
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core";
+import { Config } from "../../stores/config";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SketchTools = (): JSX.Element => {
+const SketchTools = (props: Config): JSX.Element => {
   const classes = useStyles();
 
   const [tool, setTool] = React.useState("pencil");
@@ -32,6 +32,7 @@ const SketchTools = (): JSX.Element => {
   return (
     <Paper className={classes.paper}>
       <ToolSelector selected={tool} onChange={handleSelectTool} />
+      <div>HELLO: {props.selectedTool}</div>
     </Paper>
   );
 };

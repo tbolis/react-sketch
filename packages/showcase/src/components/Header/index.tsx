@@ -6,6 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
 
 import Logo from "./react-sketch-logo.jpg";
+import { Config } from "../../stores/config";
 
 const useStyles = makeStyles((theme) => ({
   avatar: {
@@ -13,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Header = (): JSX.Element => {
+const Header = (props: Config): JSX.Element => {
   const classes = useStyles();
   return (
     <AppBar title="Sketch Tool" position="static">

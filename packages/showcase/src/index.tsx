@@ -1,38 +1,24 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
 import { App } from "./App";
-import { makeAutoObservable, toJS } from "mobx";
+import * as React from "react";
+import { configure } from "mobx";
+import * as ReactDOM from "react-dom";
 import { observer } from "mobx-react-lite";
 import { createContext, useContext } from "react";
-import { configure } from "mobx";
+import { CONFIG, ConfigStore } from "./stores/config";
 
 configure({
   enforceActions: "never",
 });
 
-export class ConfigOptions {
-  selectedTool = "pencil";
-
-  constructor() {
-    makeAutoObservable(this);
-  }
-}
-
-const options = new ConfigOptions();
-const ShowcaseContext = createContext<ConfigOptions>(options);
+const ShowcaseContext = createContext<ConfigStore>(CONFIG);
 
 const AppView = observer(() => {
   const options = useContext(ShowcaseContext);
-  return <App selectedTool={options.selectedTool} />;
+  return <App {...options} />;
 });
 
-setInterval(() => {
-  console.error(`${options.selectedTool}`);
-  options.selectedTool = options.selectedTool + " pencil";
-}, 1000);
-
 ReactDOM.render(
-  <ShowcaseContext.Provider value={options}>
+  <ShowcaseContext.Provider value={CONFIG}>
     <AppView />
   </ShowcaseContext.Provider>,
   document.getElementById("container")
