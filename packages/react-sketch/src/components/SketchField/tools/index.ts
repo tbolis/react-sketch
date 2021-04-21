@@ -3,7 +3,7 @@
 import { fabric } from "fabric";
 import { IEvent } from "fabric/fabric-impl";
 import { Pencil } from "./Pencil";
-import { SketchProperties } from "../../../types";
+import { SketchProperties } from "../SketchField";
 
 /**
  * "Abstract" like base class for a Canvas tool

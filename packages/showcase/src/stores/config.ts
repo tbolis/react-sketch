@@ -4,8 +4,8 @@ export interface Config {
   selectedTool: string;
 }
 
-export class ConfigStore {
-  selectedTool = "pencil";
+export class ConfigStore implements Config {
+  public selectedTool = "pencil";
 
   constructor() {
     makeAutoObservable(this);

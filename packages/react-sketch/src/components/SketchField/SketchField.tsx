@@ -5,7 +5,21 @@ import { PureComponent } from "react";
 import { FabricCanvasTool, initialize_tool } from "./tools";
 import { autoresize } from "./resize";
 import { fabric } from "fabric";
-import { SketchProperties } from "../../types";
+
+interface SketchStyle {
+  className?: string;
+  style?: CSS.Properties;
+  autoresize?: boolean;
+  height?: number;
+  width?: number;
+}
+
+interface SketchTool {
+  tool: string;
+  lineColor?: string;
+}
+
+export interface SketchProperties extends SketchTool, SketchStyle {}
 
 interface SketchState {
   action: boolean;

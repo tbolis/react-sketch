@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Track the resize of the window and update our state
  *

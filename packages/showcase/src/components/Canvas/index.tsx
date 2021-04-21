@@ -3,7 +3,7 @@ import SketchField from "react-sketch";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core";
 import { teal } from "@material-ui/core/colors";
-import { useState } from "react";
+import { Config } from "../../stores/config";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -17,17 +17,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SketchCanvas = (): JSX.Element => {
+const SketchCanvas = (props: Config): JSX.Element => {
   const classes = useStyles();
 
-  const [sketchConfig, setSketchConfig] = useState({
-    tool: "pencil",
+  const sketchConfig = {
+    tool: props.selectedTool,
     autoresize: true,
-  });
+  };
 
   return (
     <Paper className={classes.paper}>
-      <SketchField /*className={classes.sketch}*/ {...sketchConfig} />
+      <SketchField className={classes.sketch} {...sketchConfig} />
     </Paper>
   );
 };

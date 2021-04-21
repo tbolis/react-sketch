@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { fabric } from "fabric";
 
 class Line /*extends FabricCanvasTool*/ {

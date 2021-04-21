@@ -6,16 +6,19 @@ import Chip from "@material-ui/core/Chip";
 import ToggleButton from "@material-ui/lab/ToggleButton";
 import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import Typography from "@material-ui/core/Typography";
-import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
-import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
+import { Accordion, AccordionSummary, AccordionDetails } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Slider from "@material-ui/core/Slider";
 import ExposureNeg1Icon from "@material-ui/icons/ExposureNeg1";
 import ExposurePlus1Icon from "@material-ui/icons/ExposurePlus1";
 import Grid from "@material-ui/core/Grid";
 
-const ToolSelector = (props): JSX.Element => {
+interface ToolSelectorProps {
+  selected: string;
+  onChange?: (event: React.MouseEvent<HTMLElement>, value: any) => void;
+}
+
+const ToolSelector = (props: ToolSelectorProps): JSX.Element => {
   const toolset = [
     <ToggleButton key={"pencil"} value={"pencil"}>
       <PenIcon />
@@ -26,8 +29,8 @@ const ToolSelector = (props): JSX.Element => {
   ];
 
   return (
-    <ExpansionPanel>
-      <ExpansionPanelSummary
+    <Accordion>
+      <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         aria-controls="panel1a-content"
         id="panel1a-header">
@@ -40,8 +43,8 @@ const ToolSelector = (props): JSX.Element => {
           size="small"
           label={props.selected}
         />
-      </ExpansionPanelSummary>
-      <ExpansionPanelDetails style={{ display: "block" }}>
+      </AccordionSummary>
+      <AccordionDetails style={{ display: "block" }}>
         <ToggleButtonGroup
           exclusive
           size="large"
@@ -61,8 +64,8 @@ const ToolSelector = (props): JSX.Element => {
             <ExposurePlus1Icon />
           </Grid>
         </Grid>
-      </ExpansionPanelDetails>
-    </ExpansionPanel>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 

@@ -3,6 +3,7 @@ import ToolSelector from "./ToolSelector";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core";
 import { Config } from "../../stores/config";
+import { CONFIG } from "../../stores/config";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -10,29 +11,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+/**
+ * Handle the selection of the Sketch tool
+ *
+ * @param {object} event The event source of the callback.
+ * @param {any} value of the selected buttons. When `exclusive` is true
+ */
+const handleSelectTool = (event: React.MouseEvent<HTMLElement>, value: any) => {
+  CONFIG.selectedTool = value;
+};
+
 const SketchTools = (props: Config): JSX.Element => {
   const classes = useStyles();
 
-  const [tool, setTool] = React.useState("pencil");
-  const [lineColor, setLineColor] = React.useState("black");
-  const [fillColor, setFillColor] = React.useState("transparent");
-
-  const handleSelectTool = (event, tool) => {
-    tool != null && setTool(tool);
-  };
-
-  const handleLineColor = (color, event) => {
-    color != null && setLineColor(color.hex);
-  };
-
-  const handleFillColor = (color, event) => {
-    color != null && setFillColor(color.hex);
-  };
-
   return (
     <Paper className={classes.paper}>
-      <ToolSelector selected={tool} onChange={handleSelectTool} />
-      <div>HELLO: {props.selectedTool}</div>
+      <ToolSelector selected={props.selectedTool} onChange={handleSelectTool} />
     </Paper>
   );
 };
