@@ -21,7 +21,8 @@
     "url": "https://github.com/tbolis/react-sketch/issues"
   },
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build:typescript": "tsc && webpack --mode production",
     "build": "webpack --mode production",

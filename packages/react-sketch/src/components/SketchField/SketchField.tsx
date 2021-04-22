@@ -1,25 +1,10 @@
 import * as React from "react";
-import * as CSS from "csstype";
 import PropTypes from "prop-types";
 import { PureComponent } from "react";
 import { FabricCanvasTool, initialize_tool } from "./tools";
 import { autoresize } from "./resize";
 import { fabric } from "fabric";
-
-interface SketchStyle {
-  className?: string;
-  style?: CSS.Properties;
-  autoresize?: boolean;
-  height?: number;
-  width?: number;
-}
-
-interface SketchTool {
-  tool: string;
-  lineColor?: string;
-}
-
-export interface SketchProperties extends SketchTool, SketchStyle {}
+import { SketchProperties } from "../../types";
 
 interface SketchState {
   action: boolean;
