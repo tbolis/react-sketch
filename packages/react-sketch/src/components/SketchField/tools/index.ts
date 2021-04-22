@@ -2,7 +2,6 @@
 
 import { fabric } from "fabric";
 import { IEvent } from "fabric/fabric-impl";
-import { Pencil } from "./Pencil";
 import { SketchProperties } from "../../../types";
 
 /**
@@ -28,11 +27,4 @@ export abstract class FabricCanvasTool {
   get canvas(): fabric.Canvas {
     return this._canvas;
   }
-}
-
-/**
- * "Abstract" like base class for a Canvas tool
- */
-export abstract class FabricCanvasTool2 {
-  protected constructor(canvas: fabric.Canvas) {}
 }

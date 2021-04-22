@@ -11,6 +11,7 @@ interface SketchStyle {
 interface SketchTool {
   tool: string;
   lineColor?: string;
+  lineWidth?: number;
 }
 
 export interface SketchState {

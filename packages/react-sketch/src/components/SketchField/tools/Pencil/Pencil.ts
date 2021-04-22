@@ -9,7 +9,9 @@ export class Pencil extends FabricCanvasTool {
 
   configureCanvas(config: SketchProperties): void {
     this.canvas.isDrawingMode = true;
-    this.canvas.freeDrawingBrush.width = 3;
-    this.canvas.freeDrawingBrush.color = "black";
+    this.canvas.freeDrawingBrush.width = config.lineWidth ? config.lineWidth : 1;
+    this.canvas.freeDrawingBrush.color = config.lineColor
+      ? config.lineColor
+      : "black";
   }
 }
