@@ -9,6 +9,12 @@ import { SketchProperties } from "../../../types";
  * "Abstract" like base class for a Canvas tool
  */
 export abstract class FabricCanvasTool {
+  private readonly _canvas: fabric.Canvas;
+
+  protected constructor(canvas: fabric.Canvas) {
+    this._canvas = canvas;
+  }
+
   abstract configureCanvas(props: SketchProperties): void;
 
   doMouseUp(event: IEvent): void {}
@@ -18,14 +24,15 @@ export abstract class FabricCanvasTool {
   doMouseMove(event: IEvent): void {}
 
   doMouseOut(event: IEvent): void {}
+
+  get canvas(): fabric.Canvas {
+    return this._canvas;
+  }
 }
 
-export const initialize_tool = (
-  canvas: fabric.Canvas,
-  props: SketchProperties,
-  tool: string
-): Pencil => {
-  const pencil: Pencil = new Pencil(canvas);
-  pencil.configureCanvas(props);
-  return pencil;
-};
+/**
+ * "Abstract" like base class for a Canvas tool
+ */
+export abstract class FabricCanvasTool2 {
+  protected constructor(canvas: fabric.Canvas) {}
+}

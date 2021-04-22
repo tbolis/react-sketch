@@ -1,13 +1,13 @@
 import { fabric } from "fabric";
+import { FabricCanvasTool } from "../index";
+import { SketchProperties } from "../../../../types";
 
-export class Pencil {
-  private canvas: fabric.Canvas;
-
+export class Pencil extends FabricCanvasTool {
   constructor(canvas: fabric.Canvas) {
-    this.canvas = canvas;
+    super(canvas);
   }
 
-  configureCanvas(config: any): void {
+  configureCanvas(config: SketchProperties): void {
     this.canvas.isDrawingMode = true;
     this.canvas.freeDrawingBrush.width = 3;
     this.canvas.freeDrawingBrush.color = "black";

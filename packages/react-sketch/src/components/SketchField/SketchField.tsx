@@ -1,14 +1,10 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import { PureComponent } from "react";
-import { FabricCanvasTool, initialize_tool } from "./tools";
 import { autoresize } from "./resize";
 import { fabric } from "fabric";
-import { SketchProperties } from "../../types";
-
-interface SketchState {
-  action: boolean;
-}
+import { SketchProperties, SketchState } from "../../types";
+import { initialize_tool } from "./tools/factory";
 
 /**
  * Sketch Tool based on FabricJS for React Applications

@@ -13,6 +13,10 @@ interface SketchTool {
   lineColor?: string;
 }
 
+export interface SketchState {
+  action: boolean;
+}
+
 export interface SketchProperties extends SketchTool, SketchStyle {}
 
 // declare module "react-sketch123123" {
