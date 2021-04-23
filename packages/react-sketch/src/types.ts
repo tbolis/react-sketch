@@ -1,4 +1,20 @@
 import * as CSS from "csstype";
+import PropTypes from "prop-types";
+
+/**
+ * Enumeration which declares the various tools available for
+ * SketchField
+ */
+export enum Tool {
+  CIRCLE = "circle",
+  LINE = "line",
+  ARROW = "arrow",
+  PENCIL = "pencil",
+  RECTANGLE = "rectangle",
+  SELECT = "select",
+  PAN = "pan",
+  HIGHLIGHTER = "highlighter",
+}
 
 interface SketchStyle {
   className?: string;
@@ -9,9 +25,11 @@ interface SketchStyle {
 }
 
 interface SketchTool {
-  tool: string;
-  lineColor?: string;
-  lineWidth?: number;
+  tool: Tool | string; // tool type
+  lineColor?: string; // the color of the line
+  lineWidth?: number; // The width of the line
+  fillColor?: string; // the fill color of the shape when applicable
+  backgroundColor?: string; // the background color of the sketch
 }
 
 export interface SketchState {
@@ -23,36 +41,11 @@ export interface SketchProperties extends SketchTool, SketchStyle {}
 // declare module "react-sketch123123" {
 //   import * as React from "react";
 //
-//   export const Tools: {
-//     Circle: string;
-//     Line: string;
-//     Arrow: string;
-//     Pencil: string;
-//     Rectangle: string;
-//     RectangleLabel: string;
-//     Select: string;
-//     Pan: string;
-//     DefaultTool: string;
-//   } = {
-//     Circle: "circle",
-//     Line: "line",
-//     Arrow: "arrow",
-//     Pencil: "pencil",
-//     Rectangle: "rectangle",
-//     RectangleLabel: "rectangle-label",
-//     Select: "select",
-//     Pan: "pan",
-//     DefaultTool: "default-tool",
-//   };
 //   export class SketchField extends React.PureComponent<{
 //     // the color of the line
 //     lineColor?: string;
 //     // The width of the line
 //     lineWidth?: number;
-//     // the fill color of the shape when applicable
-//     fillColor?: string;
-//     // the background color of the sketch
-//     backgroundColor?: string;
 //     // the opacity of the object
 //     opacity?: number;
 //     // number of undo/redo steps to maintain

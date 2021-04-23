@@ -4,7 +4,7 @@ import { PureComponent } from "react";
 import { autoresize } from "./resize";
 import { fabric } from "fabric";
 import { SketchProperties, SketchState } from "../../types";
-import { initialize_tool } from "./tools/factory";
+import { create_tool } from "./tools/factory";
 
 /**
  * Sketch Tool based on FabricJS for React Applications
@@ -45,9 +45,8 @@ class SketchField extends PureComponent<SketchProperties, SketchState> {
   };
 
   componentDidMount = (): void => {
-    const { tool } = this.props;
     this.canvas = new fabric.Canvas(this.canvasEl);
-    this.tool = initialize_tool(this.canvas, this.props, tool);
+    this.tool = create_tool(this.canvas, this.props);
     this.containerEl && autoresize(this.canvas, this.containerEl);
     window && window.addEventListener("resize", this._resize_listener);
   };

@@ -1,5 +1,5 @@
 import * as React from "react";
-import SketchField from "react-sketch";
+import { SketchField, Types } from "react-sketch";
 import Paper from "@material-ui/core/Paper";
 import { makeStyles } from "@material-ui/core";
 import { teal } from "@material-ui/core/colors";
@@ -20,14 +20,15 @@ const useStyles = makeStyles((theme) => ({
 const SketchCanvas = (props: Config): JSX.Element => {
   const classes = useStyles();
 
-  const sketchConfig = {
+  const properties: Types.SketchProperties = {
     tool: props.selectedTool,
+    //toolOptions: ,
     autoresize: true,
   };
 
   return (
     <Paper className={classes.paper}>
-      <SketchField className={classes.sketch} {...sketchConfig} />
+      <SketchField className={classes.sketch} {...properties} />
     </Paper>
   );
 };

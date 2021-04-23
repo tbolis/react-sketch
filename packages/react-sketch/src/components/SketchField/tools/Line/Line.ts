@@ -1,37 +1,34 @@
-// @ts-nocheck
-
 import { fabric } from "fabric";
+import { FabricCanvasTool } from "../index";
+import { SketchProperties } from "../../../../types";
 
-class Line /*extends FabricCanvasTool*/ {
-  private canvas: fabric.Canvas;
-  private _width: number;
-  private _color: string;
-  private line: Line | null;
+export class Line extends FabricCanvasTool {
+  private width?: number;
+  private color?: string;
   private isDown: boolean;
+  private line: fabric.Line | null;
 
   constructor(canvas: fabric.Canvas) {
-    this.canvas = canvas;
-    this._width = 3;
-    this._color = "blue";
-    this.line = null;
+    super(canvas);
     this.isDown = false;
+    this.line = null;
   }
 
-  configureCanvas(config) {
+  configureCanvas(props: SketchProperties): void {
     this.canvas.isDrawingMode = this.canvas.selection = false;
     this.canvas.forEachObject((o) => (o.selectable = o.evented = false));
-    this._width = 1;
-    this._color = "blue";
+    this.width = props.lineWidth;
+    this.color = props.lineColor;
   }
 
-  doMouseDown(o) {
+  doMouseDown(event: fabric.IEvent): void {
     this.isDown = true;
-    const pointer = this.canvas.getPointer(o.e);
+    const pointer = this.canvas.getPointer(event.e);
     const points = [pointer.x, pointer.y, pointer.x, pointer.y];
     this.line = new fabric.Line(points, {
-      strokeWidth: this._width,
-      fill: this._color,
-      stroke: this._color,
+      strokeWidth: this.width,
+      fill: this.color,
+      stroke: this.color,
       originX: "center",
       originY: "center",
       selectable: false,
@@ -40,21 +37,19 @@ class Line /*extends FabricCanvasTool*/ {
     this.canvas.add(this.line);
   }
 
-  doMouseMove(o) {
+  doMouseMove(event: fabric.IEvent): void {
     if (!this.isDown) return;
-    const pointer = this.canvas.getPointer(o.e);
-    this.line.set({ x2: pointer.x, y2: pointer.y });
-    this.line.setCoords();
+    const pointer = this.canvas.getPointer(event.e);
+    this.line?.set({ x2: pointer.x, y2: pointer.y });
+    this.line?.setCoords();
     this.canvas.renderAll();
   }
 
-  doMouseUp(o) {
+  doMouseUp(event: fabric.IEvent): void {
     this.isDown = false;
   }
 
-  doMouseOut(o) {
+  doMouseOut(event: fabric.IEvent): void {
     this.isDown = false;
   }
 }
-
-export default Line;
