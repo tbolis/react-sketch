@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { FabricCanvasTool } from "../index";
-import { SketchProperties } from "../../../../types";
+import { SketchProperties, Tool } from "../../../../types";
 
 export class Line extends FabricCanvasTool {
   private width?: number;
@@ -17,8 +17,8 @@ export class Line extends FabricCanvasTool {
   configureCanvas(props: SketchProperties): void {
     this.canvas.isDrawingMode = this.canvas.selection = false;
     this.canvas.forEachObject((o) => (o.selectable = o.evented = false));
-    this.width = props.lineWidth;
-    this.color = props.lineColor;
+    this.width = props.lineWidth ? props.lineWidth : 1;
+    this.color = props.lineColor ? props.lineColor : "black";
   }
 
   doMouseDown(event: fabric.IEvent): void {
@@ -51,5 +51,9 @@ export class Line extends FabricCanvasTool {
 
   doMouseOut(event: fabric.IEvent): void {
     this.isDown = false;
+  }
+
+  type(): Tool {
+    return Tool.LINE;
   }
 }

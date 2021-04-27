@@ -2,7 +2,18 @@
 
 import { fabric } from "fabric";
 import { IEvent } from "fabric/fabric-impl";
-import { SketchProperties } from "../../../types";
+import { SketchProperties, Tool } from "../../../types";
+import { EventInput } from "../events";
+
+/**
+ * Interface to support canvas events
+ */
+export interface CanvasEventAware {
+  onMouseUp(input: EventInput): void;
+  onMouseDown(input: EventInput): void;
+  onMouseMove(input: EventInput): void;
+  onMouseOut(input: EventInput): void;
+}
 
 /**
  * "Abstract" like base class for a Canvas tool
@@ -13,6 +24,8 @@ export abstract class FabricCanvasTool {
   protected constructor(canvas: fabric.Canvas) {
     this._canvas = canvas;
   }
+
+  abstract type(): Tool;
 
   abstract configureCanvas(props: SketchProperties): void;
 

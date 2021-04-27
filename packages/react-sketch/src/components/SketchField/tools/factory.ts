@@ -15,9 +15,7 @@ export const create_tool = (
   canvas: fabric.Canvas,
   props: SketchProperties
 ): FabricCanvasTool => {
-  console.log(props);
   const tool = props.tool;
-  console.log(tool);
   let toolInstance: FabricCanvasTool | null = null;
 
   switch (tool) {

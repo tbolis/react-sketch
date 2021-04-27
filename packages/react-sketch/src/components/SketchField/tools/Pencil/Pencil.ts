@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
 import { FabricCanvasTool } from "../index";
-import { SketchProperties } from "../../../../types";
+import { SketchProperties, Tool } from "../../../../types";
 
 export class Pencil extends FabricCanvasTool {
   constructor(canvas: fabric.Canvas) {
@@ -13,5 +13,9 @@ export class Pencil extends FabricCanvasTool {
     this.canvas.freeDrawingBrush.color = config.lineColor
       ? config.lineColor
       : "black";
+  }
+
+  type(): Tool {
+    return Tool.PENCIL;
   }
 }
