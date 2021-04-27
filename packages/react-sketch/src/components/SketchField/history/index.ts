@@ -1,11 +1,12 @@
 // @ts-nocheck
 
 import { EventInput } from "../events";
+import { AbstractEventAware, CanvasEventAware } from "../tools";
 
 /**
  * Maintains the history of an object
  */
-export class UndoHistory {
+export class UndoHistory extends AbstractEventAware {
   constructor(undoLimit = 10, debug = false) {
     this.undoLimit = undoLimit;
     this.undoList = [];
@@ -137,8 +138,5 @@ export class UndoHistory {
 
   public onObjectAdded({ event, tool, props, state }: EventInput): void {
     console.log("history added");
-  }
-  public onObjectddd2({ event, tool, props, state }: EventInput): void {
-    console.log("history added2");
   }
 }

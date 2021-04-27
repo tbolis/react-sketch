@@ -15,6 +15,16 @@ export interface CanvasEventAware {
   onMouseOut(input: EventInput): void;
 }
 
+export abstract class AbstractEventAware implements CanvasEventAware {
+  onMouseDown(input: EventInput): void {}
+
+  onMouseMove(input: EventInput): void {}
+
+  onMouseOut(input: EventInput): void {}
+
+  onMouseUp(input: EventInput): void {}
+}
+
 /**
  * "Abstract" like base class for a Canvas tool
  */

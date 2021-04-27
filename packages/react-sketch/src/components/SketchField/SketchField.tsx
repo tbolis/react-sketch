@@ -6,7 +6,7 @@ import { fabric } from "fabric";
 import { SketchProperties, SketchState } from "../../types";
 import { create_tool } from "./tools/factory";
 import { EventCallback, FabricCanvasEventsManager } from "./events";
-import { FabricCanvasTool } from "./tools";
+import { CanvasEventAware, FabricCanvasTool } from "./tools";
 import { uuid4 } from "../../utils";
 import { UndoHistory } from "./history";
 import * as CanvasEvents from "./events";
@@ -47,32 +47,30 @@ class SketchField extends PureComponent<SketchProperties, SketchState> {
     this.containerEl && autoresize(this.canvas, this.containerEl);
   };
 
+  // Helper declaration for all canvas events
+  private on = (name: string, callback: EventCallback): void => {
+    this.canvas.on(name, (event: fabric.IEvent) => {
+      callback({
+        event: event,
+        tool: this.tool,
+        props: this.props,
+        state: this.state,
+      });
+    });
+  };
+
   /**
    * Bind Canvas events with Component
    */
-  private _bind_canvas_events(): void {
-    const eventsManager = new FabricCanvasEventsManager(this.canvas, this);
-
-    // Helper declaration for all events
-    const on = (name: string, callback: EventCallback) => {
-      this.canvas.on(name, (event: fabric.IEvent) => {
-        callback({
-          event: event,
-          tool: this.tool,
-          props: this.props,
-          state: this.state,
-        });
-      });
-    };
-
+  private _bind_canvas_events(eventAware: CanvasEventAware): void {
     // Fabric Events
     // on("object:moved", eventsManager.onObjectMoved);
     // canvas.on("object:modified", (e) => this.callEvent(e, this._onObjectModified));
     // canvas.on("object:removed", (e) => this.callEvent(e, this._onObjectRemoved));
-    on("mouse:up", eventsManager.onMouseUp);
-    on("mouse:down", eventsManager.onMouseDown);
-    on("mouse:move", eventsManager.onMouseMove);
-    on("mouse:out", eventsManager.onMouseOut);
+    this.on("mouse:up", eventAware.onMouseUp);
+    this.on("mouse:down", eventAware.onMouseDown);
+    this.on("mouse:move", eventAware.onMouseMove);
+    this.on("mouse:out", eventAware.onMouseOut);
     // canvas.on("object:moving", (e) => this.callEvent(e, this._onObjectMoving));
     // canvas.on("object:scaling", (e) => this.callEvent(e, this._onObjectScaling));
     // canvas.on("object:rotating", (e) => this.callEvent(e, this._onObjectRotating));
@@ -88,7 +86,12 @@ class SketchField extends PureComponent<SketchProperties, SketchState> {
     this.tool = create_tool(this.canvas, this.props);
     this.containerEl && autoresize(this.canvas, this.containerEl);
     window && window.addEventListener("resize", this._resize_listener);
-    this._bind_canvas_events();
+
+    const eventsManager = new FabricCanvasEventsManager(this.canvas, this);
+    this._bind_canvas_events(eventsManager);
+
+    const history = new UndoHistory(10);
+    this._bind_canvas_events(history);
   };
 
   componentDidUpdate(
