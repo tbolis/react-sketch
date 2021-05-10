@@ -36,6 +36,16 @@ export default function () {
   return (
     <Paper className={classes.paper}>
       <ToolSelector selected={tool} onChange={handleSelectTool} />
+      <ColorSelector
+        lineColor={lineColor}
+        fillColor={fillColor}
+        onChangeLineColor={handleLineColor}
+        onChangeFillColor={handleFillColor}
+      />
+      <Text />
+      <Background />
+      <CanvasControls />
+      <ImageControls />
     </Paper>
   );
 }

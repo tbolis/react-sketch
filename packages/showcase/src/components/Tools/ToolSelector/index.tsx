@@ -8,10 +8,6 @@ import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
 import Typography from "@material-ui/core/Typography";
 import { Accordion, AccordionSummary, AccordionDetails } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import Slider from "@material-ui/core/Slider";
-import ExposureNeg1Icon from "@material-ui/icons/ExposureNeg1";
-import ExposurePlus1Icon from "@material-ui/icons/ExposurePlus1";
-import Grid from "@material-ui/core/Grid";
 
 interface ToolSelectorProps {
   selected: string;
@@ -53,17 +49,6 @@ const ToolSelector = (props: ToolSelectorProps): JSX.Element => {
           onChange={props.onChange}>
           {toolset}
         </ToggleButtonGroup>
-        <Grid container spacing={1}>
-          <Grid item>
-            <ExposureNeg1Icon />
-          </Grid>
-          <Grid item xs>
-            <Slider />
-          </Grid>
-          <Grid item>
-            <ExposurePlus1Icon />
-          </Grid>
-        </Grid>
       </AccordionDetails>
     </Accordion>
   );

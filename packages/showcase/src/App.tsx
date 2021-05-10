@@ -8,8 +8,10 @@ import { Header, SketchCanvas, SketchTools } from "./components";
 
 const useStyles = makeStyles((theme) => ({
   grid: {
-    padding: theme.spacing(1),
     color: theme.palette.text.secondary,
+  },
+  item: {
+    padding: theme.spacing(1.2),
   },
 }));
 
@@ -22,14 +24,14 @@ export const App = (props: Config): JSX.Element => {
 
   return (
     <ThemeProvider>
-      <Grid container spacing={1} className={classes.grid}>
+      <Grid container className={classes.grid}>
         <Grid item xs={12}>
           <Header {...props} />
         </Grid>
-        <Grid item xs={12} sm={12} md={8} lg={7}>
+        <Grid item xs={12} sm={12} md={8} lg={7} className={classes.item}>
           <SketchCanvas {...props} />
         </Grid>
-        <Grid item xs={12} sm={12} md={4} lg={5}>
+        <Grid item xs={12} sm={12} md={4} lg={5} className={classes.item}>
           <SketchTools {...props} />
         </Grid>
       </Grid>

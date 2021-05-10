@@ -8,6 +8,7 @@ import { AbstractEventAware, CanvasEventAware } from "../tools";
  */
 export class UndoHistory extends AbstractEventAware {
   constructor(undoLimit = 10, debug = false) {
+    super();
     this.undoLimit = undoLimit;
     this.undoList = [];
     this.redoList = [];

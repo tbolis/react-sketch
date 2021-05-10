@@ -1,8 +1,7 @@
 import { fabric } from "fabric";
 import { PureComponent } from "react";
 import { SketchProperties, SketchState } from "../../types";
-import { UndoHistory } from "./history";
-import { CanvasEventAware, FabricCanvasTool } from "./tools";
+import { AbstractEventAware, FabricCanvasTool } from "./tools";
 
 export interface EventInput {
   event: fabric.IEvent;
@@ -17,7 +16,7 @@ export interface EventCallback {
 /**
  * Canvas Events Manager Class
  */
-export class FabricCanvasEventsManager implements CanvasEventAware {
+export class FabricCanvasEventsManager extends AbstractEventAware {
   private canvas: fabric.Canvas;
   private sketch: PureComponent<SketchProperties, SketchState>;
 
@@ -25,6 +24,7 @@ export class FabricCanvasEventsManager implements CanvasEventAware {
     canvas: fabric.Canvas,
     sketch: PureComponent<SketchProperties, SketchState>
   ) {
+    super();
     this.canvas = canvas;
     this.sketch = sketch;
   }

@@ -22,7 +22,7 @@ const SketchCanvas = (props: Config): JSX.Element => {
 
   const properties: Types.SketchProperties = {
     tool: props.selectedTool,
-    //toolOptions: ,
+    lineWidth: props.lineWidth,
     autoresize: true,
   };
 
