@@ -9,8 +9,8 @@
 import { fabric } from "fabric";
 
 export const autoresize = (
-  canvas: fabric.Canvas,
-  container: HTMLDivElement
+  canvas: fabric.Canvas | null,
+  container: HTMLDivElement | null
 ): void => {
   const { offsetWidth, clientHeight } = container;
   const prevWidth = canvas.getWidth();

@@ -14,7 +14,7 @@ import { UndoHistory } from "./history";
  * Sketch Tool based on FabricJS for React Applications
  */
 class SketchField extends PureComponent<SketchProperties, SketchState> {
-  private canvas!: fabric.Canvas;
+  private canvas!: fabric.Canvas | null;
   private canvasEl!: HTMLCanvasElement | null;
   private containerEl!: HTMLDivElement | null;
   private tool!: FabricCanvasTool;
@@ -23,15 +23,10 @@ class SketchField extends PureComponent<SketchProperties, SketchState> {
     super(props);
   }
 
-  // TODO: probably not needed since we use typescript
-  static propTypes = {
-    tool: PropTypes.string,
-    lineWidth: PropTypes.number,
-    lineColor: PropTypes.string,
-  };
-
-  static defaultProps = {
+  static defaultProps: SketchProperties = {
+    tool: "pencil",
     lineColor: "black",
+    lineWidth: 1,
   };
 
   state = {
@@ -43,7 +38,7 @@ class SketchField extends PureComponent<SketchProperties, SketchState> {
    * @param event the UIEvent of resize event
    */
   private _resize_listener = (event: UIEvent): void => {
-    this.containerEl && autoresize(this.canvas, this.containerEl);
+    autoresize(this.canvas, this.containerEl);
   };
 
   /**
@@ -52,7 +47,7 @@ class SketchField extends PureComponent<SketchProperties, SketchState> {
   private _bind_canvas_events(eventAware: CanvasEventAware): void {
     // Helper declaration for all canvas events
     const on = (name: string, callback: EventCallback): void => {
-      this.canvas.on(name, (event: fabric.IEvent) => {
+      this.canvas?.on(name, (event: fabric.IEvent) => {
         callback({
           event: event,
           tool: this.tool,
@@ -96,8 +91,6 @@ class SketchField extends PureComponent<SketchProperties, SketchState> {
   ): void {
     const props: Readonly<SketchProperties> = this.props;
     const state: Readonly<SketchState> = this.state;
-
-    console.log("how we refresh", props.lineWidth);
 
     if (prevProps.tool !== props.tool) {
       if (this.canvas) {
