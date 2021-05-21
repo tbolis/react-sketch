@@ -1,22 +1,22 @@
 /*eslint no-unused-vars: 0*/
+// @ts-nocheck
 
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import History from "./history";
-import { uuid4 } from "./utils";
-import Arrow from "./tools/Arrow";
-import Tool from "./tools";
-import DefaultTool from "./tools/defaul-tool";
-import Select from "./tools/Select";
-import Pencil from "./tools/Pencil";
-import Line from "./tools/Line";
-import Rectangle from "./tools/Rectangle";
-import RectangleLabel from "./tools/Rectangle/rectangle-label";
-import Circle from "./tools/Circle";
-import Pan from "./tools/Pan";
-import Highlighter from "./tools/Highlighter";
-
-const fabric = require("fabric").fabric;
+import History from "../../history";
+import { uuid4 } from "../../utils";
+import Arrow from "./../../tools/Arrow";
+import Tool from "./../../tools";
+import DefaultTool from "./../../tools/defaul-tool";
+import Select from "./../../tools/Select";
+import Pencil from "./../../tools/Pencil";
+import Line from "./../../tools/Line";
+import Rectangle from "./../../tools/Rectangle";
+import RectangleLabel from "./../../tools/Rectangle/rectangle-label";
+import Circle from "./../../tools/Circle";
+import Pan from "./../../tools/Pan";
+import Highlighter from "./../../tools/Highlighter";
+import { fabric } from "fabric";
 
 /**
  * Sketch Tool based on FabricJS for React Applications
@@ -593,11 +593,7 @@ class SketchField extends PureComponent {
       const imgObj = new fabric.Image(img);
       if (stretched || stretchedX) imgObj.scaleToWidth(canvas.width);
       if (stretched || stretchedY) imgObj.scaleToHeight(canvas.height);
-      canvas.setBackgroundImage(
-        imgObj,
-        () => canvas.renderAll(),
-        fabricOptions
-      );
+      canvas.setBackgroundImage(imgObj, () => canvas.renderAll(), fabricOptions);
     };
     img.src = dataUrl;
   };
@@ -650,23 +646,15 @@ class SketchField extends PureComponent {
 
     // Events binding
     canvas.on("object:added", (e) => this.callEvent(e, this._onObjectAdded));
-    canvas.on("object:modified", (e) =>
-      this.callEvent(e, this._onObjectModified)
-    );
-    canvas.on("object:removed", (e) =>
-      this.callEvent(e, this._onObjectRemoved)
-    );
+    canvas.on("object:modified", (e) => this.callEvent(e, this._onObjectModified));
+    canvas.on("object:removed", (e) => this.callEvent(e, this._onObjectRemoved));
     canvas.on("mouse:down", (e) => this.callEvent(e, this._onMouseDown));
     canvas.on("mouse:move", (e) => this.callEvent(e, this._onMouseMove));
     canvas.on("mouse:up", (e) => this.callEvent(e, this._onMouseUp));
     canvas.on("mouse:out", (e) => this.callEvent(e, this._onMouseOut));
     canvas.on("object:moving", (e) => this.callEvent(e, this._onObjectMoving));
-    canvas.on("object:scaling", (e) =>
-      this.callEvent(e, this._onObjectScaling)
-    );
-    canvas.on("object:rotating", (e) =>
-      this.callEvent(e, this._onObjectRotating)
-    );
+    canvas.on("object:scaling", (e) => this.callEvent(e, this._onObjectScaling));
+    canvas.on("object:rotating", (e) => this.callEvent(e, this._onObjectRotating));
     // IText Events fired on Adding Text
     // canvas.on("text:event:changed", console.log)
     // canvas.on("text:selection:changed", console.log)
@@ -681,8 +669,7 @@ class SketchField extends PureComponent {
     (value || defaultValue) && this.fromJSON(value || defaultValue);
   };
 
-  componentWillUnmount = () =>
-    window.removeEventListener("resize", this._resize);
+  componentWillUnmount = () => window.removeEventListener("resize", this._resize);
 
   componentDidUpdate = (prevProps, prevState) => {
     if (
@@ -726,8 +713,7 @@ class SketchField extends PureComponent {
       <div
         className={className}
         ref={(c) => (this._container = c)}
-        style={canvasDivStyle}
-      >
+        style={canvasDivStyle}>
         <canvas id={uuid4()} ref={(c) => (this._canvas = c)}>
           Sorry, Canvas HTML5 element is not supported by your browser :(
         </canvas>

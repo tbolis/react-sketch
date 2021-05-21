@@ -1,19 +1,27 @@
 {
-  "parser": "babel-eslint",
-  "plugins": ["react", "jest", "eslint-plugin-react"],
-  "env": {
-    "es6": true,
-    "jest": true,
-    "amd": true,
-    "browser": true,
-    "node": true
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
   },
-  "extends": ["eslint:recommended", "plugin:react/recommended"],
-  "globals": {
-    "React": true,
-    "document": true,
-    "require": true,
-    "window": true,
-    "localStorage": true
+  "plugins": ["@typescript-eslint", "react-hooks", "prettier"],
+  "extends": ["plugin:react/recommended", "plugin:@typescript-eslint/recommended"],
+  "rules": {
+    "@typescript-eslint/no-var-requires": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/ban-types": 0,
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "prettier/prettier": "error",
+    "react/prop-types": "off"
+  },
+  "settings": {
+    "react": {
+      "pragma": "React",
+      "version": "detect"
+    }
   }
 }

@@ -191,8 +191,7 @@ class SketchFieldDemo extends React.Component {
           <IconButton onTouchTap={(c) => this._removeMe(index)}>
             <ClearIcon color="white" />
           </IconButton>
-        }
-      >
+        }>
         <img src={drawing} />
       </GridListTile>
     );
@@ -323,25 +322,19 @@ class SketchFieldDemo extends React.Component {
           <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <AppBar title="Sketch Tool" position="static" style={styles.appBar}>
               <Toolbar>
-                <Typography
-                  variant="h6"
-                  color="inherit"
-                  style={{ flexGrow: 1 }}
-                >
+                <Typography variant="h6" color="inherit" style={{ flexGrow: 1 }}>
                   Sketch Tool
                 </Typography>
                 <IconButton
                   color="primary"
                   disabled={!this.state.canUndo}
-                  onClick={this._undo}
-                >
+                  onClick={this._undo}>
                   <UndoIcon />
                 </IconButton>
                 <IconButton
                   color="primary"
                   disabled={!this.state.canRedo}
-                  onClick={this._redo}
-                >
+                  onClick={this._redo}>
                   <RedoIcon />
                 </IconButton>
                 <IconButton color="primary" onClick={this._save}>
@@ -374,9 +367,7 @@ class SketchFieldDemo extends React.Component {
                   : "transparent"
               }
               width={this.state.controlledSize ? this.state.sketchWidth : null}
-              height={
-                this.state.controlledSize ? this.state.sketchHeight : null
-              }
+              height={this.state.controlledSize ? this.state.sketchHeight : null}
               defaultValue={dataJson}
               value={controlledValue}
               forceValue
@@ -393,8 +384,7 @@ class SketchFieldDemo extends React.Component {
                   <IconButton
                     onClick={(e) =>
                       this.setState({ expandTools: !this.state.expandTools })
-                    }
-                  >
+                    }>
                     <ExpandMore />
                   </IconButton>
                 }
@@ -408,8 +398,7 @@ class SketchFieldDemo extends React.Component {
                         label="Canvas Tool"
                         value={this.state.tool}
                         onChange={this._selectTool}
-                        helperText="Please select Canvas Tool"
-                      >
+                        helperText="Please select Canvas Tool">
                         <MenuItem value={Tools.Select} key="Select">
                           Select
                         </MenuItem>
@@ -466,9 +455,7 @@ class SketchFieldDemo extends React.Component {
                       <TextField
                         label="Text"
                         helperText="Add text to Sketch"
-                        onChange={(e) =>
-                          this.setState({ text: e.target.value })
-                        }
+                        onChange={(e) => this.setState({ text: e.target.value })}
                         value={this.state.text}
                       />
                     </div>
@@ -491,8 +478,7 @@ class SketchFieldDemo extends React.Component {
                       this.setState({
                         expandControls: !this.state.expandControls,
                       })
-                    }
-                  >
+                    }>
                     <ExpandMore />
                   </IconButton>
                 }
@@ -546,8 +532,7 @@ class SketchFieldDemo extends React.Component {
                         onClick={(e) => {
                           this._sketch.copy();
                           this._sketch.paste();
-                        }}
-                      >
+                        }}>
                         <CopyIcon />
                       </IconButton>
                     </div>
@@ -555,8 +540,7 @@ class SketchFieldDemo extends React.Component {
                       <IconButton
                         color="primary"
                         disabled={!this.state.enableRemoveSelected}
-                        onClick={this._removeSelected}
-                      >
+                        onClick={this._removeSelected}>
                         <RemoveIcon />
                       </IconButton>
                     </div>
@@ -572,8 +556,7 @@ class SketchFieldDemo extends React.Component {
                   <IconButton
                     onClick={(e) =>
                       this.setState({ expandColors: !this.state.expandColors })
-                    }
-                  >
+                    }>
                     <ExpandMore />
                   </IconButton>
                 }
@@ -585,9 +568,7 @@ class SketchFieldDemo extends React.Component {
                   <CompactPicker
                     id="lineColor"
                     color={this.state.lineColor}
-                    onChange={(color) =>
-                      this.setState({ lineColor: color.hex })
-                    }
+                    onChange={(color) => this.setState({ lineColor: color.hex })}
                   />
                   <br />
                   <br />
@@ -606,9 +587,7 @@ class SketchFieldDemo extends React.Component {
                   />
                   <CompactPicker
                     color={this.state.fillColor}
-                    onChange={(color) =>
-                      this.setState({ fillColor: color.hex })
-                    }
+                    onChange={(color) => this.setState({ fillColor: color.hex })}
                   />
                 </CardContent>
               </Collapse>
@@ -621,8 +600,7 @@ class SketchFieldDemo extends React.Component {
                   <IconButton
                     onClick={(e) =>
                       this.setState({ expandBack: !this.state.expandBack })
-                    }
-                  >
+                    }>
                     <ExpandMore />
                   </IconButton>
                 }
@@ -693,8 +671,7 @@ class SketchFieldDemo extends React.Component {
                       style={styles.dropArea}
                       activeStyle={styles.activeStyle}
                       rejectStyle={styles.rejectStyle}
-                      onDrop={this._onBackgroundImageDrop}
-                    >
+                      onDrop={this._onBackgroundImageDrop}>
                       Try dropping an image here,
                       <br />
                       or click
@@ -713,8 +690,7 @@ class SketchFieldDemo extends React.Component {
                   <IconButton
                     onClick={(e) =>
                       this.setState({ expandImages: !this.state.expandImages })
-                    }
-                  >
+                    }>
                     <ExpandMore />
                   </IconButton>
                 }
@@ -725,25 +701,21 @@ class SketchFieldDemo extends React.Component {
                     <TextField
                       label="Image URL"
                       helperText="Copy/Paste an image URL"
-                      onChange={(e) =>
-                        this.setState({ imageUrl: e.target.value })
-                      }
+                      onChange={(e) => this.setState({ imageUrl: e.target.value })}
                       value={this.state.imageUrl}
                     />
                     <Button
                       variant="outlined"
                       onClick={(e) => {
                         this._sketch.addImg(this.state.imageUrl);
-                      }}
-                    >
+                      }}>
                       Load Image from URL
                     </Button>
                   </div>
                   <br />
                   <Button
                     variant="outlined"
-                    onClick={(e) => this._sketch.addImg(dataUrl)}
-                  >
+                    onClick={(e) => this._sketch.addImg(dataUrl)}>
                     Load Image from Data URL
                   </Button>
                 </CardContent>
@@ -759,8 +731,7 @@ class SketchFieldDemo extends React.Component {
                       this.setState({
                         expandControlled: !this.state.expandControlled,
                       })
-                    }
-                  >
+                    }>
                     <ExpandMore />
                   </IconButton>
                 }
@@ -773,8 +744,7 @@ class SketchFieldDemo extends React.Component {
                       this.setState({
                         controlledValue: dataJsonControlled,
                       })
-                    }
-                  >
+                    }>
                     Load controlled Value
                   </Button>
                 </CardContent>

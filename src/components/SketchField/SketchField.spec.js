@@ -4,14 +4,9 @@
 
 import React from "react";
 import { mount } from "enzyme";
-import SketchField from "../src/SketchField";
+import SketchField from "./index";
 
-function objectFromDrag(
-  canvas,
-  from = { x: 0, y: 0 },
-  to = { x: 10, y: 10 },
-  id
-) {
+function objectFromDrag(canvas, from = { x: 0, y: 0 }, to = { x: 10, y: 10 }, id) {
   function MouseEventPositionGenerator(pos = { x: 0, y: 0 }) {
     const eventX = ["x", "pageX", "screenX", "clientX", "offsetX"];
     const eventY = ["y", "pageY", "screenY", "clientY", "offsetY"];
@@ -33,7 +28,7 @@ function objectFromDrag(
 
 describe("SketchField", () => {
   it("Loads Normally", () => {
-    require("../src/SketchField");
+    require("./index");
   });
 
   it("Contains canvas tag", () => {

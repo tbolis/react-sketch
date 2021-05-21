@@ -80,9 +80,7 @@ export const hexToRgbA = (hex) => {
       c = [c[0], c[0], c[1], c[1], c[2], c[2]];
     }
     c = "0x" + c.join("");
-    return (
-      "rgba(" + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(",") + ",0.4)"
-    );
+    return "rgba(" + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(",") + ",0.4)";
   }
   throw new Error("Bad Hex");
 };
