@@ -26,7 +26,10 @@
   ],
   "license": "MIT",
   "scripts": {
-    "start": "wsrun start",
+    "start": "yarn workspace showcase start",
+    "build": "yarn workspace react-sketch build && yarn workspace showcase build",
+    "typecheck": "yarn workspace react-sketch typecheck && yarn workspace showcase typecheck",
+    "clean": "node -e \"for (const d of ['packages/react-sketch/dist', 'packages/showcase/build']) require('fs').rmSync(d, { recursive: true, force: true })\"",
     "lint": "eslint --fix ./packages/**/src",
     "format": "prettier --write \"./**\""
   },
@@ -42,8 +45,7 @@
     "prettier": "^2.2.1",
     "typescript": "^5.9.3",
     "webpack": "^5.111.1",
-    "webpack-cli": "^7.2.3",
-    "wsrun": "^5.2.4"
+    "webpack-cli": "^7.2.3"
   },
   "husky": {
     "hooks": {
