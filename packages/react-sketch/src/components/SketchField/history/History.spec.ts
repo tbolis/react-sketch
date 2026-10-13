@@ -1,23 +1,15 @@
-// @ts-nocheck
-/* eslint no-console: 0 */
-/* eslint-env node, mocha */
+import { UndoHistory } from "./index";
 
-import History from "./index";
-
-describe("History", () => {
-  it("Loads Normally", () => {
-    require("./index");
-  });
-
+describe("UndoHistory", () => {
   it("Undo limit is set", () => {
-    const instance = new History();
-    const instanceWithCustomUndoSteps = new History(15);
+    const instance = new UndoHistory();
+    const instanceWithCustomUndoSteps = new UndoHistory(15);
     expect(instance.getUndoLimit()).toEqual(10);
     expect(instanceWithCustomUndoSteps.getUndoLimit()).toEqual(15);
   });
 
   it("Informs if can undo", () => {
-    const instance = new History();
+    const instance = new UndoHistory();
     expect(instance.canUndo()).toBeFalsy();
     instance.keep("1");
     expect(instance.canUndo()).toBeTruthy();
@@ -26,7 +18,9 @@ describe("History", () => {
   });
 
   it("Can undo/redo object", () => {
-    const instance = new History(15, true);
+    // debug = true prints the history on every operation
+    const log = jest.spyOn(console, "log").mockImplementation(() => undefined);
+    const instance = new UndoHistory(15, true);
     instance.keep("1");
     instance.keep("2");
     expect(instance.canUndo()).toBeTruthy();
@@ -36,10 +30,12 @@ describe("History", () => {
     expect(instance.getCurrent()).toBeNull();
     expect(instance.redo()).toEqual("1");
     expect(instance.getCurrent()).toEqual("1");
+    expect(log).toHaveBeenCalled();
+    log.mockRestore();
   });
 
   it("Multiple undo/redo of objects", () => {
-    const instance = new History();
+    const instance = new UndoHistory();
     instance.keep("1");
     instance.keep("2");
     instance.keep("3");
@@ -60,7 +56,7 @@ describe("History", () => {
   });
 
   it("Redo is reset after a keep of a new object", () => {
-    const instance = new History();
+    const instance = new UndoHistory();
     instance.keep("1");
     instance.keep("2");
     instance.keep("3");
@@ -74,7 +70,7 @@ describe("History", () => {
   });
 
   it("Can clear history", () => {
-    const instance = new History();
+    const instance = new UndoHistory();
     instance.keep("1");
     instance.keep("2");
     instance.keep("3");
