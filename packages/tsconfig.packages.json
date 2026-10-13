@@ -3,7 +3,7 @@
     "jsx": "react-jsx",
     "target": "es2015",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "lib": ["dom", "dom.iterable", "esnext"],
     "types": [],
     "strict": true,
