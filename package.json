@@ -31,7 +31,10 @@
     "typecheck": "yarn workspace react-sketch typecheck && yarn workspace showcase typecheck",
     "clean": "node -e \"for (const d of ['packages/react-sketch/dist', 'packages/showcase/build']) require('fs').rmSync(d, { recursive: true, force: true })\"",
     "lint": "eslint --fix ./packages/**/src",
-    "format": "prettier --write \"./**\""
+    "format": "prettier --write \"./**\"",
+    "test": "yarn workspace react-sketch test",
+    "test:watch": "yarn workspace react-sketch test --watch",
+    "test:coverage": "yarn workspace react-sketch test:coverage"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.21.0",
