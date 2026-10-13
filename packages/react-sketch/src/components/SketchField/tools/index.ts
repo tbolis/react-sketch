@@ -88,4 +88,22 @@ export abstract class FabricCanvasTool {
   get canvas(): fabric.Canvas {
     return this._canvas;
   }
+
+  /**
+   * Position of the given canvas event, in canvas coordinates
+   */
+  protected pointer(event: IEvent): { x: number; y: number } {
+    return this.canvas.getPointer(event.e);
+  }
+
+  /**
+   * Switch the canvas between "select" mode (objects can be selected and
+   * moved) and "draw" mode (objects are frozen, so a drag always draws).
+   * Free drawing is turned off in both.
+   */
+  protected setInteractive(interactive: boolean): void {
+    this.canvas.isDrawingMode = false;
+    this.canvas.selection = interactive;
+    this.canvas.forEachObject((o) => (o.selectable = o.evented = interactive));
+  }
 }

@@ -15,15 +15,14 @@ export class Line extends FabricCanvasTool {
   }
 
   configureCanvas(props: SketchProperties): void {
-    this.canvas.isDrawingMode = this.canvas.selection = false;
-    this.canvas.forEachObject((o) => (o.selectable = o.evented = false));
+    this.setInteractive(false);
     this.width = props.lineWidth ? props.lineWidth : 1;
     this.color = props.lineColor ? props.lineColor : "black";
   }
 
   doMouseDown(event: fabric.IEvent): void {
     this.isDown = true;
-    const pointer = this.canvas.getPointer(event.e);
+    const pointer = this.pointer(event);
     const points = [pointer.x, pointer.y, pointer.x, pointer.y];
     this.line = new fabric.Line(points, {
       strokeWidth: this.width,
@@ -39,17 +38,17 @@ export class Line extends FabricCanvasTool {
 
   doMouseMove(event: fabric.IEvent): void {
     if (!this.isDown) return;
-    const pointer = this.canvas.getPointer(event.e);
+    const pointer = this.pointer(event);
     this.line?.set({ x2: pointer.x, y2: pointer.y });
     this.line?.setCoords();
     this.canvas.renderAll();
   }
 
-  doMouseUp(event: fabric.IEvent): void {
+  doMouseUp(): void {
     this.isDown = false;
   }
 
-  doMouseOut(event: fabric.IEvent): void {
+  doMouseOut(): void {
     this.isDown = false;
   }
 
