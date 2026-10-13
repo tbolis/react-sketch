@@ -11,9 +11,11 @@ export enum Tool {
   ARROW = "arrow",
   PENCIL = "pencil",
   RECTANGLE = "rectangle",
+  RECTANGLE_LABEL = "rectangle-label",
   SELECT = "select",
   PAN = "pan",
   HIGHLIGHTER = "highlighter",
+  DEFAULT_TOOL = "default-tool",
 }
 
 interface SketchStyle {
