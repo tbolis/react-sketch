@@ -1,72 +1,117 @@
 import { fabric } from "fabric";
-import { PureComponent } from "react";
-import { SketchProperties, SketchState } from "../../types";
-import { AbstractEventAware, FabricCanvasTool } from "./tools";
+import { SketchEvent, SketchProperties } from "../../types";
+import { SketchHistory } from "./history/SketchHistory";
+import { AbstractEventAware, CanvasEventAware, FabricCanvasTool } from "./tools";
 
 export interface EventInput {
   event: fabric.IEvent;
   tool: FabricCanvasTool;
   props: SketchProperties;
-  state: SketchState;
-}
-export interface EventCallback {
-  (input: EventInput): void;
 }
 
 /**
- * Canvas Events Manager Class
+ * The canvas events a tool can react to, plus the ones of the sketch itself
  */
-export class FabricCanvasEventsManager extends AbstractEventAware {
-  private canvas: fabric.Canvas;
-  private sketch: PureComponent<SketchProperties, SketchState>;
+export interface SketchEventAware extends CanvasEventAware {
+  // Object management
+  onObjectAdded(input: EventInput): void;
+}
 
+/**
+ * The event as given to the callbacks of the component. The canvas event has
+ * the same shape, but its types come from the canvas library, which the
+ * component does not expose.
+ */
+const sketchEvent = (event: fabric.IEvent): SketchEvent =>
+  event as unknown as SketchEvent;
+
+/**
+ * Canvas Events Manager Class
+ *
+ * It hands the canvas events to the selected tool, to the history of the
+ * sketch and to the callbacks given as properties of the component.
+ */
+export class FabricCanvasEventsManager
+  extends AbstractEventAware
+  implements SketchEventAware
+{
+  private readonly history: SketchHistory;
+  private readonly schedule: (callback: () => void, delay: number) => void;
+
+  /**
+   * @param history the history of the sketch
+   * @param schedule runs the callback after the delay (in milliseconds)
+   */
   constructor(
-    canvas: fabric.Canvas,
-    sketch: PureComponent<SketchProperties, SketchState>
+    history: SketchHistory,
+    schedule: (callback: () => void, delay: number) => void
   ) {
     super();
-    this.canvas = canvas;
-    this.sketch = sketch;
+    this.history = history;
+    this.schedule = schedule;
   }
 
   /**
-   * Action when an object is added to the canvas
+   * Action when an object is added to the canvas. The objects which undo and
+   * redo add back are not new, so they are not recorded nor announced.
    */
-  public onObjectAdded({ event, tool, props, state }: EventInput): void {
-    // if (!input.state.action) {
-    //   this.setState({ action: true });
-    //   return;
-    // }
-    // const obj = event.target;
-    // obj.__version = 1;
-    // record current object state as json and save as originalState
-    // const objState = obj.toJSON();
-    // obj.__originalState = objState;
-    // const state = JSON.stringify(objState);
-    // object, previous state, current state
-    // this._history.keep([obj, state, state]);
-    // onObjectAdded(e);
-  }
-  public onObjectMoved({ event, tool, props, state }: EventInput): void {
-    console.log("foo");
+  public onObjectAdded({ event, props }: EventInput): void {
+    if (this.history.replaying) return;
+    if (event.target) this.history.onObjectAdded(event.target);
+    props.onObjectAdded?.(sketchEvent(event));
   }
 
-  public onMouseUp({ event, tool, props, state }: EventInput): void {
-    tool.doMouseUp(event);
+  public onObjectModified({ event, props }: EventInput): void {
+    if (event.target) this.history.onObjectModified(event.target);
+    props.onObjectModified?.(sketchEvent(event));
   }
-  public onMouseDown({ event, tool, props, state }: EventInput): void {
-    console.log("down");
+
+  public onObjectRemoved({ event, props }: EventInput): void {
+    props.onObjectRemoved?.(sketchEvent(event));
+  }
+
+  public onObjectMoving({ event, props }: EventInput): void {
+    props.onObjectMoving?.(sketchEvent(event));
+  }
+
+  public onObjectScaling({ event, props }: EventInput): void {
+    props.onObjectScaling?.(sketchEvent(event));
+  }
+
+  public onObjectRotating({ event, props }: EventInput): void {
+    props.onObjectRotating?.(sketchEvent(event));
+  }
+
+  public onMouseDown({ event, tool, props }: EventInput): void {
     tool.doMouseDown(event);
-    // const { onMouseDown } = this.props;
-    // this._selectedTool.doMouseDown(e);
-    // onMouseDown(e);
+    props.onMouseDown?.(sketchEvent(event));
   }
-  public onMouseMove({ event, tool, props, state }: EventInput): void {
-    console.log("move");
+
+  public onMouseMove({ event, tool, props }: EventInput): void {
     tool.doMouseMove(event);
+    props.onMouseMove?.(sketchEvent(event));
   }
-  public onMouseOut({ event, tool, props, state }: EventInput): void {
-    console.log("out");
+
+  public onMouseOut({ event, tool, props }: EventInput): void {
     tool.doMouseOut(event);
+    this.notifyChange({ event, tool, props });
+    props.onMouseOut?.(sketchEvent(event));
+  }
+
+  public onMouseUp({ event, tool, props }: EventInput): void {
+    tool.doMouseUp(event);
+    // The drawing is finished, so the state of the new object is final
+    this.history.onMouseUp();
+    this.notifyChange({ event, tool, props });
+    props.onMouseUp?.(sketchEvent(event));
+  }
+
+  /**
+   * Tell the application that the sketch may have changed, shortly after
+   * the mouse was released or left the canvas.
+   */
+  private notifyChange({ event, props }: EventInput): void {
+    const { onChange } = props;
+    if (onChange) this.schedule(() => onChange(event.e), 10);
   }
 }
