@@ -14,7 +14,8 @@
     "lint": "eslint \"packages/**/*.{ts,tsx}\"",
     "lint:fix": "eslint --fix \"packages/**/*.{ts,tsx}\"",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
@@ -27,8 +28,8 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.13.0",
-    "husky": "^6.0.0",
-    "lint-staged": "^10.5.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "prettier": "^3.9.10",
     "source-map-loader": "^2.0.1",
     "typescript": "^4.2.3",
@@ -36,21 +37,11 @@
     "webpack": "^5.30.0",
     "wsrun": "^5.2.4"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
-    "*.{js,jsx}": [
-      "prettier --write",
+    "*.{ts,tsx}": [
       "eslint --fix",
-      "jest --findRelatedTests",
-      "git add"
+      "prettier --write"
     ],
-    "*.{html,css,less,ejs,json}": [
-      "prettier --write",
-      "git add"
-    ]
+    "*.{json,css,md,yml}": "prettier --write"
   }
 }
