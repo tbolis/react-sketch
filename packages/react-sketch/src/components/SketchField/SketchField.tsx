@@ -103,7 +103,7 @@ class SketchField extends PureComponent<SketchProperties, SketchState> {
     window.removeEventListener("resize", this._resize_listener, true);
   };
 
-  render = (): JSX.Element => {
+  render = (): React.ReactElement => {
     const { className, style, width, height } = this.props;
     const canvasDivStyle = Object.assign(
       {},
@@ -116,8 +116,14 @@ class SketchField extends PureComponent<SketchProperties, SketchState> {
         id={uuid4()}
         className={className}
         style={canvasDivStyle}
-        ref={(elem) => (this.containerEl = elem)}>
-        <canvas id={uuid4()} ref={(elem) => (this.canvasEl = elem)}>
+        ref={(elem) => {
+          this.containerEl = elem;
+        }}>
+        <canvas
+          id={uuid4()}
+          ref={(elem) => {
+            this.canvasEl = elem;
+          }}>
           Sorry, Canvas HTML5 element is not supported by your browser :(
         </canvas>
       </div>
