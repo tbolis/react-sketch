@@ -3,26 +3,29 @@
   "version": "1.0.0",
   "description": "Sketch Component Showcase",
   "scripts": {
-    "start": "webpack serve --mode development --open"
+    "start": "webpack serve --mode development --open",
+    "build": "webpack --mode production",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@material-ui/types": "^5.1.0",
-    "@types/node": "^14.14.41",
-    "html-webpack-plugin": "^5.3.1",
-    "source-map-loader": "^2.0.1",
-    "webpack-cli": "^4.6.0",
-    "webpack-dev-server": "^3.11.2"
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "css-loader": "^7.1.5",
+    "html-webpack-plugin": "^5.6.8",
+    "source-map-loader": "^5.0.0",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.6.2",
+    "webpack-dev-server": "^6.0.0"
   },
   "dependencies": {
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
-    "css-loader": "^5.2.1",
     "mobx": "^6.2.0",
     "mobx-react-lite": "^3.2.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-sketch": "^1.0.0",
-    "style-loader": "^2.0.0"
+    "react-sketch": "^1.0.0"
   }
 }

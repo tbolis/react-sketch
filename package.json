@@ -26,17 +26,16 @@
   ],
   "license": "MIT",
   "scripts": {
-    "start": "wsrun start",
+    "start": "yarn workspace showcase start",
+    "build": "yarn workspace react-sketch build && yarn workspace showcase build",
+    "typecheck": "yarn workspace react-sketch typecheck && yarn workspace showcase typecheck",
+    "clean": "node -e \"for (const d of ['packages/react-sketch/dist', 'packages/showcase/build']) require('fs').rmSync(d, { recursive: true, force: true })\"",
     "lint": "eslint --fix ./packages/**/src",
     "format": "prettier --write \"./**\""
   },
   "devDependencies": {
-    "@types/react": "^17.0.3",
-    "@types/react-dom": "^17.0.3",
     "@typescript-eslint/eslint-plugin": "^4.21.0",
     "@typescript-eslint/parser": "^4.21.0",
-    "awesome-typescript-loader": "^5.2.1",
-    "css-loader": "^5.2.0",
     "eslint": "^7.23.0",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.23.1",
@@ -44,10 +43,9 @@
     "husky": "^6.0.0",
     "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
-    "source-map-loader": "^2.0.1",
-    "typescript": "^4.2.3",
-    "webpack": "^5.30.0",
-    "wsrun": "^5.2.4"
+    "typescript": "^6.0.3",
+    "webpack": "^5.111.1",
+    "webpack-cli": "^7.2.3"
   },
   "husky": {
     "hooks": {
