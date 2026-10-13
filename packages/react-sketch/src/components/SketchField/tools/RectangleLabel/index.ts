@@ -1,0 +1,1 @@
+export { RectangleLabel } from "./RectangleLabel";
