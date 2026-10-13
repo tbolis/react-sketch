@@ -9,8 +9,9 @@ module.exports = {
       "ts-jest",
       {
         tsconfig: "<rootDir>/tsconfig.spec.json",
-        // Type errors fail the build for spec files only. Type-checking the
-        // production sources is the job of tsc, not of the test run.
+        // Only spec files are type-checked during the test run. Type errors in
+        // production sources are reported by tsc, so they do not fail tests.
+        // Remove the line below to type-check every file imported by a test.
         diagnostics: { exclude: ["**", "!**/*.spec.ts", "!**/*.spec.tsx"] },
       },
     ],
@@ -20,7 +21,8 @@ module.exports = {
     "src/**/*.{ts,tsx}",
     "!src/**/*.spec.{ts,tsx}",
     "!src/**/*.d.ts",
-    // pure re-export barrels (history/index.ts and tools/index.ts hold code and stay in)
+    // Re-export barrels only: history/index.ts and tools/index.ts hold code, so
+    // they stay in the report.
     "!src/index.ts",
     "!src/components/SketchField/index.ts",
     "!src/components/SketchField/tools/*/index.ts",
