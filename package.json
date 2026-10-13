@@ -31,8 +31,6 @@
     "format": "prettier --write \"./**\""
   },
   "devDependencies": {
-    "@types/react": "^17.0.3",
-    "@types/react-dom": "^17.0.3",
     "@typescript-eslint/eslint-plugin": "^4.21.0",
     "@typescript-eslint/parser": "^4.21.0",
     "awesome-typescript-loader": "^5.2.1",
@@ -46,7 +44,8 @@
     "prettier": "^2.2.1",
     "source-map-loader": "^2.0.1",
     "typescript": "^5.9.3",
-    "webpack": "^5.30.0",
+    "webpack": "^5.111.1",
+    "webpack-cli": "^7.2.3",
     "wsrun": "^5.2.4"
   },
   "husky": {

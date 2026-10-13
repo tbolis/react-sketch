@@ -1,35 +1,43 @@
 const path = require("path");
-const TerserPlugin = require("terser-webpack-plugin");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+
+const umdExternal = (name, root) => ({
+  commonjs: name,
+  commonjs2: name,
+  amd: name,
+  root,
+});
 
 module.exports = {
   entry: {
     index: "./src/index.ts",
   },
-  performance: {
-    hints: false,
-  },
-  optimization: {
-    minimize: true,
-    minimizer: [new TerserPlugin()],
+  // react and fabric are provided by the consumer, never bundled.
+  externals: {
+    react: umdExternal("react", "React"),
+    "react/jsx-runtime": umdExternal("react/jsx-runtime", "ReactJSXRuntime"),
+    fabric: umdExternal("fabric", "fabric"),
   },
   output: {
     filename: "[name].js",
-    library: "ReactSketch",
-    libraryTarget: "umd",
+    library: { name: "ReactSketch", type: "umd" },
+    globalObject: "this",
     path: path.resolve(__dirname, "dist"),
+    clean: true,
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
   },
   devtool: "source-map",
-  plugins: [new CleanWebpackPlugin()],
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: "awesome-typescript-loader",
+        loader: "ts-loader",
         exclude: /node_modules/,
+        options: {
+          configFile: path.resolve(__dirname, "tsconfig.json"),
+          onlyCompileBundledFiles: true,
+        },
       },
     ],
   },
