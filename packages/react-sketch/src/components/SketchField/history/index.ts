@@ -1,36 +1,32 @@
-// @ts-nocheck
-
-import { EventInput } from "../events";
-import { AbstractEventAware, CanvasEventAware } from "../tools";
-
 /**
- * Maintains the history of an object
+ * Maintains the history of an object: the undo and redo stacks, limited to
+ * the given number of steps
  */
-export class UndoHistory extends AbstractEventAware {
-  constructor(undoLimit = 10, debug = false) {
-    super();
+export class UndoHistory<T = unknown> {
+  private readonly undoLimit: number;
+  private undoList: T[] = [];
+  private redoList: T[] = [];
+  private current: T | null = null;
+
+  constructor(undoLimit = 10) {
     this.undoLimit = undoLimit;
-    this.undoList = [];
-    this.redoList = [];
-    this.current = null;
-    this.debug = debug;
   }
 
   /**
    * Get the limit of undo/redo actions
    *
-   * @returns {number|*} the undo limit, as it is configured when constructing the history instance
+   * @returns the undo limit, as it is configured when constructing the history instance
    */
-  getUndoLimit() {
+  getUndoLimit(): number {
     return this.undoLimit;
   }
 
   /**
    * Get Current state
    *
-   * @returns {null|*}
+   * @returns the last kept object, or null when the history is empty
    */
-  getCurrent() {
+  getCurrent(): T | null {
     return this.current;
   }
 
@@ -39,21 +35,17 @@ export class UndoHistory extends AbstractEventAware {
    *
    * This method will set the object as current value and will push the previous "current" object to the undo history
    *
-   * @param obj
+   * @param obj the object to keep
    */
-  keep(obj) {
-    try {
-      this.redoList = [];
-      if (this.current) {
-        this.undoList.push(this.current);
-      }
-      if (this.undoList.length > this.undoLimit) {
-        this.undoList.shift();
-      }
-      this.current = obj;
-    } finally {
-      this.print();
+  keep(obj: T): void {
+    this.redoList = [];
+    if (this.current !== null) {
+      this.undoList.push(this.current);
     }
+    if (this.undoList.length > this.undoLimit) {
+      this.undoList.shift();
+    }
+    this.current = obj;
   }
 
   /**
@@ -61,23 +53,19 @@ export class UndoHistory extends AbstractEventAware {
    *
    * @returns the new current value after the undo operation, else null if no undo operation was possible
    */
-  undo() {
-    try {
-      if (this.current) {
-        this.redoList.push(this.current);
-        if (this.redoList.length > this.undoLimit) {
-          this.redoList.shift();
-        }
-        if (this.undoList.length === 0) this.current = null;
+  undo(): T | null {
+    if (this.current !== null) {
+      this.redoList.push(this.current);
+      if (this.redoList.length > this.undoLimit) {
+        this.redoList.shift();
       }
-      if (this.undoList.length > 0) {
-        this.current = this.undoList.pop();
-        return this.current;
-      }
-      return null;
-    } finally {
-      this.print();
+      if (this.undoList.length === 0) this.current = null;
     }
+    if (this.undoList.length > 0) {
+      this.current = this.undoList.pop() as T;
+      return this.current;
+    }
+    return null;
   }
 
   /**
@@ -85,59 +73,35 @@ export class UndoHistory extends AbstractEventAware {
    *
    * @returns the new current value after the redo operation, or null if no redo operation was possible
    */
-  redo() {
-    try {
-      if (this.redoList.length > 0) {
-        if (this.current) this.undoList.push(this.current);
-        this.current = this.redoList.pop();
-        return this.current;
-      }
-      return null;
-    } finally {
-      this.print();
+  redo(): T | null {
+    if (this.redoList.length > 0) {
+      if (this.current !== null) this.undoList.push(this.current);
+      this.current = this.redoList.pop() as T;
+      return this.current;
     }
+    return null;
   }
 
   /**
    * Checks whether we can perform a redo operation
-   *
-   * @returns {boolean}
    */
-  canRedo() {
+  canRedo(): boolean {
     return this.redoList.length > 0;
   }
 
   /**
    * Checks whether we can perform an undo operation
-   *
-   * @returns {boolean}
    */
-  canUndo() {
+  canUndo(): boolean {
     return this.undoList.length > 0 || this.current !== null;
   }
 
   /**
    * Clears the history maintained, can be undone
    */
-  clear() {
+  clear(): void {
     this.undoList = [];
     this.redoList = [];
     this.current = null;
-    this.print();
-  }
-
-  print() {
-    if (this.debug) {
-      /* eslint-disable no-console */
-      console.log(
-        this.undoList,
-        " -> " + this.current + " <- ",
-        this.redoList.slice(0).reverse()
-      );
-    }
-  }
-
-  public onObjectAdded({ event, tool, props, state }: EventInput): void {
-    console.log("history added");
   }
 }

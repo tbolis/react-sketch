@@ -18,9 +18,7 @@ describe("UndoHistory", () => {
   });
 
   it("Can undo/redo object", () => {
-    // debug = true prints the history on every operation
-    const log = jest.spyOn(console, "log").mockImplementation(() => undefined);
-    const instance = new UndoHistory(15, true);
+    const instance = new UndoHistory<string>(15);
     instance.keep("1");
     instance.keep("2");
     expect(instance.canUndo()).toBeTruthy();
@@ -30,8 +28,6 @@ describe("UndoHistory", () => {
     expect(instance.getCurrent()).toBeNull();
     expect(instance.redo()).toEqual("1");
     expect(instance.getCurrent()).toEqual("1");
-    expect(log).toHaveBeenCalled();
-    log.mockRestore();
   });
 
   it("Multiple undo/redo of objects", () => {
