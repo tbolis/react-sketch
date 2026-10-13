@@ -28,7 +28,10 @@
   "scripts": {
     "start": "wsrun start",
     "lint": "eslint --fix ./packages/**/src",
-    "format": "prettier --write \"./**\""
+    "format": "prettier --write \"./**\"",
+    "test": "yarn workspace react-sketch test",
+    "test:watch": "yarn workspace react-sketch test --watch",
+    "test:coverage": "yarn workspace react-sketch test:coverage"
   },
   "devDependencies": {
     "@types/react": "^17.0.3",
