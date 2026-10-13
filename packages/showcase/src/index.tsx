@@ -1,7 +1,6 @@
 import { App } from "./App";
-import * as React from "react";
+import { createRoot } from "react-dom/client";
 import { configure } from "mobx";
-import * as ReactDOM from "react-dom";
 import { observer } from "mobx-react-lite";
 import { createContext, useContext } from "react";
 import { Config, CONFIG } from "./stores/config";
@@ -17,9 +16,13 @@ const AppView = observer(() => {
   return <App {...options} />;
 });
 
-ReactDOM.render(
+const container = document.getElementById("container");
+if (!container) {
+  throw new Error("Missing #container element");
+}
+
+createRoot(container).render(
   <ShowcaseContext.Provider value={CONFIG}>
     <AppView />
-  </ShowcaseContext.Provider>,
-  document.getElementById("container")
+  </ShowcaseContext.Provider>
 );

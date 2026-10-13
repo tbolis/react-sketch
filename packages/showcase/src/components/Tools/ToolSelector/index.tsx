@@ -1,20 +1,21 @@
-import "./index.css";
-import React from "react";
-import PenIcon from "@material-ui/icons/Gesture";
-import LineIcon from "@material-ui/icons/Straighten";
-import Chip from "@material-ui/core/Chip";
-import ToggleButton from "@material-ui/lab/ToggleButton";
-import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
-import Typography from "@material-ui/core/Typography";
-import { Accordion, AccordionSummary, AccordionDetails } from "@material-ui/core";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import type { MouseEvent, ReactElement } from "react";
+import PenIcon from "@mui/icons-material/Gesture";
+import LineIcon from "@mui/icons-material/Straighten";
+import Chip from "@mui/material/Chip";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import Typography from "@mui/material/Typography";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 interface ToolSelectorProps {
   selected: string;
-  onChange?: (event: React.MouseEvent<HTMLElement>, value: any) => void;
+  onChange?: (event: MouseEvent<HTMLElement>, value: string | null) => void;
 }
 
-const ToolSelector = (props: ToolSelectorProps): JSX.Element => {
+const ToolSelector = (props: ToolSelectorProps): ReactElement => {
   const toolset = [
     <ToggleButton key={"pencil"} value={"pencil"}>
       <PenIcon />
@@ -40,12 +41,12 @@ const ToolSelector = (props: ToolSelectorProps): JSX.Element => {
           label={props.selected}
         />
       </AccordionSummary>
-      <AccordionDetails style={{ display: "block" }}>
+      <AccordionDetails sx={{ display: "block" }}>
         <ToggleButtonGroup
           exclusive
           size="large"
           value={props.selected}
-          className="canvas-tools"
+          sx={{ display: "inline-block" }}
           onChange={props.onChange}>
           {toolset}
         </ToggleButtonGroup>

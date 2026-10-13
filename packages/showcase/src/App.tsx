@@ -1,37 +1,25 @@
 import "./App.css";
-import * as React from "react";
+import type { ReactElement } from "react";
 import { Config } from "./stores/config";
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 import ThemeProvider from "./components/theme";
-import { makeStyles } from "@material-ui/core";
 import { Header, SketchCanvas, SketchTools } from "./components";
-
-const useStyles = makeStyles((theme) => ({
-  grid: {
-    color: theme.palette.text.secondary,
-  },
-  item: {
-    padding: theme.spacing(1.2),
-  },
-}));
 
 /**
  * Export a simple showcase application to demonstrate React SketchField
  * capabilities
  */
-export const App = (props: Config): JSX.Element => {
-  const classes = useStyles();
-
+export const App = (props: Config): ReactElement => {
   return (
     <ThemeProvider>
-      <Grid container className={classes.grid}>
-        <Grid item xs={12}>
-          <Header {...props} />
+      <Grid container sx={{ color: "text.secondary" }}>
+        <Grid size={12}>
+          <Header />
         </Grid>
-        <Grid item xs={12} sm={12} md={8} lg={7} className={classes.item}>
+        <Grid size={{ xs: 12, md: 8, lg: 7 }} sx={{ p: 1.2 }}>
           <SketchCanvas {...props} />
         </Grid>
-        <Grid item xs={12} sm={12} md={4} lg={5} className={classes.item}>
+        <Grid size={{ xs: 12, md: 4, lg: 5 }} sx={{ p: 1.2 }}>
           <SketchTools {...props} />
         </Grid>
       </Grid>
