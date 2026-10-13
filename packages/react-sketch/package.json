@@ -37,8 +37,7 @@
   },
   "dependencies": {
     "csstype": "^3.2.3",
-    "fabric": "^4.4.0",
-    "prop-types": "^15.6.2"
+    "fabric": "^4.4.0"
   },
   "peerDependencies": {
     "react": "^17.0.0 || ^18.0.0 || ^19.0.0"
