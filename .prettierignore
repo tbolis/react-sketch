@@ -3,14 +3,10 @@ coverage/
 dist/
 docs/
 node_modules/
-*.md
-.prettierignore
 yarn.lock
 .idea
-LICENSE
-*.jpg
-.DS_Store
-.npmignore
-.gitignore
-*.log
-*.ico
+
+# Temporary: legacy folders, removed once the port to packages/ is complete.
+/src/
+/examples/
+/webpack/
