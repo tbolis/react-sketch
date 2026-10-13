@@ -1,7 +1,4 @@
 {
   "extends": "../tsconfig.packages.json",
-  "compilerOptions": {
-    "noUncheckedSideEffectImports": false
-  },
   "include": ["src"]
 }

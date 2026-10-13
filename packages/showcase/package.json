@@ -1,14 +1,20 @@
 {
   "name": "showcase",
   "version": "1.0.0",
-  "description": "Sketch Component Showcase",
+  "private": true,
+  "description": "Demo application for react-sketch: interactive tools panel and the defaultValue, controlled value and addImg usage scenarios",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tbolis/react-sketch.git",
+    "directory": "packages/showcase"
+  },
   "scripts": {
     "start": "webpack serve --mode development --open",
     "build": "webpack --mode production",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@material-ui/types": "^5.1.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "css-loader": "^7.1.5",
@@ -19,13 +25,14 @@
     "webpack-dev-server": "^6.0.0"
   },
   "dependencies": {
-    "@material-ui/core": "^4.11.3",
-    "@material-ui/icons": "^4.11.2",
-    "@material-ui/lab": "^4.0.0-alpha.57",
-    "mobx": "^6.2.0",
-    "mobx-react-lite": "^3.2.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.5.0",
+    "@mui/material": "^9.5.0",
+    "mobx": "^7.0.6",
+    "mobx-react-lite": "^5.1.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "react-sketch": "^1.0.0"
   }
 }

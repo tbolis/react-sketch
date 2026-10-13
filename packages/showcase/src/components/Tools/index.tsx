@@ -1,41 +1,75 @@
-import * as React from "react";
+import type { MouseEvent, ReactElement } from "react";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import Paper from "@mui/material/Paper";
+import { CONFIG, type Config } from "../../stores/config";
+import Background from "./Background";
+import CanvasSize from "./CanvasSize";
+import ColorSelector from "./ColorSelector";
+import ImageControls from "./ImageControls";
+import LabeledSlider from "./LabeledSlider";
+import Section from "./Section";
+import TextControls from "./TextControls";
 import ToolSelector from "./ToolSelector";
-import Paper from "@material-ui/core/Paper";
-import { makeStyles } from "@material-ui/core";
-import { Config } from "../../stores/config";
-import { CONFIG } from "../../stores/config";
-import LineWidth from "./LineWidth";
-
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    padding: theme.spacing(1),
-    color: theme.palette.text.secondary,
-  },
-}));
 
 /**
  * Handle the selection of the Sketch tool
  *
  * @param {object} event The event source of the callback.
- * @param {any} value of the selected buttons. When `exclusive` is true
+ * @param {string | null} value of the selected buttons, null when the selected one is clicked again
  */
-const handleSelectTool = (event: React.MouseEvent<HTMLElement>, value: any) => {
-  CONFIG.selectedTool = value;
-};
-
-const handleLineWidth = (event: React.ChangeEvent<{}>, value: number | number[]) => {
-  if (!Array.isArray(value)) {
-    CONFIG.lineWidth = value;
+const handleSelectTool = (event: MouseEvent<HTMLElement>, value: string | null) => {
+  if (value !== null) {
+    CONFIG.selectedTool = value;
   }
 };
 
-const SketchTools = (props: Config): JSX.Element => {
-  const classes = useStyles();
-
+const SketchTools = (props: Config): ReactElement => {
   return (
-    <Paper className={classes.paper}>
+    <Paper sx={{ p: 1, color: "text.secondary" }}>
       <ToolSelector selected={props.selectedTool} onChange={handleSelectTool} />
-      <LineWidth width={props.lineWidth} onChange={handleLineWidth} />
+      <Section
+        id="stroke"
+        title="Line"
+        chip={`${props.lineWidth}px`}
+        defaultExpanded>
+        <LabeledSlider
+          label="Line Weight"
+          value={props.lineWidth}
+          min={1}
+          max={100}
+          startIcon={<RemoveIcon />}
+          endIcon={<AddIcon />}
+          onChange={(value) => (CONFIG.lineWidth = value)}
+        />
+        <LabeledSlider
+          label="Opacity"
+          value={props.opacity}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(value) => (CONFIG.opacity = value)}
+        />
+      </Section>
+      <ColorSelector
+        lineColor={props.lineColor}
+        fillWithColor={props.fillWithColor}
+        fillColor={props.fillColor}
+      />
+      <CanvasSize
+        controlledSize={props.controlledSize}
+        sketchWidth={props.sketchWidth}
+        sketchHeight={props.sketchHeight}
+      />
+      <Background
+        fillWithBackgroundColor={props.fillWithBackgroundColor}
+        backgroundColor={props.backgroundColor}
+        stretched={props.stretched}
+        stretchedX={props.stretchedX}
+        stretchedY={props.stretchedY}
+      />
+      <TextControls text={props.text} />
+      <ImageControls imageUrl={props.imageUrl} />
     </Paper>
   );
 };
