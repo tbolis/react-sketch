@@ -1,57 +1,59 @@
 import type { MouseEvent, ReactElement } from "react";
+import { Types } from "react-sketch";
+import SelectIcon from "@mui/icons-material/NearMe";
 import PenIcon from "@mui/icons-material/Gesture";
 import LineIcon from "@mui/icons-material/Straighten";
-import Chip from "@mui/material/Chip";
+import ArrowIcon from "@mui/icons-material/NorthEast";
+import RectangleIcon from "@mui/icons-material/CropSquare";
+import RectangleLabelIcon from "@mui/icons-material/Label";
+import CircleIcon from "@mui/icons-material/RadioButtonUnchecked";
+import PanIcon from "@mui/icons-material/PanTool";
+import HighlighterIcon from "@mui/icons-material/Highlight";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
-import Typography from "@mui/material/Typography";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Section from "../Section";
 
 interface ToolSelectorProps {
   selected: string;
   onChange?: (event: MouseEvent<HTMLElement>, value: string | null) => void;
 }
 
-const ToolSelector = (props: ToolSelectorProps): ReactElement => {
-  const toolset = [
-    <ToggleButton key={"pencil"} value={"pencil"}>
-      <PenIcon />
-    </ToggleButton>,
-    <ToggleButton key={"line"} value={"line"}>
-      <LineIcon />
-    </ToggleButton>,
-  ];
+const TOOLS = [
+  { value: Types.Tool.SELECT, label: "Select", icon: <SelectIcon /> },
+  { value: Types.Tool.PENCIL, label: "Pencil", icon: <PenIcon /> },
+  { value: Types.Tool.LINE, label: "Line", icon: <LineIcon /> },
+  { value: Types.Tool.ARROW, label: "Arrow", icon: <ArrowIcon /> },
+  { value: Types.Tool.RECTANGLE, label: "Rectangle", icon: <RectangleIcon /> },
+  {
+    value: Types.Tool.RECTANGLE_LABEL,
+    label: "Rectangle label",
+    icon: <RectangleLabelIcon />,
+  },
+  { value: Types.Tool.CIRCLE, label: "Circle", icon: <CircleIcon /> },
+  { value: Types.Tool.PAN, label: "Pan", icon: <PanIcon /> },
+  { value: Types.Tool.HIGHLIGHTER, label: "Highlighter", icon: <HighlighterIcon /> },
+];
 
+const ToolSelector = (props: ToolSelectorProps): ReactElement => {
   return (
-    <Accordion>
-      <AccordionSummary
-        expandIcon={<ExpandMoreIcon />}
-        aria-controls="panel1a-content"
-        id="panel1a-header">
-        <Typography variant="overline" gutterBottom>
-          Canvas Tool &nbsp;
-        </Typography>
-        <Chip
-          variant="outlined"
-          color="primary"
-          size="small"
-          label={props.selected}
-        />
-      </AccordionSummary>
-      <AccordionDetails sx={{ display: "block" }}>
-        <ToggleButtonGroup
-          exclusive
-          size="large"
-          value={props.selected}
-          sx={{ display: "inline-block" }}
-          onChange={props.onChange}>
-          {toolset}
-        </ToggleButtonGroup>
-      </AccordionDetails>
-    </Accordion>
+    <Section id="tool" title="Canvas Tool" chip={props.selected} defaultExpanded>
+      <ToggleButtonGroup
+        exclusive
+        size="large"
+        value={props.selected}
+        sx={{ flexWrap: "wrap" }}
+        onChange={props.onChange}>
+        {TOOLS.map((tool) => (
+          <ToggleButton
+            key={tool.value}
+            value={tool.value}
+            aria-label={tool.label}
+            title={tool.label}>
+            {tool.icon}
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
+    </Section>
   );
 };
 
