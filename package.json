@@ -45,7 +45,7 @@
     "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
     "source-map-loader": "^2.0.1",
-    "typescript": "^4.2.3",
+    "typescript": "^5.9.3",
     "webpack": "^5.30.0",
     "wsrun": "^5.2.4"
   },

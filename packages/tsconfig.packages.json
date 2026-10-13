@@ -1,17 +1,20 @@
 {
   "compilerOptions": {
-    "jsx": "react",
+    "jsx": "react-jsx",
     "target": "es2015",
-    "module": "commonjs",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "strict": true,
-    "composite": true,
-    "esModuleInterop": true,
+    "module": "esnext",
     "moduleResolution": "node",
-    "typeRoots": ["./types", "node_modules/@types"],
-    "lib": ["es2015", "dom"]
-  },
-  "exclude": ["dist", "node_modules", "types"]
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "strict": true,
+    "noImplicitReturns": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "paths": {
+      "react-sketch": ["./react-sketch/src/index.ts"]
+    }
+  }
 }
