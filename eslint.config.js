@@ -11,10 +11,6 @@ module.exports = defineConfig([
     "**/dist/",
     "**/coverage/",
     "**/node_modules/",
-    // Temporary: legacy folders, removed once the port to packages/ is complete.
-    "src/",
-    "examples/",
-    "webpack/",
   ]),
   {
     files: ["packages/**/*.{ts,tsx}"],

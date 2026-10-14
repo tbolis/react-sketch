@@ -5,8 +5,3 @@ docs/
 node_modules/
 yarn.lock
 .idea
-
-# Temporary: legacy folders, removed once the port to packages/ is complete.
-/src/
-/examples/
-/webpack/
