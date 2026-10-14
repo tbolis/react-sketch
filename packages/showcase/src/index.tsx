@@ -2,7 +2,7 @@ import { App } from "./App";
 import { createRoot } from "react-dom/client";
 import { configure } from "mobx";
 import { observer } from "mobx-react-lite";
-import { createContext, useContext } from "react";
+import { createContext, use } from "react";
 import { Config, CONFIG } from "./stores/config";
 
 configure({
@@ -12,7 +12,7 @@ configure({
 const ShowcaseContext = createContext<Config>(CONFIG);
 
 const AppView = observer(() => {
-  const options = useContext(ShowcaseContext);
+  const options = use(ShowcaseContext);
   return <App {...options} />;
 });
 
@@ -22,7 +22,7 @@ if (!container) {
 }
 
 createRoot(container).render(
-  <ShowcaseContext.Provider value={CONFIG}>
+  <ShowcaseContext value={CONFIG}>
     <AppView />
-  </ShowcaseContext.Provider>
+  </ShowcaseContext>
 );

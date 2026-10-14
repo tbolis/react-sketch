@@ -12,7 +12,7 @@ import ClearIcon from "@mui/icons-material/DeleteSweep";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
-import { CONFIG, type Config } from "../../../stores/config";
+import { CONFIG, createDrawing, type Config } from "../../../stores/config";
 import { downloadText, downloadUrl } from "../../../utils/files";
 import { syncState, withSketch } from "../sketchRef";
 
@@ -66,7 +66,7 @@ const copy = () =>
 
 const save = () =>
   withSketch((sketch) => {
-    CONFIG.drawings = [...CONFIG.drawings, sketch.toDataURL()];
+    CONFIG.drawings = [...CONFIG.drawings, createDrawing(sketch.toDataURL())];
   });
 
 const download = () =>

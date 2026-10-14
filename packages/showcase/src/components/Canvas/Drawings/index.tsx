@@ -19,11 +19,11 @@ const Drawings = ({ drawings }: Pick<Config, "drawings">): ReactElement | null =
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
         {drawings.map((drawing, index) => (
           <Box
-            key={index}
+            key={drawing.id}
             sx={{ position: "relative", width: 160, bgcolor: "common.white" }}>
             <Box
               component="img"
-              src={drawing}
+              src={drawing.src}
               alt={`Saved drawing ${index + 1}`}
               sx={{ width: 1 }}
             />
@@ -32,7 +32,7 @@ const Drawings = ({ drawings }: Pick<Config, "drawings">): ReactElement | null =
               aria-label={`Remove saved drawing ${index + 1}`}
               sx={{ position: "absolute", top: 0, right: 0, color: "common.black" }}
               onClick={() =>
-                (CONFIG.drawings = drawings.filter((_, i) => i !== index))
+                (CONFIG.drawings = drawings.filter((d) => d.id !== drawing.id))
               }>
               <ClearIcon fontSize="small" />
             </IconButton>

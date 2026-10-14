@@ -31,8 +31,26 @@ export interface Config {
   canRedo: boolean;
   hasSelection: boolean;
   canPaste: boolean;
-  drawings: string[];
+  drawings: Drawing[];
 }
+
+/**
+ * A drawing saved with the save action, as a data URL
+ */
+export interface Drawing {
+  id: number;
+  src: string;
+}
+
+let lastDrawingId = 0;
+
+/**
+ * Creates a drawing with an id that is unique in this session
+ */
+export const createDrawing = (src: string): Drawing => ({
+  id: ++lastDrawingId,
+  src,
+});
 
 export class ConfigStore implements Config {
   public scenario: Scenario = "playground";
@@ -57,7 +75,7 @@ export class ConfigStore implements Config {
   public canRedo = false;
   public hasSelection = false;
   public canPaste = false;
-  public drawings: string[] = [];
+  public drawings: Drawing[] = [];
 
   constructor() {
     // The controlled value is handed to the canvas as is, do not wrap it in a proxy
