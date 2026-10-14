@@ -27,7 +27,7 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
 - The showcase replaces `examples/`: React 19, `@mui/material` 9 and MobX 7, with a tools panel, an
   actions toolbar and the scenarios `defaultValue`, `value` with `forceValue`, and `addImg`. It runs
   with `yarn start` on port 23000 and uses the sources of the library, no build needed first.
-- Toolchain: TypeScript 6, ESLint 9 (flat config) with typescript-eslint, Prettier 3, Jest 30 with
+- Toolchain: TypeScript 6, ESLint 10 (flat config) with typescript-eslint and @eslint-react, Prettier 3, Jest 30 with
   ts-jest and Testing Library (replacing karma, enzyme and the Jest 23 setup of 0.5.x), husky 9 with
   lint-staged. GitHub Actions (`.github/workflows/ci.yml`, Node.js 22 and 24) replaces Travis CI.
 - Documentation: README rewritten, code of conduct updated to Contributor Covenant 2.1, README files
