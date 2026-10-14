@@ -15,7 +15,6 @@ export interface Config {
   lineWidth: number;
   fillWithColor: boolean;
   fillColor: string;
-  opacity: number;
   fillWithBackgroundColor: boolean;
   backgroundColor: string;
   controlledSize: boolean;
@@ -42,7 +41,6 @@ export class ConfigStore implements Config {
   public lineWidth = 1;
   public fillWithColor = false;
   public fillColor = "#68ccca";
-  public opacity = 1;
   public fillWithBackgroundColor = false;
   public backgroundColor = "#ffffff";
   public controlledSize = false;
