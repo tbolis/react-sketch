@@ -874,6 +874,20 @@ describe("SketchField", () => {
         sketch.disableTouchScroll();
         expect(canvas.allowTouchScrolling).toBe(false);
       });
+
+      // jsdom does not implement touch-action: it keeps the assigned value only
+      // on the style object, which is what the component sets.
+      it("switch the touch-action style that lets the browser scroll", () => {
+        const { sketch, canvas } = mount();
+
+        sketch.enableTouchScroll();
+        expect(canvas.upperCanvasEl.style.touchAction).toBe("manipulation");
+        expect(canvas.lowerCanvasEl.style.touchAction).toBe("manipulation");
+
+        sketch.disableTouchScroll();
+        expect(canvas.upperCanvasEl.style.touchAction).toBe("none");
+        expect(canvas.lowerCanvasEl.style.touchAction).toBe("none");
+      });
     });
 
     describe("addImg", () => {

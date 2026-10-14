@@ -298,15 +298,28 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * Enable touch Scrolling on Canvas
    */
   enableTouchScroll = (): void => {
-    this.canvas.allowTouchScrolling = true;
+    this.setTouchScrolling(true);
   };
 
   /**
    * Disable touch Scrolling on Canvas
    */
   disableTouchScroll = (): void => {
-    this.canvas.allowTouchScrolling = false;
+    this.setTouchScrolling(false);
   };
+
+  /**
+   * Switch the touch scrolling of the canvas. fabric reads allowTouchScrolling
+   * only when it creates the canvas elements, so the touch-action style that
+   * lets the browser scroll is set here too, with the values fabric uses.
+   */
+  private setTouchScrolling(allow: boolean): void {
+    const canvas = this.canvas;
+    canvas.allowTouchScrolling = allow;
+    const touchAction = allow ? "manipulation" : "none";
+    canvas.upperCanvasEl.style.touchAction = touchAction;
+    canvas.lowerCanvasEl.style.touchAction = touchAction;
+  }
 
   /**
    * Add an image as object to the canvas
