@@ -14,8 +14,10 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
   hand-written `types/index.d.ts` of 0.5.x is removed.
 - React 17, 18 and 19 are supported. `react` is a peer dependency (`^17.0.0 || ^18.0.0 || ^19.0.0`).
   `react-dom` and `prop-types` are no longer dependencies of the library.
-- fabric 4.4 (`fabric` `^4.4.0`) is a dependency of the library. 0.5.x bundled fabric into the build
-  (fabric 3.5 at 0.5.6), now it is installed next to the library and is external in the bundle.
+- fabric 7.4 (`fabric` `^7.4.0`) is a dependency of the library. 0.5.x bundled fabric into the build
+  (fabric 3.5 at 0.5.6), now it is installed next to the library and is external in the bundle. fabric
+  7.4 fixes the stored XSS advisories of fabric versions before 7.2 and 7.4 that have no patch in fabric
+  4 to 6. fabric types are not part of the public declarations of the package.
 - Developing requires Node.js 22 or later (`engines` in the root `package.json`, `.nvmrc` has 24). The
   package itself has no Node.js requirement. The `node >= 8` engine of 0.5.x and the Node.js 6, 7 and 8
   notes are removed.
@@ -68,6 +70,19 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
   object.
 - Every tool falls back to line width 1, color black and fill `"transparent"` when the properties are
   not set.
+- Because of fabric 7, the JSON returned by `toJSON()` and `clear()` has the fabric 7 format: the
+  `type` of each object is PascalCase (`"Rect"`, `"IText"`), there is a `version` field, and numbers are
+  rounded to 4 decimals. JSON saved by 0.5.x still loads with `fromJSON()`, `value` and `defaultValue`
+  (the showcase sample data is JSON saved by 0.5.x). JSON saved by 1.0.0 does not load in 0.5.x. The
+  `type` of live objects, as seen in the event callbacks, is unchanged, except `ActiveSelection`, which
+  is now `activeselection`.
+- Undoing a modification restores the values to a precision of 1e-4.
+- The Pencil and Highlighter paths have a center origin, so their `left` and `top` are the center of the
+  path. They are drawn the same, and a stroke now includes its last point.
+- `addImg()` with a URL that cannot be loaded adds nothing and does not call `onObjectAdded`. In 0.5.x it
+  added an empty image object.
+- Objects added by `copy()`, `paste()`, and by loading a value appear a few microtasks after the call or
+  the 100 ms timer. Tests that use fake timers need to flush promises.
 
 ### Fixed
 
@@ -99,6 +114,8 @@ These behaviors of 0.5.x are kept.
 - `undoSteps` keeps one step more than its value: `undoSteps + 1` actions can be undone. It is read when
   the component mounts.
 - Drawing an arrow records undo steps that have no visible effect.
+- Undoing the move of a line puts the line at 0,0, and redo leaves it there. Undoing the move of the
+  rectangle of a RectangleLabel restores a width and a height of 0. Both happen in 0.5.x too.
 - `forceValue` loads `value` on every update of the component, so a parent that re-renders often loads
   it often.
 - Calling a method of the component before it is mounted throws.

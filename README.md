@@ -114,7 +114,9 @@ export const Drawing = () => <Sketch tool={Sketch.Tools.Pencil} lineWidth={3} />
 ### Initial, loaded and saved drawings
 
 `toJSON()` returns the drawing as an object. `defaultValue` and `value` accept that object, or the same
-object as a JSON string.
+object as a JSON string. The object has the format of fabric 7 (object types such as `"Rect"` and
+`"IText"`). Drawings saved with `react-sketch` 0.5.x load as well, drawings saved with 1.0.0 do not load
+in 0.5.x.
 
 - `defaultValue` is loaded when the component mounts, unless `value` is set.
 - `value` is loaded when it changes (a different object, compared by identity). Pass a new object, for
