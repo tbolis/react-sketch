@@ -1,14 +1,17 @@
 {
   "name": "react-sketch",
   "version": "1.0.0",
-  "description": "Sketch Element for React based applications, backed-up by fabricjs as its core",
+  "description": "React component for drawing on an HTML canvas with pencil, line, arrow, rectangle and circle tools, built on fabric.js, with undo/redo, JSON import/export and TypeScript types",
   "keywords": [
     "react",
     "canvas",
     "sketch",
+    "drawing",
+    "fabric",
     "fabricjs",
-    "fabric.js"
+    "typescript"
   ],
+  "homepage": "https://github.com/tbolis/react-sketch#readme",
   "author": {
     "name": "Thomas Bolis",
     "email": "thomas.bolis@gmail.com"

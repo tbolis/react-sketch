@@ -3,11 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "description": "Demo application for react-sketch: interactive tools panel and the defaultValue, controlled value and addImg usage scenarios",
+  "homepage": "https://github.com/tbolis/react-sketch#readme",
+  "author": {
+    "name": "Thomas Bolis",
+    "email": "thomas.bolis@gmail.com"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/tbolis/react-sketch.git",
     "directory": "packages/showcase"
+  },
+  "bugs": {
+    "url": "https://github.com/tbolis/react-sketch/issues"
   },
   "scripts": {
     "start": "webpack serve --mode development --open",
