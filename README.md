@@ -299,7 +299,7 @@ Use the tools by name (`"pencil"`), with `Tools` (`Tools.Pencil`) or with the en
 - React: `^17.0.0 || ^18.0.0 || ^19.0.0` (peer dependency). The test suite runs on React 19.
 - Browsers: browsers with HTML5 canvas support. No polyfills are included and Internet Explorer 11 is not supported.
 - Server-side rendering has not been tested. Render the component in the browser only.
-- Node.js: the package has no runtime requirement for Node.js. Developing in this repository requires Node.js 22 or later (`.nvmrc` has 24) and Yarn 1.
+- Node.js: the package has no runtime requirement for Node.js. Developing in this repository requires Node.js 22.22.1 or later (`.nvmrc` has 24) and Yarn 1.
 
 ## Repository layout
 
@@ -313,7 +313,7 @@ This is a Yarn 1 workspaces monorepo.
 
 ## Development
 
-Requirements: Node.js 22 or later, Yarn 1.
+Requirements: Node.js 22.22.1 or later, Yarn 1.
 
 ```sh
 git clone https://github.com/tbolis/react-sketch.git

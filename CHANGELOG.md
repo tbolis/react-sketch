@@ -18,7 +18,7 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
   (fabric 3.5 at 0.5.6), now it is installed next to the library and is external in the bundle. fabric
   7.4 fixes the stored XSS advisories of fabric versions before 7.2 and 7.4 that have no patch in fabric
   4 to 6. fabric types are not part of the public declarations of the package.
-- Developing requires Node.js 22 or later (`engines` in the root `package.json`, `.nvmrc` has 24). The
+- Developing requires Node.js 22.22.1 or later (`engines` in the root `package.json`, `.nvmrc` has 24). The
   package itself has no Node.js requirement. The `node >= 8` engine of 0.5.x and the Node.js 6, 7 and 8
   notes are removed.
 - New build output in `packages/react-sketch/dist`: `index.js`, a UMD bundle (global `ReactSketch`)
