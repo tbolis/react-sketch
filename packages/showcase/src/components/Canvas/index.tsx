@@ -1,44 +1,18 @@
 import type { ReactElement } from "react";
-import { SketchField, Types } from "react-sketch";
+import { SketchField } from "react-sketch";
 import Paper from "@mui/material/Paper";
 import { teal } from "@mui/material/colors";
 import defaultValue from "../../data/defaultValue";
 import { Config } from "../../stores/config";
-import { sketchRef, syncHistory, withSketch, type SketchApi } from "./api";
 import CanvasActions from "./CanvasActions";
 import Drawings from "./Drawings";
 import { ScenarioControls, ScenarioTabs } from "./Scenarios";
+import { sketchRef, syncState } from "./sketchRef";
 
-// TODO(part2): SketchField does not expose the ref API in its types yet, remove the cast
-const bindSketch = (instance: SketchField | null): void => {
-  sketchRef.current = instance as unknown as SketchApi | null;
-};
+const style = { backgroundColor: teal[50] };
 
 const SketchCanvas = (props: Config): ReactElement => {
-  const properties: Types.SketchProperties = {
-    tool: props.selectedTool,
-    lineColor: props.lineColor,
-    lineWidth: props.lineWidth,
-    fillColor: props.fillWithColor ? props.fillColor : "transparent",
-    backgroundColor: props.fillWithBackgroundColor
-      ? props.backgroundColor
-      : "transparent",
-    width: props.controlledSize ? props.sketchWidth : undefined,
-    height: props.controlledSize ? props.sketchHeight : undefined,
-    autoresize: true,
-  };
-
-  // TODO(part2): these props are not part of Types.SketchProperties yet, move them to
-  // `properties` once the library types them
-  const upcoming = {
-    opacity: props.opacity,
-    onChange: () => withSketch(syncHistory),
-    ...(props.scenario === "default-value" && { defaultValue }),
-    ...(props.scenario === "controlled-value" && {
-      value: props.controlledValue,
-      forceValue: props.forceValue,
-    }),
-  };
+  const controlled = props.scenario === "controlled-value";
 
   return (
     <Paper sx={{ width: "100%", height: "100%", p: 1, color: "text.secondary" }}>
@@ -47,15 +21,38 @@ const SketchCanvas = (props: Config): ReactElement => {
       <CanvasActions
         canUndo={props.canUndo}
         canRedo={props.canRedo}
-        selectedTool={props.selectedTool}
+        hasSelection={props.hasSelection}
+        canPaste={props.canPaste}
       />
+      {/*
+        SketchField is a pure component. The style and the callbacks do not change,
+        so it renders again only when a property of the canvas changes, and not with the
+        rest of the page (for example when it enables the undo button). That matters
+        for forceValue, which loads the value again on every update of the canvas.
+      */}
       <SketchField
         // A scenario starts on a fresh canvas
         key={props.scenario}
-        ref={bindSketch}
-        style={{ backgroundColor: teal[50] }}
-        {...properties}
-        {...upcoming}
+        ref={sketchRef}
+        style={style}
+        tool={props.selectedTool}
+        lineColor={props.lineColor}
+        lineWidth={props.lineWidth}
+        fillColor={props.fillWithColor ? props.fillColor : "transparent"}
+        backgroundColor={
+          props.fillWithBackgroundColor ? props.backgroundColor : "transparent"
+        }
+        width={props.controlledSize ? props.sketchWidth : undefined}
+        height={props.controlledSize ? props.sketchHeight : undefined}
+        defaultValue={props.scenario === "default-value" ? defaultValue : undefined}
+        value={controlled ? props.controlledValue : undefined}
+        forceValue={controlled && props.forceValue}
+        // The canvas announces a change after drawing, undo, redo and loading a value
+        onChange={syncState}
+        // The selection changes with the mouse, and the objects with the actions
+        onMouseUp={syncState}
+        onObjectAdded={syncState}
+        onObjectRemoved={syncState}
       />
       <Drawings drawings={props.drawings} />
     </Paper>

@@ -3,11 +3,10 @@ import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { CONFIG, type Config } from "../../../stores/config";
-import { withSketch } from "../../Canvas/api";
+import { withSketch } from "../../Canvas/sketchRef";
 import Section from "../Section";
 
 const ImageControls = ({ imageUrl }: Pick<Config, "imageUrl">): ReactElement => {
-  // TODO(part2): addImg is wired to the library ref API
   const addImage = () => withSketch((sketch) => sketch.addImg(CONFIG.imageUrl));
 
   return (

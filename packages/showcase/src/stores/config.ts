@@ -30,6 +30,8 @@ export interface Config {
   forceValue: boolean;
   canUndo: boolean;
   canRedo: boolean;
+  hasSelection: boolean;
+  canPaste: boolean;
   drawings: string[];
 }
 
@@ -55,6 +57,8 @@ export class ConfigStore implements Config {
   public forceValue = true;
   public canUndo = false;
   public canRedo = false;
+  public hasSelection = false;
+  public canPaste = false;
   public drawings: string[] = [];
 
   constructor() {
