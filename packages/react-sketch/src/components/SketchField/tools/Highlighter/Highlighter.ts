@@ -1,4 +1,4 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
 import { FabricCanvasTool } from "../index";
 import { SketchProperties, Tool } from "../../../../types";
 import { colorNameToHex, hexToRgbA } from "../../../../utils";
@@ -14,8 +14,8 @@ export class Highlighter extends FabricCanvasTool {
   configureCanvas(props: SketchProperties): void {
     const color = props.lineColor ? props.lineColor : "black";
     this.canvas.isDrawingMode = true;
-    this.canvas.freeDrawingBrush.width = props.lineWidth ? props.lineWidth : 1;
-    this.canvas.freeDrawingBrush.color = hexToRgbA(
+    this.brush.width = props.lineWidth ? props.lineWidth : 1;
+    this.brush.color = hexToRgbA(
       color.startsWith("#") ? color : colorNameToHex(color) ?? color
     );
   }

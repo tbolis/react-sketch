@@ -1,4 +1,5 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
+import { CanvasEvent } from "../../events";
 
 /**
  * A rectangle with a text box on top of it. The text box follows the
@@ -11,8 +12,8 @@ export class RectangleLabelObject {
   constructor(
     canvas: fabric.Canvas,
     text: string,
-    rectProps: fabric.IRectOptions,
-    textProps: fabric.ITextboxOptions
+    rectProps: Partial<fabric.RectProps>,
+    textProps: Partial<fabric.TextboxProps>
   ) {
     this.rect = new fabric.Rect(rectProps);
     this.textbox = new fabric.Textbox(text, textProps);
@@ -20,7 +21,7 @@ export class RectangleLabelObject {
     canvas.on("object:moving", this.update);
   }
 
-  update = (event: fabric.IEvent): void => {
+  update = (event: CanvasEvent): void => {
     if (event.target !== this.rect) return;
     this.textbox.set({
       width: this.rect.getScaledWidth(),

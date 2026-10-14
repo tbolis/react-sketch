@@ -1,10 +1,19 @@
-import { fabric } from "fabric";
+import type { FabricObject, TPointerEvent } from "fabric";
 import { SketchEvent, SketchProperties } from "../../types";
 import { SketchHistory } from "./history/SketchHistory";
 import { AbstractEventAware, CanvasEventAware, FabricCanvasTool } from "./tools";
 
+/**
+ * The part of a canvas event the sketch looks at. Mouse events have both
+ * properties, object events have a target, and some have the DOM event too.
+ */
+export interface CanvasEvent {
+  e?: TPointerEvent;
+  target?: FabricObject;
+}
+
 export interface EventInput {
-  event: fabric.IEvent;
+  event: CanvasEvent;
   tool: FabricCanvasTool;
   props: SketchProperties;
 }
@@ -22,7 +31,7 @@ export interface SketchEventAware extends CanvasEventAware {
  * the same shape, but its types come from the canvas library, which the
  * component does not expose.
  */
-const sketchEvent = (event: fabric.IEvent): SketchEvent =>
+const sketchEvent = (event: CanvasEvent): SketchEvent =>
   event as unknown as SketchEvent;
 
 /**

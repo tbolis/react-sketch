@@ -1,4 +1,5 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
+import { CanvasEvent } from "../../events";
 import { FabricCanvasTool } from "../index";
 import { SketchProperties, Tool } from "../../../../types";
 import { linearDistance } from "../../../../utils";
@@ -27,7 +28,7 @@ export class Circle extends FabricCanvasTool {
     this.fill = props.fillColor ? props.fillColor : "transparent";
   }
 
-  doMouseDown(event: fabric.IEvent): void {
+  doMouseDown(event: CanvasEvent): void {
     this.isDown = true;
     const pointer = this.pointer(event);
     this.startX = pointer.x;
@@ -47,7 +48,7 @@ export class Circle extends FabricCanvasTool {
     this.canvas.add(this.circle);
   }
 
-  doMouseMove(event: fabric.IEvent): void {
+  doMouseMove(event: CanvasEvent): void {
     if (!this.isDown) return;
     const pointer = this.pointer(event);
     // The circle is anchored at its left-center point and rotated towards the

@@ -2,16 +2,24 @@
  * @jest-environment jsdom
  */
 import "jest-canvas-mock";
-import { fabric } from "fabric";
+import * as fabric from "fabric";
 import { Tool } from "../../../types";
+import { CanvasEvent } from "../events";
 import { FabricCanvasTool } from "./index";
 import { create_tool } from "./factory";
 
 type Point = [number, number];
 
-const mouseEvent = (type: string, [x, y]: Point): fabric.IEvent => ({
+const mouseEvent = (type: string, [x, y]: Point): CanvasEvent => ({
   e: new MouseEvent(type, { clientX: x, clientY: y }),
 });
+
+/** Fire a canvas event, as the canvas does when the user interacts with it */
+const fire = (canvas: fabric.Canvas, name: string, event: object): void =>
+  (canvas as unknown as fabric.Observable<Record<string, object>>).fire(
+    name,
+    event
+  );
 
 const down = (tool: FabricCanvasTool, point: Point) =>
   tool.doMouseDown(mouseEvent("mousedown", point));
@@ -217,7 +225,7 @@ describe("Tools", () => {
 
       const [rect, text] = canvas.getObjects() as [fabric.Rect, fabric.Textbox];
       rect.set({ left: 200, top: 150 });
-      canvas.fire("object:moving", { target: rect });
+      fire(canvas, "object:moving", { target: rect });
 
       expect(text.left).toEqual(200);
       expect(text.top).toEqual(150 - text.getScaledHeight());
@@ -258,7 +266,7 @@ describe("Tools", () => {
 
       canvas.setActiveObject(rect);
       create_tool(canvas, { tool: Tool.DEFAULT_TOOL });
-      expect(canvas.getActiveObject()).toBeNull();
+      expect(canvas.getActiveObject()).toBeUndefined();
       expect([canvas.selection, rect.selectable, rect.evented]).toEqual([
         false,
         false,
@@ -276,21 +284,21 @@ describe("Tools", () => {
         lineWidth: 4,
       });
       expect(canvas.isDrawingMode).toBe(true);
-      expect(canvas.freeDrawingBrush.color).toEqual("green");
-      expect(canvas.freeDrawingBrush.width).toEqual(4);
+      expect(canvas.freeDrawingBrush?.color).toEqual("green");
+      expect(canvas.freeDrawingBrush?.width).toEqual(4);
 
       create_tool(canvas, {
         tool: Tool.HIGHLIGHTER,
         lineColor: "#ff0000",
         lineWidth: 8,
       });
-      expect(canvas.freeDrawingBrush.color).toEqual("rgba(255,0,0,0.4)");
-      expect(canvas.freeDrawingBrush.width).toEqual(8);
+      expect(canvas.freeDrawingBrush?.color).toEqual("rgba(255,0,0,0.4)");
+      expect(canvas.freeDrawingBrush?.width).toEqual(8);
     });
 
     it("highlights with color names", () => {
       create_tool(canvas, { tool: Tool.HIGHLIGHTER, lineColor: "Red" });
-      expect(canvas.freeDrawingBrush.color).toEqual("rgba(255,0,0,0.4)");
+      expect(canvas.freeDrawingBrush?.color).toEqual("rgba(255,0,0,0.4)");
     });
 
     it("rejects highlighter colors it cannot convert", () => {

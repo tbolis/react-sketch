@@ -1,4 +1,4 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
 import { SketchProperties, Tool } from "../../../types";
 import { FabricCanvasTool } from "./index";
 import { Arrow } from "./Arrow";

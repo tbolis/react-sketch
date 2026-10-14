@@ -1,11 +1,11 @@
 import { createRef, StrictMode } from "react";
 import { render } from "@testing-library/react";
-import { fabric } from "fabric";
+import * as fabric from "fabric";
 import SketchField from "./SketchField";
 import { SketchProperties, Tool } from "../../types";
 
 type Point = [number, number];
-type Identified = fabric.Object & { id?: string };
+type Identified = fabric.FabricObject & { id?: string };
 
 /** The fabric canvas of a mounted SketchField */
 const canvasOf = (sketch: SketchField): fabric.Canvas => sketch["canvas"];
@@ -38,14 +38,21 @@ const objectFromDrag = (
   to: Point = [10, 10],
   id?: string
 ): Identified => {
-  canvas.fire("mouse:down", mouseEvent("mousedown", from));
-  canvas.fire("mouse:move", mouseEvent("mousemove", to));
-  canvas.fire("mouse:up", mouseEvent("mouseup", to));
+  fire(canvas, "mouse:down", mouseEvent("mousedown", from));
+  fire(canvas, "mouse:move", mouseEvent("mousemove", to));
+  fire(canvas, "mouse:up", mouseEvent("mouseup", to));
   const objects = canvas.getObjects();
   const newObj: Identified = objects[objects.length - 1];
   if (id) newObj.id = id;
   return newObj;
 };
+
+/** Let the pending promises (the loading of images, cloning) settle */
+const settle = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0));
+
+/** Fire a canvas event, as the canvas does when the user interacts with it */
+const fire = (canvas: fabric.Canvas, name: string, event: object): void =>
+  (canvas as unknown as fabric.Observable<Record<string, object>>).fire(name, event);
 
 const ids = (canvas: fabric.Canvas): (string | undefined)[] =>
   canvas.getObjects().map((o: Identified) => o.id);
@@ -178,8 +185,8 @@ describe("SketchField", () => {
     it("draws with a black line, 10 pixels wide, by default", () => {
       const { canvas } = mount({ tool: Tool.PENCIL });
 
-      expect(canvas.freeDrawingBrush.color).toEqual("black");
-      expect(canvas.freeDrawingBrush.width).toEqual(10);
+      expect(canvas.freeDrawingBrush?.color).toEqual("black");
+      expect(canvas.freeDrawingBrush?.width).toEqual(10);
     });
 
     it("also selects objects when the tool is null, as in 0.5.x", () => {
@@ -199,8 +206,8 @@ describe("SketchField", () => {
       });
 
       expect(canvas.isDrawingMode).toBe(true);
-      expect(canvas.freeDrawingBrush.color).toEqual("red");
-      expect(canvas.freeDrawingBrush.width).toEqual(3);
+      expect(canvas.freeDrawingBrush?.color).toEqual("red");
+      expect(canvas.freeDrawingBrush?.width).toEqual(3);
     });
 
     it("uses the regular pointer when drawing with the pencil (#181)", () => {
@@ -238,8 +245,8 @@ describe("SketchField", () => {
 
       update({ tool: Tool.PENCIL, lineColor: "blue", lineWidth: 7 });
 
-      expect(canvas.freeDrawingBrush.color).toEqual("blue");
-      expect(canvas.freeDrawingBrush.width).toEqual(7);
+      expect(canvas.freeDrawingBrush?.color).toEqual("blue");
+      expect(canvas.freeDrawingBrush?.width).toEqual(7);
     });
 
     it("configures the tool again when the fill color changes", () => {
@@ -260,7 +267,7 @@ describe("SketchField", () => {
 
         // the default line color is used instead
         expect(canvas.isDrawingMode).toBe(true);
-        expect(canvas.freeDrawingBrush.color).toEqual("rgba(0,0,0,0.4)");
+        expect(canvas.freeDrawingBrush?.color).toEqual("rgba(0,0,0,0.4)");
         unmount();
       });
     });
@@ -270,15 +277,15 @@ describe("SketchField", () => {
         tool: Tool.HIGHLIGHTER,
         lineColor: "#ff0000",
       });
-      expect(canvas.freeDrawingBrush.color).toEqual("rgba(255,0,0,0.4)");
+      expect(canvas.freeDrawingBrush?.color).toEqual("rgba(255,0,0,0.4)");
 
       expect(() =>
         update({ tool: Tool.HIGHLIGHTER, lineColor: "rgb(0, 0, 255)" })
       ).not.toThrow();
-      expect(canvas.freeDrawingBrush.color).toEqual("rgba(0,0,0,0.4)");
+      expect(canvas.freeDrawingBrush?.color).toEqual("rgba(0,0,0,0.4)");
 
       update({ tool: Tool.HIGHLIGHTER, lineColor: "blue" });
-      expect(canvas.freeDrawingBrush.color).toEqual("rgba(0,0,255,0.4)");
+      expect(canvas.freeDrawingBrush?.color).toEqual("rgba(0,0,255,0.4)");
     });
   });
 
@@ -492,13 +499,13 @@ describe("SketchField", () => {
       // [Action2] Change rectangle dimension and save its state
       rect1.set({ width: 50, height: 60 });
       rect1.setCoords();
-      canvas.fire("object:modified", { target: rect1 });
+      fire(canvas, "object:modified", { target: rect1 });
       stateStack.push(rect1.toJSON());
 
       // [Action3] Change the position and save its state
       rect1.set({ left: 20, top: 70 });
       rect1.setCoords();
-      canvas.fire("object:modified", { target: rect1 });
+      fire(canvas, "object:modified", { target: rect1 });
       stateStack.push(rect1.toJSON());
 
       // Undo Action3
@@ -529,11 +536,11 @@ describe("SketchField", () => {
       const rect1 = objectFromDrag(canvas, START, END);
       const original = rect1.toJSON();
       rect1.set({ left: 100 });
-      canvas.fire("object:modified", { target: rect1 });
+      fire(canvas, "object:modified", { target: rect1 });
       sketch.undo();
 
       rect1.set({ left: 200 });
-      canvas.fire("object:modified", { target: rect1 });
+      fire(canvas, "object:modified", { target: rect1 });
       sketch.undo();
 
       expect(canvas.getObjects()[0].toJSON()).toEqual(original);
@@ -543,7 +550,7 @@ describe("SketchField", () => {
       const { sketch, canvas } = mount({ tool: Tool.RECTANGLE });
       const stranger = new fabric.Rect({ width: 5, height: 5 });
 
-      canvas.fire("object:modified", { target: stranger });
+      fire(canvas, "object:modified", { target: stranger });
 
       expect(sketch.canUndo()).toBe(false);
     });
@@ -630,14 +637,14 @@ describe("SketchField", () => {
       const { canvas } = mount({ tool: Tool.RECTANGLE, onChange });
 
       const up = mouseEvent("mouseup", END);
-      canvas.fire("mouse:up", up);
+      fire(canvas, "mouse:up", up);
       expect(onChange).not.toHaveBeenCalled();
       jest.advanceTimersByTime(10);
       expect(onChange).toHaveBeenCalledTimes(1);
       expect(onChange).toHaveBeenLastCalledWith(up.e);
 
       const out = mouseEvent("mouseout", END);
-      canvas.fire("mouse:out", out);
+      fire(canvas, "mouse:out", out);
       jest.advanceTimersByTime(10);
       expect(onChange).toHaveBeenCalledTimes(2);
       expect(onChange).toHaveBeenLastCalledWith(out.e);
@@ -647,7 +654,7 @@ describe("SketchField", () => {
       jest.useFakeTimers();
       const onChange = jest.fn();
       const { canvas, unmount } = mount({ tool: Tool.RECTANGLE, onChange });
-      canvas.fire("mouse:up", mouseEvent("mouseup", END));
+      fire(canvas, "mouse:up", mouseEvent("mouseup", END));
 
       unmount();
       jest.advanceTimersByTime(1000);
@@ -669,7 +676,7 @@ describe("SketchField", () => {
       });
 
       objectFromDrag(canvas, START, END);
-      canvas.fire("mouse:out", mouseEvent("mouseout", END));
+      fire(canvas, "mouse:out", mouseEvent("mouseout", END));
 
       expect(onMouseDown).toHaveBeenCalledTimes(1);
       expect(onMouseDown.mock.calls[0][0].e).toBeInstanceOf(MouseEvent);
@@ -719,10 +726,10 @@ describe("SketchField", () => {
       });
       const object = objectFromDrag(canvas, START, END);
 
-      canvas.fire("object:modified", { target: object });
-      canvas.fire("object:moving", { target: object });
-      canvas.fire("object:scaling", { target: object });
-      canvas.fire("object:rotating", { target: object });
+      fire(canvas, "object:modified", { target: object });
+      fire(canvas, "object:moving", { target: object });
+      fire(canvas, "object:scaling", { target: object });
+      fire(canvas, "object:rotating", { target: object });
 
       [onObjectModified, onObjectMoving, onObjectScaling, onObjectRotating].forEach(
         (callback) => {
@@ -745,94 +752,94 @@ describe("SketchField", () => {
   describe("value", () => {
     beforeEach(() => jest.useFakeTimers());
 
-    const load = () => jest.advanceTimersByTime(100);
+    const load = () => jest.advanceTimersByTimeAsync(100);
 
-    it("loads defaultValue when it mounts", () => {
+    it("loads defaultValue when it mounts", async () => {
       const { canvas } = mount({
         defaultValue: { objects: [rect(10, 10), rect(50, 50)] },
       });
       expect(canvas.getObjects()).toHaveLength(0);
 
-      load();
+      await load();
 
       expect(canvas.getObjects()).toHaveLength(2);
     });
 
-    it("loads value when it mounts, rather than defaultValue", () => {
+    it("loads value when it mounts, rather than defaultValue", async () => {
       const { canvas } = mount({
         value: { objects: [rect(10, 10)] },
         defaultValue: { objects: [rect(10, 10), rect(50, 50)] },
       });
 
-      load();
+      await load();
 
       expect(canvas.getObjects()).toHaveLength(1);
     });
 
-    it("loads value when it changes, not when it stays the same", () => {
+    it("loads value when it changes, not when it stays the same", async () => {
       const first = { objects: [rect(10, 10)] };
       const second = { objects: [rect(10, 10), rect(50, 50)] };
       const { canvas, update } = mount({ value: first });
       const loadFromJSON = jest.spyOn(canvas, "loadFromJSON");
-      load();
+      await load();
       expect(loadFromJSON).toHaveBeenCalledTimes(1);
 
       update({ value: second });
-      load();
+      await load();
       expect(canvas.getObjects()).toHaveLength(2);
       expect(loadFromJSON).toHaveBeenCalledTimes(2);
 
       update({ value: second, className: "other" });
-      load();
+      await load();
       expect(loadFromJSON).toHaveBeenCalledTimes(2);
     });
 
-    it("loads value on every update when forceValue is set", () => {
+    it("loads value on every update when forceValue is set", async () => {
       const value = { objects: [rect(10, 10)] };
       const { canvas, update } = mount({ value, forceValue: true });
       const loadFromJSON = jest.spyOn(canvas, "loadFromJSON");
-      load();
+      await load();
 
       update({ value, forceValue: true, className: "other" });
-      load();
+      await load();
 
       expect(loadFromJSON).toHaveBeenCalledTimes(2);
     });
 
-    it("calls onChange, without arguments, once the value is loaded", () => {
+    it("calls onChange, without arguments, once the value is loaded", async () => {
       const onChange = jest.fn();
       mount({ value: { objects: [rect(10, 10)] }, onChange });
       expect(onChange).not.toHaveBeenCalled();
 
-      load();
+      await load();
 
       expect(onChange).toHaveBeenCalledTimes(1);
       expect(onChange).toHaveBeenCalledWith();
     });
 
-    it("keeps the background color of the sketch when the value has none", () => {
+    it("keeps the background color of the sketch when the value has none", async () => {
       const { canvas, update } = mount({
         backgroundColor: "red",
         value: { objects: [rect(10, 10)] },
       });
-      load();
+      await load();
       expect(canvas.backgroundColor).toEqual("red");
 
       update({
         backgroundColor: "red",
         value: { objects: [], background: "blue" },
       });
-      load();
+      await load();
       expect(canvas.backgroundColor).toEqual("blue");
     });
 
-    it("makes the loaded objects follow the tool", () => {
+    it("makes the loaded objects follow the tool", async () => {
       const { canvas } = mount({
         tool: Tool.DEFAULT_TOOL,
         value: { objects: [rect(10, 10)] },
       });
 
-      load();
+      await load();
 
       const [object] = canvas.getObjects();
       expect(canvas.selection).toBe(false);
@@ -840,12 +847,12 @@ describe("SketchField", () => {
       expect(object.evented).toBe(false);
     });
 
-    it("does not load into a canvas which is gone", () => {
+    it("does not load into a canvas which is gone", async () => {
       const { canvas, unmount } = mount({ value: { objects: [rect(10, 10)] } });
       const loadFromJSON = jest.spyOn(canvas, "loadFromJSON");
 
       unmount();
-      load();
+      await load();
 
       expect(loadFromJSON).not.toHaveBeenCalled();
     });
@@ -871,16 +878,16 @@ describe("SketchField", () => {
 
     describe("addImg", () => {
       const stubImages = () =>
-        jest.spyOn(fabric.Image, "fromURL").mockImplementation((_url, callback) => {
-          const image = new fabric.Image(document.createElement("img"), {
-            width: 100,
-            height: 60,
-          });
-          callback?.(image);
-          return image;
-        });
+        jest.spyOn(fabric.FabricImage, "fromURL").mockImplementation(() =>
+          Promise.resolve(
+            new fabric.FabricImage(document.createElement("img"), {
+              width: 100,
+              height: 60,
+            })
+          )
+        );
 
-      it("adds the image at the given position and scale", () => {
+      it("adds the image at the given position and scale", async () => {
         const fromURL = stubImages();
         const { sketch, canvas } = mount();
         canvas.renderOnAddRemove = false;
@@ -890,23 +897,26 @@ describe("SketchField", () => {
           top: 25,
           scale: 2,
         });
+        await settle();
 
         const [image] = canvas.getObjects();
         expect(fromURL).toHaveBeenCalledWith(
           "data:image/png;base64,00",
-          expect.any(Function)
+          {},
+          { originX: "left", originY: "top" }
         );
         expect(image.type).toEqual("image");
         expect([image.left, image.top, image.scaleX]).toEqual([15, 25, 2]);
       });
 
-      it("scales the image to half, and places it at random, by default", () => {
+      it("scales the image to half, and places it at random, by default", async () => {
         stubImages();
         jest.spyOn(Math, "random").mockReturnValue(0.5);
         const { sketch, canvas } = mount();
         canvas.renderOnAddRemove = false;
 
         sketch.addImg("data:image/png;base64,00");
+        await settle();
 
         const [image] = canvas.getObjects();
         expect(image.scaleX).toEqual(0.5);
@@ -914,32 +924,48 @@ describe("SketchField", () => {
         expect(image.top).toEqual(0.5 * (canvas.getHeight() - 60 * 0.5));
       });
 
-      it("can be undone", () => {
+      it("can be undone", async () => {
         stubImages();
         const { sketch, canvas } = mount();
         canvas.renderOnAddRemove = false;
         sketch.addImg("data:image/png;base64,00");
+        await settle();
 
         sketch.undo();
 
         expect(canvas.getObjects()).toHaveLength(0);
       });
 
-      it("adds nothing when the component was unmounted meanwhile", () => {
+      it("adds nothing when the component was unmounted meanwhile", async () => {
         let finish: () => void = () => undefined;
-        jest.spyOn(fabric.Image, "fromURL").mockImplementation((_url, callback) => {
-          const image = new fabric.Image(document.createElement("img"));
-          finish = () => callback?.(image);
-          return image;
-        });
+        jest.spyOn(fabric.FabricImage, "fromURL").mockImplementation(
+          () =>
+            new Promise((resolve) => {
+              const image = new fabric.FabricImage(document.createElement("img"));
+              finish = () => resolve(image);
+            })
+        );
         const { sketch, canvas, unmount } = mount();
         const add = jest.spyOn(canvas, "add");
         sketch.addImg("data:image/png;base64,00");
 
         unmount();
+        finish();
+        await settle();
 
-        expect(finish).not.toThrow();
         expect(add).not.toHaveBeenCalled();
+      });
+
+      it("adds nothing, and does not fail, when the image cannot be loaded", async () => {
+        jest
+          .spyOn(fabric.FabricImage, "fromURL")
+          .mockImplementation(() => Promise.reject(new Error("no image")));
+        const { sketch, canvas } = mount();
+
+        sketch.addImg("not-an-image");
+        await settle();
+
+        expect(canvas.getObjects()).toHaveLength(0);
       });
     });
 
@@ -1026,49 +1052,49 @@ describe("SketchField", () => {
     describe("fromJSON", () => {
       beforeEach(() => jest.useFakeTimers());
 
-      it("populates the canvas a moment later, from an object or a string", () => {
+      it("populates the canvas a moment later, from an object or a string", async () => {
         const { sketch, canvas } = mount();
 
         sketch.fromJSON({ objects: [rect(10, 10)] });
         expect(canvas.getObjects()).toHaveLength(0);
-        jest.advanceTimersByTime(100);
+        await jest.advanceTimersByTimeAsync(100);
         expect(canvas.getObjects()).toHaveLength(1);
 
         sketch.fromJSON(JSON.stringify({ objects: [rect(10, 10), rect(5, 5)] }));
-        jest.advanceTimersByTime(100);
+        await jest.advanceTimersByTimeAsync(100);
         expect(canvas.getObjects()).toHaveLength(2);
       });
 
-      it("does nothing without a value", () => {
+      it("does nothing without a value", async () => {
         const { sketch, canvas } = mount();
         const loadFromJSON = jest.spyOn(canvas, "loadFromJSON");
 
         sketch.fromJSON();
         sketch.fromJSON("");
-        jest.advanceTimersByTime(100);
+        await jest.advanceTimersByTimeAsync(100);
 
         expect(loadFromJSON).not.toHaveBeenCalled();
       });
 
-      it("restores what toJSON returned", () => {
+      it("restores what toJSON returned", async () => {
         const { sketch, canvas } = mount({ tool: Tool.RECTANGLE });
         objectFromDrag(canvas, START, END);
         const saved = sketch.toJSON();
         canvas.clear();
 
         sketch.fromJSON(saved);
-        jest.advanceTimersByTime(100);
+        await jest.advanceTimersByTimeAsync(100);
 
         expect(canvas.getObjects()).toHaveLength(1);
         expect(canvas.getObjects()[0].type).toEqual("rect");
       });
 
-      it("starts the history again with the loaded objects", () => {
+      it("starts the history again with the loaded objects", async () => {
         const { sketch, canvas } = mount({ tool: Tool.RECTANGLE });
         const stale = objectFromDrag(canvas, START, END);
 
         sketch.fromJSON({ objects: [rect(10, 10), rect(50, 50)] });
-        jest.advanceTimersByTime(100);
+        await jest.advanceTimersByTimeAsync(100);
         expect(canvas.getObjects()).toHaveLength(2);
 
         // undo takes the loaded objects back one by one, and never brings
@@ -1196,7 +1222,7 @@ describe("SketchField", () => {
     });
 
     describe("copy and paste", () => {
-      it("copies the selected object and pastes it, a bit further", () => {
+      it("copies the selected object and pastes it, a bit further", async () => {
         const { sketch, canvas } = mount({ tool: Tool.RECTANGLE });
         canvas.renderOnAddRemove = false;
         objectFromDrag(canvas, START, END, "rect1");
@@ -1206,6 +1232,7 @@ describe("SketchField", () => {
 
         sketch.copy();
         sketch.paste();
+        await settle();
 
         expect(canvas.getObjects()).toHaveLength(3);
         const pasted = canvas.getObjects()[2];
@@ -1213,7 +1240,7 @@ describe("SketchField", () => {
         expect(canvas.getActiveObject()).toBe(pasted);
       });
 
-      it("pastes further down on every paste", () => {
+      it("pastes further down on every paste", async () => {
         const { sketch, canvas } = mount({ tool: Tool.RECTANGLE });
         canvas.renderOnAddRemove = false;
         objectFromDrag(canvas, START, END);
@@ -1222,13 +1249,14 @@ describe("SketchField", () => {
 
         sketch.paste();
         sketch.paste();
+        await settle();
 
         const [, first, second] = canvas.getObjects();
         expect(first.left).toEqual(START[0] + 10);
         expect(second.left).toEqual(START[0] + 20);
       });
 
-      it("pastes a multiple selection", () => {
+      it("pastes a multiple selection", async () => {
         const { sketch, canvas } = mount({ tool: Tool.RECTANGLE });
         canvas.renderOnAddRemove = false;
         objectFromDrag(canvas, START, END);
@@ -1239,24 +1267,26 @@ describe("SketchField", () => {
 
         sketch.copy();
         sketch.paste();
+        await settle();
 
         expect(canvas.getObjects()).toHaveLength(4);
       });
 
-      it("can undo a paste", () => {
+      it("can undo a paste", async () => {
         const { sketch, canvas } = mount({ tool: Tool.RECTANGLE });
         canvas.renderOnAddRemove = false;
         objectFromDrag(canvas, START, END);
         canvas.setActiveObject(canvas.getObjects()[0]);
         sketch.copy();
         sketch.paste();
+        await settle();
 
         sketch.undo();
 
         expect(canvas.getObjects()).toHaveLength(1);
       });
 
-      it("does nothing without a selection to copy, or without a copy to paste", () => {
+      it("does nothing without a selection to copy, or without a copy to paste", async () => {
         const { sketch, canvas } = mount({ tool: Tool.RECTANGLE });
         objectFromDrag(canvas, START, END);
 
@@ -1265,6 +1295,7 @@ describe("SketchField", () => {
           sketch.copy();
           sketch.paste();
         }).not.toThrow();
+        await settle();
 
         expect(canvas.getObjects()).toHaveLength(1);
       });
@@ -1289,8 +1320,8 @@ describe("SketchField", () => {
 
         sketch.setBackgroundFromDataUrl("data:image/png;base64,00");
 
-        const image = canvas.backgroundImage as fabric.Image;
-        expect(image).toBeInstanceOf(fabric.Image);
+        const image = canvas.backgroundImage as fabric.FabricImage;
+        expect(image).toBeInstanceOf(fabric.FabricImage);
         expect(image.scaleX).toEqual(1);
         expect(image.scaleY).toEqual(1);
       });
@@ -1303,7 +1334,7 @@ describe("SketchField", () => {
           stretched: true,
         });
 
-        const image = canvas.backgroundImage as fabric.Image;
+        const image = canvas.backgroundImage as fabric.FabricImage;
         expect(image.scaleX).toEqual(canvas.getWidth() / 200);
         expect(image.scaleY).toEqual(canvas.getHeight() / 100);
       });
@@ -1315,14 +1346,14 @@ describe("SketchField", () => {
         sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
           stretchedX: true,
         });
-        let image = canvas.backgroundImage as fabric.Image;
+        let image = canvas.backgroundImage as fabric.FabricImage;
         expect(image.scaleX).toEqual(canvas.getWidth() / 200);
         expect(image.scaleY).toEqual(canvas.getWidth() / 200);
 
         sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
           stretchedY: true,
         });
-        image = canvas.backgroundImage as fabric.Image;
+        image = canvas.backgroundImage as fabric.FabricImage;
         expect(image.scaleX).toEqual(canvas.getHeight() / 100);
         expect(image.scaleY).toEqual(canvas.getHeight() / 100);
       });
@@ -1335,7 +1366,7 @@ describe("SketchField", () => {
           opacity: 0.5,
         });
 
-        expect((canvas.backgroundImage as fabric.Image).opacity).toEqual(0.5);
+        expect((canvas.backgroundImage as fabric.FabricImage).opacity).toEqual(0.5);
       });
 
       it("sets nothing when the component was unmounted meanwhile", () => {
@@ -1350,7 +1381,12 @@ describe("SketchField", () => {
           return img;
         });
         const { sketch, canvas, unmount } = mount();
-        const setBackgroundImage = jest.spyOn(canvas, "setBackgroundImage");
+        const setBackgroundImage = jest.fn();
+        Object.defineProperty(canvas, "backgroundImage", {
+          configurable: true,
+          get: () => undefined,
+          set: setBackgroundImage,
+        });
         sketch.setBackgroundFromDataUrl("data:image/png;base64,00");
 
         unmount();
