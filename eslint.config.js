@@ -7,11 +7,7 @@ const prettier = require("eslint-config-prettier/flat");
 const { defineConfig, globalIgnores } = require("eslint/config");
 
 module.exports = defineConfig([
-  globalIgnores([
-    "**/dist/",
-    "**/coverage/",
-    "**/node_modules/",
-  ]),
+  globalIgnores(["**/dist/", "**/coverage/", "**/node_modules/"]),
   {
     files: ["packages/**/*.{ts,tsx}"],
     extends: [

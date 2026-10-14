@@ -58,7 +58,7 @@ describe("Utils", () => {
       element = document.createElement("div");
       element.style.borderLeftWidth = "2px";
       element.style.borderTopWidth = "3px";
-      element.getBoundingClientRect = () => ({ left: 10, top: 20 } as DOMRect);
+      element.getBoundingClientRect = () => ({ left: 10, top: 20 }) as DOMRect;
       document.body.appendChild(element);
     });
 
@@ -76,10 +76,10 @@ describe("Utils", () => {
     });
 
     it("Supports touch events", () => {
-      const event = ({
+      const event = {
         target: element,
         changedTouches: [{ clientX: 30, clientY: 40 }],
-      } as unknown) as TouchEvent;
+      } as unknown as TouchEvent;
       expect(pointerPosition(event)).toEqual([18, 17]);
     });
   });

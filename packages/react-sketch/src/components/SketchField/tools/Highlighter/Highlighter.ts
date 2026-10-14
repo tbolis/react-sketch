@@ -16,7 +16,7 @@ export class Highlighter extends FabricCanvasTool {
     this.canvas.isDrawingMode = true;
     this.brush.width = props.lineWidth ? props.lineWidth : 1;
     this.brush.color = hexToRgbA(
-      color.startsWith("#") ? color : colorNameToHex(color) ?? color
+      color.startsWith("#") ? color : (colorNameToHex(color) ?? color)
     );
   }
 

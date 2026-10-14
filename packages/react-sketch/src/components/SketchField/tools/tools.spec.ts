@@ -16,10 +16,7 @@ const mouseEvent = (type: string, [x, y]: Point): CanvasEvent => ({
 
 /** Fire a canvas event, as the canvas does when the user interacts with it */
 const fire = (canvas: fabric.Canvas, name: string, event: object): void =>
-  (canvas as unknown as fabric.Observable<Record<string, object>>).fire(
-    name,
-    event
-  );
+  (canvas as unknown as fabric.Observable<Record<string, object>>).fire(name, event);
 
 const down = (tool: FabricCanvasTool, point: Point) =>
   tool.doMouseDown(mouseEvent("mousedown", point));
@@ -106,10 +103,7 @@ describe("Tools", () => {
       const [rect] = canvas.getObjects() as fabric.Rect[];
       expect(canvas.getObjects()).toHaveLength(1);
       expect([rect.left, rect.top, rect.width, rect.height]).toEqual([
-        10,
-        20,
-        100,
-        50,
+        10, 20, 100, 50,
       ]);
       expect(rect.stroke).toEqual("red");
       expect(rect.strokeWidth).toEqual(3);
@@ -131,18 +125,12 @@ describe("Tools", () => {
 
       const [rect] = canvas.getObjects() as fabric.Rect[];
       expect([rect.left, rect.top, rect.width, rect.height]).toEqual([
-        40,
-        60,
-        60,
-        40,
+        40, 60, 60, 40,
       ]);
 
       move(tool, [150, 130]);
       expect([rect.left, rect.top, rect.width, rect.height]).toEqual([
-        100,
-        100,
-        50,
-        30,
+        100, 100, 50, 30,
       ]);
     });
   });
@@ -210,10 +198,7 @@ describe("Tools", () => {
       const [rect, text] = canvas.getObjects() as [fabric.Rect, fabric.Textbox];
       expect(canvas.getObjects()).toHaveLength(2);
       expect([rect.left, rect.top, rect.width, rect.height]).toEqual([
-        100,
-        100,
-        80,
-        60,
+        100, 100, 80, 60,
       ]);
       expect(text.text).toEqual("New drawing");
       expect(text.backgroundColor).toEqual("red");
