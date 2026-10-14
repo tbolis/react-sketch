@@ -8,7 +8,8 @@ import { withSketch } from "../../Canvas/sketchRef";
 import Section from "../Section";
 
 const TextControls = ({ text }: Pick<Config, "text">): ReactElement => {
-  const addText = () => withSketch((sketch) => sketch.addText(CONFIG.text));
+  const addText = () =>
+    withSketch((sketch) => sketch.addText(CONFIG.text, { fill: CONFIG.lineColor }));
 
   return (
     <Section id="text" title="Text">

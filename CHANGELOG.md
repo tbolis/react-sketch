@@ -99,6 +99,9 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
 - Unmounting clears the pending timers (`fromJSON`, `onChange`) and disposes the canvas, so no callback
   runs on a disposed canvas.
 - `undo()` does nothing when there is nothing to undo. In 0.5.x it threw an error.
+- `enableTouchScroll()` and `disableTouchScroll()` also set the `touch-action` style of the canvas, as
+  fabric reads the flag only when it creates the canvas. In 0.5.x the flag changed and the browser
+  kept blocking the scroll.
 - The Rectangle and RectangleLabel tools follow the pointer when dragging in every direction.
 - The Arrow tool no longer adds the previous arrow again on a mouse up that follows a finished arrow.
 - The Pencil tool uses the default cursor, not the crosshair of fabric (#181).
