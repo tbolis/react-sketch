@@ -11,7 +11,9 @@ module.exports = {
   entry: {
     index: "./src/index.ts",
   },
-  // react and fabric are provided by the consumer, never bundled.
+  // react and fabric are provided by the consumer, never bundled. The script
+  // tag build of fabric (7.x) defines window.fabric with the named exports,
+  // which is what `import * as fabric from "fabric"` reads from the global.
   externals: {
     react: umdExternal("react", "React"),
     "react/jsx-runtime": umdExternal("react/jsx-runtime", "ReactJSXRuntime"),

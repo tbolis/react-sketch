@@ -1,4 +1,5 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
+import { CanvasEvent } from "../../events";
 import { FabricCanvasTool } from "../index";
 import { Tool } from "../../../../types";
 
@@ -20,14 +21,14 @@ export class Pan extends FabricCanvasTool {
     this.canvas.defaultCursor = "move";
   }
 
-  doMouseDown(event: fabric.IEvent): void {
+  doMouseDown(event: CanvasEvent): void {
     this.isDown = true;
     const pointer = this.pointer(event);
     this.startX = pointer.x;
     this.startY = pointer.y;
   }
 
-  doMouseMove(event: fabric.IEvent): void {
+  doMouseMove(event: CanvasEvent): void {
     if (!this.isDown) return;
     const pointer = this.pointer(event);
     this.canvas.relativePan(

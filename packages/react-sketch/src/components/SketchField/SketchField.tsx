@@ -1,6 +1,6 @@
 import * as React from "react";
 import { PureComponent } from "react";
-import { fabric } from "fabric";
+import * as fabric from "fabric";
 import {
   BackgroundOptions,
   DataUrlOptions,
@@ -12,7 +12,7 @@ import {
   Tool,
 } from "../../types";
 import { uuid4 } from "../../utils";
-import { FabricCanvasEventsManager, SketchEventAware } from "./events";
+import { CanvasEvent, FabricCanvasEventsManager, SketchEventAware } from "./events";
 import { SketchHistory } from "./history/SketchHistory";
 import { autoresize } from "./resize";
 import { FabricCanvasTool } from "./tools";
@@ -74,6 +74,24 @@ const defaultProps: DefaultedProps = {
 };
 
 /**
+ * The canvas of the sketch. Clearing it (also when a value is loaded) does not
+ * announce the discarded objects as removed, as it never did: the removal of
+ * an object is something the user does.
+ */
+class SketchCanvas extends fabric.Canvas {
+  clearing = false;
+
+  clear(): void {
+    this.clearing = true;
+    try {
+      super.clear();
+    } finally {
+      this.clearing = false;
+    }
+  }
+}
+
+/**
  * Sketch Tool based on FabricJS for React Applications
  *
  * The methods of the component (undo, redo, toJSON, ...) are available
@@ -82,11 +100,13 @@ const defaultProps: DefaultedProps = {
 class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   static defaultProps = defaultProps;
 
-  private canvas!: fabric.Canvas;
+  private canvas!: SketchCanvas;
   private tool!: FabricCanvasTool;
   private history!: SketchHistory;
   private mounted = false;
-  private clipboard: fabric.Object | null = null;
+  private clipboard: Promise<fabric.FabricObject> | null = null;
+  /** The pastes, which run one after the other as cloning is asynchronous */
+  private pasting: Promise<unknown> = Promise.resolve();
   private readonly timers = new Set<number>();
   private readonly canvasEl = React.createRef<HTMLCanvasElement>();
   private readonly containerEl = React.createRef<HTMLDivElement>();
@@ -115,7 +135,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * Whether the canvas is the one of the mounted component. It is not when a
    * callback of the canvas runs after the component was unmounted.
    */
-  private isCurrent(canvas: fabric.Canvas): boolean {
+  private isCurrent(canvas: SketchCanvas): boolean {
     return this.mounted && this.canvas === canvas;
   }
 
@@ -140,8 +160,14 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
       "text:editing:entered": "onTextEditingEntered",
       "text:selection:changed": "onTextSelectionChanged",
     };
+    // The canvas types its events by name, which is not known here
+    const canvas = this.canvas as unknown as fabric.Observable<
+      Record<string, CanvasEvent>
+    >;
     Object.entries(events).forEach(([name, handler]) => {
-      this.canvas.on(name, (event: fabric.IEvent) => {
+      canvas.on(name, (event) => {
+        // Fabric 7 announces each object of a cleared canvas, fabric 4 did not
+        if (name === "object:removed" && this.canvas.clearing) return;
         eventAware[handler]({ event, tool: this.tool, props: this.props });
       });
     });
@@ -151,7 +177,15 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     const { backgroundColor, undoSteps, value, defaultValue } = this.props;
 
     this.mounted = true;
-    this.canvas = new fabric.Canvas(this.canvasEl.current);
+    // The defaults of fabric 7 that differ from the ones of fabric 4 are set back:
+    // right and middle clicks do not draw, there is no context menu override,
+    // and a selected object is drawn on top of the others only while selected
+    this.canvas = new SketchCanvas(this.canvasEl.current as HTMLCanvasElement, {
+      fireRightClick: false,
+      fireMiddleClick: false,
+      stopContextMenu: false,
+      preserveObjectStacking: false,
+    });
     this.selectTool();
     this.setBackground(backgroundColor);
 
@@ -201,7 +235,9 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     window.removeEventListener("resize", this._resize_listener);
     this.timers.forEach((id) => window.clearTimeout(id));
     this.timers.clear();
-    this.canvas.dispose();
+    // The canvas element is released at once, so it can be used again (React
+    // strict mode mounts twice). The rest is freed once the pending render is done.
+    void this.canvas.dispose();
   }
 
   /**
@@ -254,7 +290,8 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    */
   private setBackground(color?: string): void {
     if (!color) return;
-    this.canvas.setBackgroundColor(color, () => this.canvas.renderAll());
+    this.canvas.backgroundColor = color;
+    this.canvas.requestRenderAll();
   }
 
   /**
@@ -285,18 +322,21 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    */
   addImg = (dataUrl: string, options: ImageOptions = {}): void => {
     const canvas = this.canvas;
-    fabric.Image.fromURL(dataUrl, (image) => {
-      if (!this.isCurrent(canvas)) return;
-      const { left, top, scale } = {
-        left: Math.random() * (canvas.getWidth() - (image.width ?? 0) * 0.5),
-        top: Math.random() * (canvas.getHeight() - (image.height ?? 0) * 0.5),
-        scale: 0.5,
-        ...options,
-      };
-      image.scale(scale);
-      image.set({ left, top });
-      canvas.add(image);
-    });
+    fabric.FabricImage.fromURL(dataUrl, {}, { originX: "left", originY: "top" })
+      .then((image) => {
+        if (!this.isCurrent(canvas)) return;
+        const { left, top, scale } = {
+          left: Math.random() * (canvas.getWidth() - (image.width ?? 0) * 0.5),
+          top: Math.random() * (canvas.getHeight() - (image.height ?? 0) * 0.5),
+          scale: 0.5,
+          ...options,
+        };
+        image.scale(scale);
+        image.set({ left, top });
+        canvas.add(image);
+      })
+      // An image which cannot be loaded is not added
+      .catch(() => undefined);
   };
 
   /**
@@ -367,7 +407,10 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * @returns URL containing a representation of the object in the format specified by options.format
    */
   toDataURL = (options?: DataUrlOptions): string =>
-    this.canvas.toDataURL({ format: this.props.imageFormat, ...options });
+    this.canvas.toDataURL({
+      format: this.props.imageFormat,
+      ...options,
+    } as fabric.TDataUrlOptions);
 
   /**
    * Returns JSON representation of canvas
@@ -376,8 +419,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * @returns the canvas as a JSON ready object
    */
   toJSON = (propertiesToInclude?: string[]): SketchData =>
-    // fabric returns an object, although its typings say it is a string
-    this.canvas.toJSON(propertiesToInclude) as unknown as SketchData;
+    this.canvas.toObject(propertiesToInclude);
 
   /**
    * Populates canvas with data from the specified JSON.
@@ -385,7 +427,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * The canvas is populated a moment later, not right away. The history is
    * reset, as the objects it knows are replaced.
    *
-   * JSON format must conform to the one of fabric.Canvas#toDatalessJSON
+   * The JSON is what `toJSON` returns. The JSON of 0.5.x (fabric 4) is loaded too.
    *
    * @param json JSON string or object
    */
@@ -394,7 +436,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     const canvas = this.canvas;
     this.schedule(() => {
       this.history.clear();
-      canvas.loadFromJSON(json, () => {
+      void canvas.loadFromJSON(json).then(() => {
         if (!this.isCurrent(canvas)) return;
         // Loading a value drops the background color unless the value has one
         if (!canvas.backgroundColor) this.setBackground(this.props.backgroundColor);
@@ -438,8 +480,8 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     const activeObj = canvas.getActiveObject();
     if (!activeObj) return;
     const selected =
-      activeObj.type === "activeSelection"
-        ? (activeObj as fabric.ActiveSelection).getObjects()
+      activeObj instanceof fabric.ActiveSelection
+        ? activeObj.getObjects()
         : [activeObj];
     // Leaving the selection first gives the objects back their own position
     canvas.discardActiveObject();
@@ -451,9 +493,9 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * Copy the selected object, nothing happens when there is no selection
    */
   copy = (): void => {
-    this.canvas.getActiveObject()?.clone((cloned: fabric.Object) => {
-      this.clipboard = cloned;
-    });
+    // The copy is made right away, so it is the object as it is now
+    const copy = this.canvas.getActiveObject()?.clone();
+    if (copy) this.clipboard = copy;
   };
 
   /**
@@ -464,28 +506,33 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     const canvas = this.canvas;
     const clipboard = this.clipboard;
     if (!clipboard) return;
-    // clone again, so you can do multiple copies.
-    clipboard.clone((clonedObj: fabric.Object) => {
-      canvas.discardActiveObject();
-      clonedObj.set({
-        left: (clonedObj.left ?? 0) + 10,
-        top: (clonedObj.top ?? 0) + 10,
-        evented: true,
-      });
-      if (clonedObj.type === "activeSelection") {
-        const selection = clonedObj as fabric.ActiveSelection;
-        // active selection needs a reference to the canvas.
-        selection.canvas = canvas;
-        selection.forEachObject((obj) => canvas.add(obj));
-        selection.setCoords();
-      } else {
-        canvas.add(clonedObj);
-      }
-      clipboard.top = (clipboard.top ?? 0) + 10;
-      clipboard.left = (clipboard.left ?? 0) + 10;
-      canvas.setActiveObject(clonedObj);
-      canvas.requestRenderAll();
-    });
+    this.pasting = this.pasting
+      .then(async () => {
+        const copied = await clipboard;
+        // clone again, so you can do multiple copies.
+        const clonedObj = await copied.clone();
+        if (!this.isCurrent(canvas)) return;
+        canvas.discardActiveObject();
+        clonedObj.set({
+          left: (clonedObj.left ?? 0) + 10,
+          top: (clonedObj.top ?? 0) + 10,
+          evented: true,
+        });
+        if (clonedObj instanceof fabric.ActiveSelection) {
+          // active selection needs a reference to the canvas.
+          clonedObj.canvas = canvas;
+          clonedObj.forEachObject((obj) => canvas.add(obj));
+          clonedObj.setCoords();
+        } else {
+          canvas.add(clonedObj);
+        }
+        copied.top = (copied.top ?? 0) + 10;
+        copied.left = (copied.left ?? 0) + 10;
+        canvas.setActiveObject(clonedObj);
+        canvas.requestRenderAll();
+      })
+      // A paste which fails must not stop the next ones
+      .catch(() => undefined);
   };
 
   /**
@@ -505,14 +552,15 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     const { stretched, stretchedX, stretchedY, ...imageOptions } = options;
     img.onload = () => {
       if (!this.isCurrent(canvas)) return;
-      const imgObj = new fabric.Image(img);
+      const imgObj = new fabric.FabricImage(img, {
+        originX: "left",
+        originY: "top",
+      });
       if (stretched || stretchedX) imgObj.scaleToWidth(canvas.getWidth());
       if (stretched || stretchedY) imgObj.scaleToHeight(canvas.getHeight());
-      canvas.setBackgroundImage(
-        imgObj,
-        () => canvas.renderAll(),
-        imageOptions as fabric.IImageOptions
-      );
+      imgObj.set(imageOptions);
+      canvas.backgroundImage = imgObj;
+      canvas.requestRenderAll();
     };
     img.src = dataUrl;
   };
@@ -526,7 +574,11 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    */
   addText = (text: string, options: TextOptions = {}): void => {
     const canvas = this.canvas;
-    const iText = new fabric.IText(text, options as fabric.ITextOptions);
+    const iText = new fabric.IText(text, {
+      originX: "left",
+      originY: "top",
+      ...options,
+    } as Partial<fabric.ITextProps>);
     if (options.left === undefined) {
       iText.set("left", (canvas.getWidth() - (iText.width ?? 0)) * 0.5);
     }

@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "csstype": "^3.2.3",
-    "fabric": "^4.4.0"
+    "fabric": "^7.4.0"
   },
   "peerDependencies": {
     "react": "^17.0.0 || ^18.0.0 || ^19.0.0"
@@ -49,7 +49,6 @@
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
-    "@types/fabric": "^4.2.5",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.20.5",
     "@types/react": "^19.3.0",

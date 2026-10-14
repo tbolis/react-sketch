@@ -1,4 +1,5 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
+import { CanvasEvent } from "../../events";
 import { FabricCanvasTool } from "../index";
 import { SketchProperties, Tool } from "../../../../types";
 
@@ -27,7 +28,7 @@ export class Arrow extends FabricCanvasTool {
     this.color = props.lineColor ? props.lineColor : "black";
   }
 
-  doMouseDown(event: fabric.IEvent): void {
+  doMouseDown(event: CanvasEvent): void {
     this.isDown = true;
     const pointer = this.pointer(event);
     this.startX = pointer.x;
@@ -57,7 +58,7 @@ export class Arrow extends FabricCanvasTool {
     this.canvas.add(this.head);
   }
 
-  doMouseMove(event: fabric.IEvent): void {
+  doMouseMove(event: CanvasEvent): void {
     if (!this.isDown) return;
     const pointer = this.pointer(event);
     this.line?.set({ x2: pointer.x, y2: pointer.y });
@@ -81,7 +82,13 @@ export class Arrow extends FabricCanvasTool {
     this.isDown = false;
     if (!this.line || !this.head) return;
     this.canvas.remove(this.line, this.head);
-    this.canvas.add(new fabric.Group([this.line, this.head]));
+    // fabric 7 centers groups by default, the arrow keeps its top left origin
+    this.canvas.add(
+      new fabric.Group([this.line, this.head], {
+        originX: "left",
+        originY: "top",
+      })
+    );
     this.line = this.head = null;
   }
 

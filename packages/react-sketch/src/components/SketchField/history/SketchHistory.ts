@@ -1,16 +1,23 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
 import { UndoHistory } from "./index";
 
 /**
  * One undoable action of the sketch
  */
 type HistoryEntry =
-  | { action: "add"; object: fabric.Object }
-  | { action: "remove"; object: fabric.Object }
-  | { action: "modify"; object: fabric.Object; before: string; after: string };
+  | { action: "add"; object: fabric.FabricObject }
+  | { action: "remove"; object: fabric.FabricObject }
+  | { action: "modify"; object: fabric.FabricObject; before: string; after: string };
+
+/**
+ * Properties of the serialized state which are not restored: the type cannot
+ * be set, and the others hold nested objects which the canvas builds itself
+ */
+const NOT_RESTORED = ["type", "version", "objects", "layoutManager", "clipPath"];
 
 /** State of an object, as JSON string */
-const stateOf = (object: fabric.Object): string => JSON.stringify(object.toJSON());
+const stateOf = (object: fabric.FabricObject): string =>
+  JSON.stringify(object.toJSON());
 
 /**
  * Records what happens to the objects of a canvas (added, modified, removed)
@@ -20,9 +27,9 @@ export class SketchHistory {
   private readonly canvas: fabric.Canvas;
   private readonly entries: UndoHistory<HistoryEntry>;
   /** Last known state of each object, it is the "before" of its next modification */
-  private readonly snapshots = new WeakMap<fabric.Object, string>();
+  private readonly snapshots = new WeakMap<fabric.FabricObject, string>();
   /** The object added since the last mouse up, whose final state is not known yet */
-  private pending: fabric.Object | null = null;
+  private pending: fabric.FabricObject | null = null;
   private applying = false;
 
   /**
@@ -45,7 +52,7 @@ export class SketchHistory {
   /**
    * Record an object added to the canvas
    */
-  onObjectAdded(object: fabric.Object): void {
+  onObjectAdded(object: fabric.FabricObject): void {
     this.snapshots.set(object, stateOf(object));
     this.pending = object;
     this.entries.keep({ action: "add", object });
@@ -55,7 +62,7 @@ export class SketchHistory {
    * Record an object modified on the canvas. Objects which were not added
    * through {@link onObjectAdded} (for example a multiple selection) are ignored.
    */
-  onObjectModified(object: fabric.Object): void {
+  onObjectModified(object: fabric.FabricObject): void {
     const before = this.snapshots.get(object);
     if (before === undefined) return;
     const after = stateOf(object);
@@ -77,7 +84,7 @@ export class SketchHistory {
   /**
    * Record the removal of the objects and remove them from the canvas
    */
-  remove(objects: fabric.Object[]): void {
+  remove(objects: fabric.FabricObject[]): void {
     objects.forEach((object) => {
       this.entries.keep({ action: "remove", object });
       this.canvas.remove(object);
@@ -141,7 +148,9 @@ export class SketchHistory {
           break;
         case "modify": {
           const state = forward ? entry.after : entry.before;
-          object.setOptions(JSON.parse(state));
+          const props = JSON.parse(state);
+          NOT_RESTORED.forEach((key) => delete props[key]);
+          object.set(props);
           object.setCoords();
           this.snapshots.set(object, state);
           break;

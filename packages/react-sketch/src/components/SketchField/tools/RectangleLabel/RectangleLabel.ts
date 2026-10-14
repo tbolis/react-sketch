@@ -1,4 +1,5 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
+import { CanvasEvent } from "../../events";
 import { FabricCanvasTool } from "../index";
 import { RectangleLabelObject } from "./RectangleLabelObject";
 import { SketchProperties, Tool } from "../../../../types";
@@ -29,7 +30,7 @@ export class RectangleLabel extends FabricCanvasTool {
     this.fill = props.fillColor ? props.fillColor : "transparent";
   }
 
-  doMouseDown(event: fabric.IEvent): void {
+  doMouseDown(event: CanvasEvent): void {
     this.isDown = true;
     const pointer = this.pointer(event);
     this.startX = pointer.x;
@@ -86,7 +87,7 @@ export class RectangleLabel extends FabricCanvasTool {
     this.canvas.renderAll();
   }
 
-  doMouseMove(event: fabric.IEvent): void {
+  doMouseMove(event: CanvasEvent): void {
     if (!this.isDown || !this.label) return;
     const pointer = this.pointer(event);
     const { rect, textbox } = this.label;

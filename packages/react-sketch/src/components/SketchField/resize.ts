@@ -1,4 +1,4 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
 
 /**
  * Fit the canvas to the size of its container, and scale the objects of the
@@ -26,12 +26,11 @@ export const autoresize = (
 
   const wfactor = parseFloat((width / prevWidth).toFixed(2));
   const hfactor = parseFloat((height / prevHeight).toFixed(2));
-  canvas.setWidth(width);
-  canvas.setHeight(height);
+  canvas.setDimensions({ width, height });
 
   // Need to scale background images as well
   const bi = canvas.backgroundImage;
-  if (bi instanceof fabric.Image) {
+  if (bi instanceof fabric.FabricImage) {
     bi.width = (bi.width ?? 0) * wfactor;
     bi.height = (bi.height ?? 0) * hfactor;
   }
