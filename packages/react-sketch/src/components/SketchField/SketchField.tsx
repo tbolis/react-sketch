@@ -425,7 +425,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * The canvas is populated a moment later, not right away. The history is
    * reset, as the objects it knows are replaced.
    *
-   * JSON format must conform to the one of fabric.Canvas#toDatalessJSON
+   * The JSON is what `toJSON` returns. The JSON of 0.5.x (fabric 4) is loaded too.
    *
    * @param json JSON string or object
    */
