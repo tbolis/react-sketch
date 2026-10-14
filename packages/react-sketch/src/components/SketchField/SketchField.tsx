@@ -235,7 +235,9 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     window.removeEventListener("resize", this._resize_listener);
     this.timers.forEach((id) => window.clearTimeout(id));
     this.timers.clear();
-    this.canvas.dispose();
+    // The canvas element is released at once, so it can be used again (React
+    // strict mode mounts twice). The rest is freed once the pending render is done.
+    void this.canvas.dispose();
   }
 
   /**

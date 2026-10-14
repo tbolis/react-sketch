@@ -35,6 +35,17 @@ const drag = (canvas: fabric.Canvas, from: Point, to: Point): void => {
   fire(canvas, "mouse:up", mouseEvent("mouseup", to));
 };
 
+/** An event of the browser, as the canvas receives it from the page */
+const domEvent = (type: string, [x, y]: Point, button = 0): MouseEvent =>
+  new MouseEvent(type, {
+    clientX: x,
+    clientY: y,
+    button,
+    buttons: type === "mouseup" ? 0 : 1 << button,
+    bubbles: true,
+    cancelable: true,
+  });
+
 /** Draw a free hand stroke, through the brush as the canvas does */
 const stroke = (canvas: fabric.Canvas, points: Point[]): void => {
   const brush = canvas.freeDrawingBrush as fabric.BaseBrush;
@@ -837,9 +848,32 @@ describe("SketchField on fabric 7", () => {
   });
 
   describe("behavior of fabric 4 which the component keeps", () => {
-    it("ignores right and middle clicks, leaves the context menu alone", () => {
-      const { canvas } = mount();
+    it("draws with the mouse events of the page", () => {
+      const onMouseDown = jest.fn();
+      const onMouseUp = jest.fn();
+      const { canvas } = mount({ tool: Tool.LINE, onMouseDown, onMouseUp });
 
+      canvas.upperCanvasEl.dispatchEvent(domEvent("mousedown", [10, 20]));
+      document.dispatchEvent(domEvent("mousemove", [60, 80]));
+      document.dispatchEvent(domEvent("mouseup", [60, 80]));
+
+      const [line] = canvas.getObjects();
+      expect(endPoints(line)).toEqual([10, 20, 60, 80]);
+      expect(onMouseDown).toHaveBeenCalledTimes(1);
+      expect(onMouseUp).toHaveBeenCalledTimes(1);
+    });
+
+    it("ignores right and middle clicks, leaves the context menu alone", () => {
+      const onMouseDown = jest.fn();
+      const { canvas } = mount({ tool: Tool.LINE, onMouseDown });
+
+      [1, 2].forEach((button) => {
+        canvas.upperCanvasEl.dispatchEvent(domEvent("mousedown", [10, 20], button));
+        document.dispatchEvent(domEvent("mouseup", [10, 20], button));
+      });
+
+      expect(canvas.getObjects()).toHaveLength(0);
+      expect(onMouseDown).not.toHaveBeenCalled();
       expect(canvas.fireRightClick).toBe(false);
       expect(canvas.fireMiddleClick).toBe(false);
       expect(canvas.stopContextMenu).toBe(false);
