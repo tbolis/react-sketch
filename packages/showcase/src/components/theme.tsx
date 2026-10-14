@@ -1,16 +1,16 @@
-import * as React from "react";
-import blue from "@material-ui/core/colors/cyan";
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
+import type { ReactNode } from "react";
+import { cyan } from "@mui/material/colors";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-const theme = createMuiTheme({
+const theme = createTheme({
   palette: {
-    primary: blue,
-    type: "dark",
+    primary: cyan,
+    mode: "dark",
   },
 });
 
-const ShowcaseTheme = ({ children }): JSX.Element => {
-  return <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>;
+const ShowcaseTheme = ({ children }: { children: ReactNode }) => {
+  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 };
 
 export default ShowcaseTheme;

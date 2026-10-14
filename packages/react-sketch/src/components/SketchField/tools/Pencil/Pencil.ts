@@ -1,4 +1,4 @@
-import { fabric } from "fabric";
+import * as fabric from "fabric";
 import { FabricCanvasTool } from "../index";
 import { SketchProperties, Tool } from "../../../../types";
 
@@ -9,10 +9,10 @@ export class Pencil extends FabricCanvasTool {
 
   configureCanvas(config: SketchProperties): void {
     this.canvas.isDrawingMode = true;
-    this.canvas.freeDrawingBrush.width = config.lineWidth ? config.lineWidth : 1;
-    this.canvas.freeDrawingBrush.color = config.lineColor
-      ? config.lineColor
-      : "black";
+    // The regular pointer, not the crosshair of fabric (issue #181)
+    this.canvas.freeDrawingCursor = "default";
+    this.brush.width = config.lineWidth ? config.lineWidth : 1;
+    this.brush.color = config.lineColor ? config.lineColor : "black";
   }
 
   type(): Tool {

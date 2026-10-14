@@ -5,18 +5,22 @@ const port = 23000;
 
 module.exports = {
   target: "web",
-  mode: "development",
   entry: "./src/index.tsx",
   resolve: {
     extensions: [".js", ".jsx", ".json", ".ts", ".tsx"],
+    alias: {
+      // Use the library sources so the showcase runs without a prebuilt dist.
+      "react-sketch": path.resolve(__dirname, "../react-sketch/src/index.ts"),
+    },
   },
   output: {
     path: path.resolve(__dirname, "build"),
     filename: "bundle.js",
+    clean: true,
   },
   devServer: {
-    contentBase: path.join(__dirname, "src"),
-    stats: { colors: true },
+    static: { directory: path.join(__dirname, "public") },
+    devMiddleware: { stats: { colors: true } },
     port: port,
   },
   devtool: "source-map",
@@ -24,7 +28,10 @@ module.exports = {
     rules: [
       {
         test: /\.(ts|tsx)$/,
-        loader: "awesome-typescript-loader",
+        loader: "ts-loader",
+        exclude: /node_modules/,
+        // Types are checked by `yarn typecheck`.
+        options: { transpileOnly: true },
       },
       {
         enforce: "pre",

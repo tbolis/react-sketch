@@ -1,5 +1,4 @@
 import * as CSS from "csstype";
-import PropTypes from "prop-types";
 
 /**
  * Enumeration which declares the various tools available for
@@ -11,215 +10,191 @@ export enum Tool {
   ARROW = "arrow",
   PENCIL = "pencil",
   RECTANGLE = "rectangle",
+  RECTANGLE_LABEL = "rectangle-label",
   SELECT = "select",
   PAN = "pan",
   HIGHLIGHTER = "highlighter",
+  DEFAULT_TOOL = "default-tool",
 }
 
-interface SketchStyle {
-  className?: string;
-  style?: CSS.Properties;
-  autoresize?: boolean;
-  height?: number;
+/**
+ * The tools by their legacy (0.5.x) names, as in
+ * `import { Tools } from "react-sketch"`. The values are the ones of {@link Tool}.
+ */
+export const Tools = {
+  Select: Tool.SELECT,
+  Pencil: Tool.PENCIL,
+  Line: Tool.LINE,
+  Arrow: Tool.ARROW,
+  Rectangle: Tool.RECTANGLE,
+  RectangleLabel: Tool.RECTANGLE_LABEL,
+  Circle: Tool.CIRCLE,
+  Pan: Tool.PAN,
+  DefaultTool: Tool.DEFAULT_TOOL,
+  Highlighter: Tool.HIGHLIGHTER,
+} as const;
+
+/**
+ * An object of the sketch, as seen by the event callbacks. This is the
+ * canvas (fabric) object, with the properties which are the same in every
+ * version of the underlying library.
+ */
+export interface SketchObject {
+  /** Kind of the object, for example "rect", "line", "path", "i-text" */
+  type?: string;
+  /** Any other property of the object, including custom ones set by the application */
+  [property: string]: unknown;
+}
+
+/**
+ * Event passed to the object and mouse callbacks of {@link SketchProperties}
+ */
+export interface SketchEvent {
+  /** The original DOM event, when the event was triggered by the user */
+  e?: Event;
+  /** The object the event is about (object events only) */
+  target?: SketchObject;
+  /** Any other property of the canvas event */
+  [property: string]: unknown;
+}
+
+/**
+ * Content of a sketch, as returned by `toJSON` and accepted by `value`,
+ * `defaultValue` and `fromJSON`: an object, or the same object as JSON string.
+ */
+export type SketchValue = object | string;
+
+/**
+ * Content of a sketch as returned by `toJSON` and `clear`
+ */
+export type SketchData = Record<string, unknown>;
+
+/**
+ * Options of `toDataURL`
+ */
+export interface DataUrlOptions {
+  /** Format of the image, "png" or "jpeg". Defaults to the `imageFormat` property, then "png" */
+  format?: string;
+  /** Quality level (0..1). Only used for jpeg. Defaults to 1 */
+  quality?: number;
+  /** Multiplier to scale by. Defaults to 1 */
+  multiplier?: number;
+  /** Cropping left offset */
+  left?: number;
+  /** Cropping top offset */
+  top?: number;
+  /** Cropping width */
   width?: number;
+  /** Cropping height */
+  height?: number;
 }
 
-interface SketchTool {
-  tool: Tool | string; // tool type
-  lineColor?: string; // the color of the line
-  lineWidth?: number; // The width of the line
-  fillColor?: string; // the fill color of the shape when applicable
-  backgroundColor?: string; // the background color of the sketch
+/**
+ * Options of `addImg`
+ */
+export interface ImageOptions {
+  /** Distance from the left of the canvas. Defaults to a random position */
+  left?: number;
+  /** Distance from the top of the canvas. Defaults to a random position */
+  top?: number;
+  /** Initial scale of the image. Defaults to 0.5 */
+  scale?: number;
 }
 
-export interface SketchState {
-  action: boolean;
+/**
+ * Options of `setBackgroundFromDataUrl`
+ */
+export interface BackgroundOptions {
+  /** Scale the image to the width and the height of the canvas */
+  stretched?: boolean;
+  /** Scale the image to the width of the canvas */
+  stretchedX?: boolean;
+  /** Scale the image to the height of the canvas */
+  stretchedY?: boolean;
+  /** Any other option is passed to the canvas as an image option, for example `opacity` */
+  [option: string]: unknown;
 }
 
-export interface SketchProperties extends SketchTool, SketchStyle {}
+/**
+ * Options of `addText`: the options of a canvas text object, for example
+ * `fontSize`, `fill`, `left`, `top`
+ */
+export type TextOptions = Record<string, unknown>;
 
-// declare module "react-sketch123123" {
-//   import * as React from "react";
-//
-//   export class SketchField extends React.PureComponent<{
-//     // the color of the line
-//     lineColor?: string;
-//     // The width of the line
-//     lineWidth?: number;
-//     // the opacity of the object
-//     opacity?: number;
-//     // number of undo/redo steps to maintain
-//     undoSteps?: number;
-//     // The tool to use, can be pencil, rectangle, circle, brush;
-//     tool?: string;
-//     // image format when calling toDataURL
-//     imageFormat?: string;
-//     // Sketch data for controlling sketch from
-//     // outside the component
-//     value?: object;
-//     // Set to true if you wish to force load the given value, even if it is  the same
-//     forceValue?: boolean;
-//     // Specify some width correction which will be applied on auto resize
-//     widthCorrection?: number;
-//     // Specify some height correction which will be applied on auto resize
-//     heightCorrection?: number;
-//     // Specify action on change
-//     onChange?: (evt: any) => void;
-//     // Default initial value
-//     defaultValue?: {};
-//     // Sketch width
-//     width?: number;
-//     // Sketch height
-//     height?: number;
-//     // Class name to pass to container div of canvas
-//     className?: string;
-//     // Style options to pass to container div of canvas
-//     style?: {};
-//   }> {
-//     /**
-//      * Enable touch Scrolling on Canvas
-//      */
-//     enableTouchScroll(): void;
-//
-//     /**
-//      * Disable touch Scrolling on Canvas
-//      */
-//     disableTouchScroll(): void;
-//
-//     /**
-//      * Add an image as object to the canvas
-//      *
-//      * @param dataUrl the image url or Data Url
-//      * @param options object to pass and change some options when loading image, the format of the object is:
-//      *
-//      * {
-//      *   left: <Number: distance from left of canvas>,
-//      *   top: <Number: distance from top of canvas>,
-//      *   scale: <Number: initial scale of image>
-//      * }
-//      */
-//     addImg(
-//       dataUrl: string,
-//       options?: { left?: number; top?: number; scale?: number }
-//     ): void;
-//
-//     /**
-//      * Zoom the drawing by the factor specified
-//      *
-//      * The zoom factor is a percentage with regards the original, for example if factor is set to 2
-//      * it will double the size whereas if it is set to 0.5 it will half the size
-//      *
-//      * @param factor the zoom factor
-//      */
-//     zoom(factor: number): void;
-//
-//     /**
-//      * Perform an undo operation on canvas, if it cannot undo it will leave the canvas intact
-//      */
-//     undo(): void;
-//
-//     /**
-//      * Perform a redo operation on canvas, if it cannot redo it will leave the canvas intact
-//      */
-//     redo(): void;
-//
-//     /**
-//      * Delegation method to check if we can perform an undo Operation, useful to disable/enable possible buttons
-//      *
-//      * @returns {*} true if we can undo otherwise false
-//      */
-//     canUndo(): boolean;
-//
-//     /**
-//      * Delegation method to check if we can perform a redo Operation, useful to disable/enable possible buttons
-//      *
-//      * @returns {*} true if we can redo otherwise false
-//      */
-//     canRedo(): boolean;
-//
-//     /**
-//      * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
-//      *
-//      * Available Options are
-//      * <table style="width:100%">
-//      *
-//      * <tr><td><b>Name</b></td><td><b>Type</b></td><td><b>Argument</b></td><td><b>Default</b></td><td><b>Description</b></td></tr>
-//      * <tr><td>format</td> <td>String</td> <td><optional></td><td>png</td><td>The format of the output image. Either "jpeg" or "png"</td></tr>
-//      * <tr><td>quality</td><td>Number</td><td><optional></td><td>1</td><td>Quality level (0..1). Only used for jpeg.</td></tr>
-//      * <tr><td>multiplier</td><td>Number</td><td><optional></td><td>1</td><td>Multiplier to scale by</td></tr>
-//      * <tr><td>left</td><td>Number</td><td><optional></td><td></td><td>Cropping left offset. Introduced in v1.2.14</td></tr>
-//      * <tr><td>top</td><td>Number</td><td><optional></td><td></td><td>Cropping top offset. Introduced in v1.2.14</td></tr>
-//      * <tr><td>width</td><td>Number</td><td><optional></td><td></td><td>Cropping width. Introduced in v1.2.14</td></tr>
-//      * <tr><td>height</td><td>Number</td><td><optional></td><td></td><td>Cropping height. Introduced in v1.2.14</td></tr>
-//      *
-//      * </table>
-//      *
-//      * @returns {String} URL containing a representation of the object in the format specified by options.format
-//      */
-//     toDataURL(options?: {
-//       format?: string;
-//       quality?: number;
-//       multiplier?: number;
-//       left?: number;
-//       top?: number;
-//       width?: number;
-//       height?: number;
-//     }): string;
-//
-//     /**
-//      * Returns JSON representation of canvas
-//      *
-//      * @param propertiesToInclude Array <optional> Any properties that you might want to additionally include in the output
-//      * @returns {string} JSON string
-//      */
-//     toJSON(propertiesToInclude?: ArrayLike<string>): string;
-//
-//     /**
-//      * Populates canvas with data from the specified JSON.
-//      *
-//      * JSON format must conform to the one of fabric.Canvas#toDatalessJSON
-//      *
-//      * @param json JSON string or object
-//      */
-//     fromJSON(json: string): void;
-//
-//     /**
-//      * Clear the content of the canvas, this will also clear history but will return the canvas content as JSON to be
-//      * used as needed in order to undo the clear if possible
-//      *
-//      * @param propertiesToInclude Array <optional> Any properties that you might want to additionally include in the output
-//      * @returns {string} JSON string of the canvas just cleared
-//      */
-//     clear(propertiesToInclude?: ArrayLike<string>): string;
-//
-//     hasSelection(): boolean;
-//     clearSelection(): void;
-//
-//     /**
-//      * Remove selected object from the canvas
-//      */
-//     removeSelected(): void;
-//
-//     copy(): void;
-//
-//     paste(): void;
-//
-//     /**
-//      * Sets the background from the dataUrl given
-//      *
-//      * @param dataUrl the dataUrl to be used as a background
-//      * @param options
-//      */
-//     setBackgroundFromDataUrl(
-//       dataUrl: string,
-//       options?: {
-//         stretched?: boolean;
-//         stretchedX?: boolean;
-//         stretchedY?: boolean;
-//         [name: string]: any;
-//       }
-//     ): void;
-//
-//     addText(text: string, options?: {}): void;
-//   }
-// }
+/**
+ * Properties of the SketchField component
+ */
+export interface SketchProperties {
+  /**
+   * The tool to use. See {@link Tool} (or `Tools`). Defaults to "select"
+   * (the objects can be moved, nothing is drawn), which is what the
+   * component did when no tool was given.
+   */
+  tool?: Tool | string;
+  /** The color of the line. Defaults to "black" */
+  lineColor?: string;
+  /** The width of the line. Defaults to 10 */
+  lineWidth?: number;
+  /** The fill color of the shape when applicable. Defaults to "transparent" */
+  fillColor?: string;
+  /** The background color of the sketch, in rgba or hex format. Defaults to "transparent" */
+  backgroundColor?: string;
+  /** The opacity of the object. Accepted for compatibility, it is not applied (as in 0.5.x). Defaults to 1.0 */
+  opacity?: number;
+  /** Number of undo/redo steps to maintain, read when the component mounts. Defaults to 25 */
+  undoSteps?: number;
+  /** Image format used by `toDataURL` when it is not given in its options, "png" or "jpeg" */
+  imageFormat?: string;
+  /**
+   * Sketch data for controlling the sketch from outside the component. It is
+   * loaded again when it changes (or on every update when `forceValue` is set)
+   */
+  value?: SketchValue;
+  /** Set to true to load the given `value` on every update, even when it did not change. Defaults to false */
+  forceValue?: boolean;
+  /** Initial value of the sketch, loaded when the component mounts */
+  defaultValue?: SketchValue;
+  /** Correction in pixels subtracted from the width of the container when the canvas is resized. Defaults to 0 */
+  widthCorrection?: number;
+  /** Correction in pixels subtracted from the height of the container when the canvas is resized. Defaults to 0 */
+  heightCorrection?: number;
+  /**
+   * Resize the canvas, and scale its objects, when the window is resized.
+   * The canvas is always fitted to its container when the component mounts
+   * and when `width` or `height` change. Defaults to true
+   */
+  autoresize?: boolean;
+  /** Width of the sketch container, in pixels */
+  width?: number;
+  /** Height of the sketch container, in pixels. Defaults to 512 */
+  height?: number;
+  /** Class name of the container div of the canvas */
+  className?: string;
+  /** Style of the container div of the canvas */
+  style?: CSS.Properties;
+  /**
+   * Called after a drawing was finished (mouse up, mouse out) and after undo, redo and
+   * loading a value. The argument is the DOM event of the former, nothing in the latter
+   */
+  onChange?: (event?: Event) => void;
+  /** Called when an object is added by the user, not when undo or redo add it back */
+  onObjectAdded?: (event: SketchEvent) => void;
+  /** Called when an object is modified by the user (moved, scaled, rotated) */
+  onObjectModified?: (event: SketchEvent) => void;
+  /** Called when an object is removed from the sketch */
+  onObjectRemoved?: (event: SketchEvent) => void;
+  /** Called on mouse down on the canvas */
+  onMouseDown?: (event: SketchEvent) => void;
+  /** Called on mouse move on the canvas */
+  onMouseMove?: (event: SketchEvent) => void;
+  /** Called on mouse up on the canvas */
+  onMouseUp?: (event: SketchEvent) => void;
+  /** Called when the mouse leaves the canvas */
+  onMouseOut?: (event: SketchEvent) => void;
+  /** Called while an object is moved */
+  onObjectMoving?: (event: SketchEvent) => void;
+  /** Called while an object is scaled */
+  onObjectScaling?: (event: SketchEvent) => void;
+  /** Called while an object is rotated */
+  onObjectRotating?: (event: SketchEvent) => void;
+}
