@@ -1,5 +1,6 @@
 import { Types } from "react-sketch";
 import { makeAutoObservable, observableRef } from "mobx";
+import sampleImage from "../assets/sample.png";
 
 /**
  * The usage scenarios of the component, each one is shown in its own tab
@@ -49,7 +50,7 @@ export class ConfigStore implements Config {
   public stretchedX = false;
   public stretchedY = false;
   public text = "a text, cool!";
-  public imageUrl = "https://files.gamebanana.com/img/ico/sprays/4ea2f4dad8d6f.png";
+  public imageUrl = sampleImage;
   public controlledValue: object | undefined = undefined;
   public forceValue = true;
   public canUndo = false;
