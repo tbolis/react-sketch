@@ -127,6 +127,9 @@ in 0.5.x.
 - `value` is not updated while the user draws. Read the drawing with `toJSON()`. Do not store the result
   of `toJSON()` in `value` from `onChange`: loading a value calls `onChange`, so the value would be
   loaded again and again.
+- Images added with `addImg` and the background image are part of the JSON, so one `value` or
+  `defaultValue` holds shapes and images. Loading replaces everything, the background image included:
+  add images after `onChange` reports the load.
 
 ```tsx
 import { useRef, useState } from "react";

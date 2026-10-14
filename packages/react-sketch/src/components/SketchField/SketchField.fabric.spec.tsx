@@ -702,6 +702,45 @@ describe("SketchField on fabric 7", () => {
         expect(saved.backgroundImage).toMatchObject({ opacity: 0.5 });
         expect(canvas.backgroundImage).toBeDefined();
       });
+
+      it("is saved with the shapes and the added images, and loading replaces all of them (#58)", async () => {
+        stubImages();
+        jest
+          .spyOn(fabric.FabricImage, "fromURL")
+          .mockImplementation((_url, _options, imageOptions) =>
+            Promise.resolve(
+              new fabric.FabricImage(document.createElement("img"), {
+                width: 100,
+                height: 60,
+                ...imageOptions,
+              })
+            )
+          );
+        const { sketch, canvas } = mount({ tool: Tool.RECTANGLE });
+        drag(canvas, [10, 20], [60, 80]);
+        sketch.addImg("data:image/png;base64,00");
+        sketch.setBackgroundFromDataUrl("data:image/png;base64,00");
+        await flush();
+
+        const saved = JSON.parse(JSON.stringify(sketch.toJSON()));
+        expect(saved.objects.map((o: { type: string }) => o.type)).toEqual([
+          "Rect",
+          "Image",
+        ]);
+        expect(saved.backgroundImage).toBeDefined();
+
+        // Loading clears the canvas first: the images and the background image
+        // that are not in the loaded value are gone
+        sketch.fromJSON({
+          ...saved,
+          objects: [saved.objects[0]],
+          backgroundImage: undefined,
+        });
+        await flush();
+
+        expect(canvas.getObjects().map((o) => o.type)).toEqual(["rect"]);
+        expect(canvas.backgroundImage).toBeFalsy();
+      });
     });
 
     it("the background color is painted by the canvas", () => {
