@@ -1,5 +1,4 @@
 import type { ReactElement, ReactNode } from "react";
-import { Types } from "react-sketch";
 import UndoIcon from "@mui/icons-material/Undo";
 import RedoIcon from "@mui/icons-material/Redo";
 import CopyIcon from "@mui/icons-material/ContentCopy";
@@ -15,9 +14,12 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import { CONFIG, type Config } from "../../../stores/config";
 import { downloadText, downloadUrl } from "../../../utils/files";
-import { syncHistory, withSketch } from "../api";
+import { syncState, withSketch } from "../sketchRef";
 
-type CanvasActionsProps = Pick<Config, "canUndo" | "canRedo" | "selectedTool">;
+type CanvasActionsProps = Pick<
+  Config,
+  "canUndo" | "canRedo" | "hasSelection" | "canPaste"
+>;
 
 interface ActionProps {
   label: string;
@@ -42,26 +44,24 @@ const Action = ({
   </IconButton>
 );
 
-// TODO(part2): all the handlers below call the library ref API through withSketch
-const undo = () =>
-  withSketch((sketch) => {
-    sketch.undo();
-    syncHistory(sketch);
-  });
+// Undo and redo are followed by the onChange of the canvas, which updates the state
+const undo = () => withSketch((sketch) => sketch.undo());
 
-const redo = () =>
-  withSketch((sketch) => {
-    sketch.redo();
-    syncHistory(sketch);
-  });
+const redo = () => withSketch((sketch) => sketch.redo());
 
-const clear = () =>
+const clear = () => {
+  // Clearing also drops the background image
+  withSketch((sketch) => sketch.clear());
+  CONFIG.controlledValue = undefined;
+  CONFIG.fillWithBackgroundColor = false;
+  // The canvas does not announce it
+  syncState();
+};
+
+const copy = () =>
   withSketch((sketch) => {
-    sketch.clear();
-    sketch.setBackgroundFromDataUrl("");
-    CONFIG.controlledValue = undefined;
-    CONFIG.fillWithBackgroundColor = false;
-    syncHistory(sketch);
+    sketch.copy();
+    CONFIG.canPaste = true;
   });
 
 const save = () =>
@@ -78,65 +78,63 @@ const download = () =>
 const CanvasActions = ({
   canUndo,
   canRedo,
-  selectedTool,
-}: CanvasActionsProps): ReactElement => {
-  // Copy, paste and remove act on the selection, which is made with the select tool
-  const selecting = selectedTool === Types.Tool.SELECT;
-
-  return (
-    <Stack
-      direction="row"
-      divider={<Divider orientation="vertical" flexItem />}
-      sx={{ flexWrap: "wrap", mb: 1 }}>
-      <Stack direction="row">
-        <Action label="Undo" disabled={!canUndo} onClick={undo}>
-          <UndoIcon />
-        </Action>
-        <Action label="Redo" disabled={!canRedo} onClick={redo}>
-          <RedoIcon />
-        </Action>
-      </Stack>
-      <Stack direction="row">
-        <Action
-          label="Copy selected"
-          disabled={!selecting}
-          onClick={() => withSketch((s) => s.copy())}>
-          <CopyIcon />
-        </Action>
-        <Action
-          label="Paste"
-          disabled={!selecting}
-          onClick={() => withSketch((s) => s.paste())}>
-          <PasteIcon />
-        </Action>
-        <Action
-          label="Delete selected"
-          disabled={!selecting}
-          onClick={() => withSketch((s) => s.removeSelected())}>
-          <RemoveSelectedIcon />
-        </Action>
-      </Stack>
-      <Stack direction="row">
-        <Action label="Zoom in" onClick={() => withSketch((s) => s.zoom(1.25))}>
-          <ZoomInIcon />
-        </Action>
-        <Action label="Zoom out" onClick={() => withSketch((s) => s.zoom(0.8))}>
-          <ZoomOutIcon />
-        </Action>
-      </Stack>
-      <Stack direction="row">
-        <Action label="Save drawing" onClick={save}>
-          <SaveIcon />
-        </Action>
-        <Action label="Download" onClick={download}>
-          <DownloadIcon />
-        </Action>
-        <Action label="Clear canvas" onClick={clear}>
-          <ClearIcon />
-        </Action>
-      </Stack>
+  hasSelection,
+  canPaste,
+}: CanvasActionsProps): ReactElement => (
+  <Stack
+    direction="row"
+    divider={<Divider orientation="vertical" flexItem />}
+    sx={{ flexWrap: "wrap", mb: 1 }}>
+    <Stack direction="row">
+      <Action label="Undo" disabled={!canUndo} onClick={undo}>
+        <UndoIcon />
+      </Action>
+      <Action label="Redo" disabled={!canRedo} onClick={redo}>
+        <RedoIcon />
+      </Action>
     </Stack>
-  );
-};
+    <Stack direction="row">
+      <Action label="Copy selected" disabled={!hasSelection} onClick={copy}>
+        <CopyIcon />
+      </Action>
+      {/* The copy stays available, even when the selection is gone */}
+      <Action
+        label="Paste"
+        disabled={!canPaste}
+        onClick={() => withSketch((sketch) => sketch.paste())}>
+        <PasteIcon />
+      </Action>
+      <Action
+        label="Delete selected"
+        disabled={!hasSelection}
+        onClick={() => withSketch((sketch) => sketch.removeSelected())}>
+        <RemoveSelectedIcon />
+      </Action>
+    </Stack>
+    <Stack direction="row">
+      <Action
+        label="Zoom in"
+        onClick={() => withSketch((sketch) => sketch.zoom(1.25))}>
+        <ZoomInIcon />
+      </Action>
+      <Action
+        label="Zoom out"
+        onClick={() => withSketch((sketch) => sketch.zoom(0.8))}>
+        <ZoomOutIcon />
+      </Action>
+    </Stack>
+    <Stack direction="row">
+      <Action label="Save drawing" onClick={save}>
+        <SaveIcon />
+      </Action>
+      <Action label="Download" onClick={download}>
+        <DownloadIcon />
+      </Action>
+      <Action label="Clear canvas" onClick={clear}>
+        <ClearIcon />
+      </Action>
+    </Stack>
+  </Stack>
+);
 
 export default CanvasActions;

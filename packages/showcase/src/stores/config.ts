@@ -1,5 +1,6 @@
 import { Types } from "react-sketch";
 import { makeAutoObservable, observableRef } from "mobx";
+import sampleImage from "../assets/sample.png";
 
 /**
  * The usage scenarios of the component, each one is shown in its own tab
@@ -14,7 +15,6 @@ export interface Config {
   lineWidth: number;
   fillWithColor: boolean;
   fillColor: string;
-  opacity: number;
   fillWithBackgroundColor: boolean;
   backgroundColor: string;
   controlledSize: boolean;
@@ -29,6 +29,8 @@ export interface Config {
   forceValue: boolean;
   canUndo: boolean;
   canRedo: boolean;
+  hasSelection: boolean;
+  canPaste: boolean;
   drawings: string[];
 }
 
@@ -39,7 +41,6 @@ export class ConfigStore implements Config {
   public lineWidth = 1;
   public fillWithColor = false;
   public fillColor = "#68ccca";
-  public opacity = 1;
   public fillWithBackgroundColor = false;
   public backgroundColor = "#ffffff";
   public controlledSize = false;
@@ -49,11 +50,13 @@ export class ConfigStore implements Config {
   public stretchedX = false;
   public stretchedY = false;
   public text = "a text, cool!";
-  public imageUrl = "https://files.gamebanana.com/img/ico/sprays/4ea2f4dad8d6f.png";
+  public imageUrl = sampleImage;
   public controlledValue: object | undefined = undefined;
   public forceValue = true;
   public canUndo = false;
   public canRedo = false;
+  public hasSelection = false;
+  public canPaste = false;
   public drawings: string[] = [];
 
   constructor() {

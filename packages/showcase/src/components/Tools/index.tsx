@@ -42,14 +42,6 @@ const SketchTools = (props: Config): ReactElement => {
           endIcon={<AddIcon />}
           onChange={(value) => (CONFIG.lineWidth = value)}
         />
-        <LabeledSlider
-          label="Opacity"
-          value={props.opacity}
-          min={0}
-          max={1}
-          step={0.01}
-          onChange={(value) => (CONFIG.opacity = value)}
-        />
       </Section>
       <ColorSelector
         lineColor={props.lineColor}

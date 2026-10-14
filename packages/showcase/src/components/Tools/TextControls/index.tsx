@@ -4,11 +4,10 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { CONFIG, type Config } from "../../../stores/config";
-import { withSketch } from "../../Canvas/api";
+import { withSketch } from "../../Canvas/sketchRef";
 import Section from "../Section";
 
 const TextControls = ({ text }: Pick<Config, "text">): ReactElement => {
-  // TODO(part2): addText is wired to the library ref API
   const addText = () => withSketch((sketch) => sketch.addText(CONFIG.text));
 
   return (

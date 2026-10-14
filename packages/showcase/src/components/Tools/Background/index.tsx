@@ -6,7 +6,7 @@ import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
 import { CONFIG, type Config } from "../../../stores/config";
 import { readAsDataUrl } from "../../../utils/files";
-import { withSketch } from "../../Canvas/api";
+import { withSketch } from "../../Canvas/sketchRef";
 import ColorField from "../ColorField";
 import Section from "../Section";
 
@@ -39,7 +39,6 @@ const setBackgroundImage = async (files: FileList | null): Promise<void> => {
   if (image) {
     const dataUrl = await readAsDataUrl(image);
     const { stretched, stretchedX, stretchedY } = CONFIG;
-    // TODO(part2): setBackgroundFromDataUrl is wired to the library ref API
     withSketch((sketch) =>
       sketch.setBackgroundFromDataUrl(dataUrl, {
         stretched,
