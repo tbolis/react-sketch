@@ -1,21 +1,25 @@
 {
   "name": "react-sketch",
   "version": "1.0.0",
-  "description": "Sketch Element for React based applications, backed-up by fabricjs as its core",
+  "description": "React component for drawing on an HTML canvas with pencil, line, arrow, rectangle and circle tools, built on fabric.js, with undo/redo, JSON import/export and TypeScript types",
   "keywords": [
     "react",
     "canvas",
     "sketch",
+    "drawing",
+    "fabric",
     "fabricjs",
-    "fabric.js"
+    "typescript"
   ],
+  "homepage": "https://github.com/tbolis/react-sketch#readme",
   "author": {
     "name": "Thomas Bolis",
     "email": "thomas.bolis@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tbolis/react-sketch.git"
+    "url": "https://github.com/tbolis/react-sketch.git",
+    "directory": "packages/react-sketch"
   },
   "bugs": {
     "url": "https://github.com/tbolis/react-sketch/issues"
@@ -23,25 +27,38 @@
   "license": "MIT",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build:typescript": "tsc && webpack --mode production",
-    "build": "webpack --mode production",
-    "start": "webpack --mode development --watch"
+    "build": "webpack --mode production && tsc -p tsconfig.build.json",
+    "start": "webpack --mode development --watch",
+    "typecheck": "tsc --noEmit -p tsconfig.build.json && tsc --noEmit -p tsconfig.spec.json",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "csstype": "^3.0.7",
-    "fabric": "^4.4.0",
-    "prop-types": "^15.6.2",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "csstype": "^3.2.3",
+    "fabric": "^7.4.0"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "devDependencies": {
-    "@babel/preset-react": "^7.13.13",
-    "@babel/preset-typescript": "^7.13.0",
-    "@types/fabric": "^4.2.5",
-    "@types/node": "^14.14.37",
-    "clean-webpack-plugin": "^3.0.0",
-    "concurrently": "^6.0.1",
-    "terser-webpack-plugin": "^5.1.1"
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "jest": "^30.5.2",
+    "jest-canvas-mock": "^2.5.8",
+    "jest-environment-jsdom": "^30.5.2",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "ts-jest": "^29.4.14",
+    "ts-loader": "^9.6.2"
   }
 }

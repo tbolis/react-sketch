@@ -1,34 +1,60 @@
-import * as React from "react";
-import { SketchField, Types } from "react-sketch";
-import Paper from "@material-ui/core/Paper";
-import { makeStyles } from "@material-ui/core";
-import { teal } from "@material-ui/core/colors";
+import type { ReactElement } from "react";
+import { SketchField } from "react-sketch";
+import Paper from "@mui/material/Paper";
+import { teal } from "@mui/material/colors";
+import defaultValue from "../../data/defaultValue";
 import { Config } from "../../stores/config";
+import CanvasActions from "./CanvasActions";
+import Drawings from "./Drawings";
+import { ScenarioControls, ScenarioTabs } from "./Scenarios";
+import { sketchRef, syncState } from "./sketchRef";
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    width: "100%",
-    height: "100%",
-    padding: theme.spacing(1),
-    color: theme.palette.text.secondary,
-  },
-  sketch: {
-    backgroundColor: teal[50],
-  },
-}));
+const style = { backgroundColor: teal[50] };
 
-const SketchCanvas = (props: Config): JSX.Element => {
-  const classes = useStyles();
-
-  const properties: Types.SketchProperties = {
-    tool: props.selectedTool,
-    lineWidth: props.lineWidth,
-    autoresize: true,
-  };
+const SketchCanvas = (props: Config): ReactElement => {
+  const controlled = props.scenario === "controlled-value";
 
   return (
-    <Paper className={classes.paper}>
-      <SketchField className={classes.sketch} {...properties} />
+    <Paper sx={{ width: "100%", height: "100%", p: 1, color: "text.secondary" }}>
+      <ScenarioTabs scenario={props.scenario} />
+      <ScenarioControls scenario={props.scenario} forceValue={props.forceValue} />
+      <CanvasActions
+        canUndo={props.canUndo}
+        canRedo={props.canRedo}
+        hasSelection={props.hasSelection}
+        canPaste={props.canPaste}
+      />
+      {/*
+        SketchField is a pure component. The style and the callbacks do not change,
+        so it renders again only when a property of the canvas changes, and not with the
+        rest of the page (for example when it enables the undo button). That matters
+        for forceValue, which loads the value again on every update of the canvas.
+      */}
+      <SketchField
+        // A scenario starts on a fresh canvas
+        key={props.scenario}
+        ref={sketchRef}
+        style={style}
+        tool={props.selectedTool}
+        lineColor={props.lineColor}
+        lineWidth={props.lineWidth}
+        fillColor={props.fillWithColor ? props.fillColor : "transparent"}
+        backgroundColor={
+          props.fillWithBackgroundColor ? props.backgroundColor : "transparent"
+        }
+        width={props.controlledSize ? props.sketchWidth : undefined}
+        height={props.controlledSize ? props.sketchHeight : undefined}
+        defaultValue={props.scenario === "default-value" ? defaultValue : undefined}
+        value={controlled ? props.controlledValue : undefined}
+        forceValue={controlled && props.forceValue}
+        // The canvas announces a change after drawing, undo, redo and loading a value
+        onChange={syncState}
+        // The selection changes with the mouse, and the objects with the actions
+        onMouseUp={syncState}
+        onObjectAdded={syncState}
+        onObjectRemoved={syncState}
+      />
+      <Drawings drawings={props.drawings} />
     </Paper>
   );
 };

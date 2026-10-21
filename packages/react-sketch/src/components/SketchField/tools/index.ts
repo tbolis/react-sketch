@@ -1,9 +1,8 @@
 /*eslint @typescript-eslint/no-unused-vars: 0,@typescript-eslint/no-empty-function: 0*/
 
-import { fabric } from "fabric";
-import { IEvent } from "fabric/fabric-impl";
+import * as fabric from "fabric";
 import { SketchProperties, Tool } from "../../../types";
-import { EventInput } from "../events";
+import { CanvasEvent, EventInput } from "../events";
 
 /**
  * Interface to support canvas events
@@ -77,15 +76,41 @@ export abstract class FabricCanvasTool {
 
   abstract configureCanvas(props: SketchProperties): void;
 
-  doMouseUp(event: IEvent): void {}
+  doMouseUp(event: CanvasEvent): void {}
 
-  doMouseDown(event: IEvent): void {}
+  doMouseDown(event: CanvasEvent): void {}
 
-  doMouseMove(event: IEvent): void {}
+  doMouseMove(event: CanvasEvent): void {}
 
-  doMouseOut(event: IEvent): void {}
+  doMouseOut(event: CanvasEvent): void {}
 
   get canvas(): fabric.Canvas {
     return this._canvas;
+  }
+
+  /**
+   * Position of the given canvas event, in canvas coordinates
+   */
+  protected pointer(event: CanvasEvent): { x: number; y: number } {
+    return this.canvas.getScenePoint(event.e as fabric.TPointerEvent);
+  }
+
+  /**
+   * The brush of the free drawing tools. Fabric does not create one by
+   * itself, so it is created the first time it is needed.
+   */
+  protected get brush(): fabric.BaseBrush {
+    return (this.canvas.freeDrawingBrush ??= new fabric.PencilBrush(this.canvas));
+  }
+
+  /**
+   * Switch the canvas between "select" mode (objects can be selected and
+   * moved) and "draw" mode (objects are frozen, so a drag always draws).
+   * Free drawing is turned off in both.
+   */
+  protected setInteractive(interactive: boolean): void {
+    this.canvas.isDrawingMode = false;
+    this.canvas.selection = interactive;
+    this.canvas.forEachObject((o) => (o.selectable = o.evented = interactive));
   }
 }

@@ -3,14 +3,5 @@ coverage/
 dist/
 docs/
 node_modules/
-*.md
-.prettierignore
 yarn.lock
 .idea
-LICENSE
-*.jpg
-.DS_Store
-.npmignore
-.gitignore
-*.log
-*.ico

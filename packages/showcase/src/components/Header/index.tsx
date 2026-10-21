@@ -1,26 +1,17 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import Avatar from "@material-ui/core/Avatar";
+import type { ReactElement } from "react";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
 
 import Logo from "./react-sketch-logo.jpg";
-import { Config } from "../../stores/config";
 
-const useStyles = makeStyles((theme) => ({
-  avatar: {
-    marginRight: theme.spacing(1),
-  },
-}));
-
-const Header = (props: Config): JSX.Element => {
-  const classes = useStyles();
+const Header = (): ReactElement => {
   return (
-    <AppBar title="Sketch Tool" position="static">
+    <AppBar position="static">
       <Toolbar>
-        <Avatar alt="Remy Sharp" src={Logo} className={classes.avatar} />
-        <Typography variant="h5" color="inherit" style={{ flexGrow: 1 }}>
+        <Avatar alt="React Sketch logo" src={Logo} sx={{ mr: 1 }} />
+        <Typography variant="h5" color="inherit" sx={{ flexGrow: 1 }}>
           Sketch Tool
         </Typography>
       </Toolbar>

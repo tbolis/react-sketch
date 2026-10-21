@@ -1,69 +1,48 @@
 {
   "name": "react-sketch-project",
-  "version": "0.5.6",
-  "description": "Sketch Element for React based applications, backed-up by fabricjs as its core",
-  "keywords": [
-    "react",
-    "canvas",
-    "sketch",
-    "fabricjs",
-    "fabric.js"
-  ],
-  "author": {
-    "name": "Thomas Bolis",
-    "email": "thomas.bolis@gmail.com"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tbolis/react-sketch.git"
-  },
-  "bugs": {
-    "url": "https://github.com/tbolis/react-sketch/issues"
-  },
+  "description": "Monorepo for react-sketch, a sketch element for React applications backed by fabric.js",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
   "license": "MIT",
+  "engines": {
+    "node": ">=22.22.1"
+  },
   "scripts": {
-    "start": "wsrun start",
-    "lint": "eslint --fix ./packages/**/src",
-    "format": "prettier --write \"./**\""
+    "start": "yarn workspace showcase start",
+    "build": "yarn workspace react-sketch build && yarn workspace showcase build",
+    "typecheck": "yarn workspace react-sketch typecheck && yarn workspace showcase typecheck",
+    "clean": "node -e \"for (const d of ['packages/react-sketch/dist', 'packages/showcase/build']) require('fs').rmSync(d, { recursive: true, force: true })\"",
+    "lint": "eslint \"packages/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint --fix \"packages/**/*.{ts,tsx}\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "yarn workspace react-sketch test",
+    "test:watch": "yarn workspace react-sketch test --watch",
+    "test:coverage": "yarn workspace react-sketch test:coverage",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "@types/react": "^17.0.3",
-    "@types/react-dom": "^17.0.3",
-    "@typescript-eslint/eslint-plugin": "^4.21.0",
-    "@typescript-eslint/parser": "^4.21.0",
-    "awesome-typescript-loader": "^5.2.1",
-    "css-loader": "^5.2.0",
-    "eslint": "^7.23.0",
-    "eslint-plugin-prettier": "^3.3.1",
-    "eslint-plugin-react": "^7.23.1",
-    "eslint-plugin-react-hooks": "^4.2.0",
-    "husky": "^6.0.0",
-    "lint-staged": "^10.5.4",
-    "prettier": "^2.2.1",
-    "source-map-loader": "^2.0.1",
-    "typescript": "^4.2.3",
-    "webpack": "^5.30.0",
-    "wsrun": "^5.2.4"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "@eslint-react/eslint-plugin": "^5.26.5",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.2",
+    "webpack": "^5.111.1",
+    "webpack-cli": "^7.2.3"
   },
   "lint-staged": {
-    "*.{js,jsx}": [
-      "prettier --write",
+    "*.{ts,tsx}": [
       "eslint --fix",
-      "jest --findRelatedTests",
-      "git add"
+      "prettier --write"
     ],
-    "*.{html,css,less,ejs,json}": [
-      "prettier --write",
-      "git add"
-    ]
+    "*.{json,css,md,yml}": "prettier --write"
   }
 }
