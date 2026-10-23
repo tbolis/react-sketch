@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 (unreleased)
+## 1.0.0 (2026-10-23)
 
 Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, the named exports
 `SketchField` and `Tools`, and the default export). The differences in behavior are listed below.
