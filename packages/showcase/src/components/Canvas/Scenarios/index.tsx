@@ -3,6 +3,7 @@ import Button from "@mui/material/Button";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
+import TextField from "@mui/material/TextField";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
@@ -16,6 +17,7 @@ const SCENARIOS: { value: Scenario; label: string }[] = [
   { value: "default-value", label: "defaultValue" },
   { value: "controlled-value", label: "value + forceValue" },
   { value: "add-img", label: "addImg" },
+  { value: "background-image", label: "backgroundImage" },
 ];
 
 const selectScenario = (scenario: Scenario) => {
@@ -47,7 +49,8 @@ const ScenarioTabs = ({ scenario }: Pick<Config, "scenario">): ReactElement => (
 const ScenarioControls = ({
   scenario,
   forceValue,
-}: Pick<Config, "scenario" | "forceValue">): ReactElement => {
+  backgroundImageUrl,
+}: Pick<Config, "scenario" | "forceValue" | "backgroundImageUrl">): ReactElement => {
   switch (scenario) {
     case "default-value":
       return (
@@ -97,6 +100,32 @@ const ScenarioControls = ({
             onClick={() => withSketch((sketch) => sketch.addImg(imageDataUrl))}>
             Load Image from Data URL
           </Button>
+        </>
+      );
+    case "background-image":
+      return (
+        <>
+          <Typography variant="body2" sx={{ mb: 1 }}>
+            The background image comes from the backgroundImage property, with the
+            fit switches of the Background section as backgroundImageOptions. The
+            canvas sets it when the URL changes, and removes it when the URL is
+            empty.
+          </Typography>
+          <Stack direction="row" spacing={2} sx={{ alignItems: "center", mb: 1 }}>
+            <TextField
+              fullWidth
+              size="small"
+              label="backgroundImage"
+              value={backgroundImageUrl}
+              onChange={(event) => (CONFIG.backgroundImageUrl = event.target.value)}
+            />
+            <Button
+              variant="outlined"
+              sx={{ flexShrink: 0 }}
+              onClick={() => (CONFIG.backgroundImageUrl = "")}>
+              Remove
+            </Button>
+          </Stack>
         </>
       );
     default:

@@ -8,6 +8,7 @@ import CanvasSize from "./CanvasSize";
 import ColorSelector from "./ColorSelector";
 import ImageControls from "./ImageControls";
 import LabeledSlider from "./LabeledSlider";
+import Overlay from "./Overlay";
 import Section from "./Section";
 import TextControls from "./TextControls";
 import ToolSelector from "./ToolSelector";
@@ -60,8 +61,9 @@ const SketchTools = (props: Config): ReactElement => {
         stretchedX={props.stretchedX}
         stretchedY={props.stretchedY}
       />
+      <Overlay />
       <TextControls text={props.text} />
-      <ImageControls imageUrl={props.imageUrl} />
+      <ImageControls imageUrl={props.imageUrl} imageCors={props.imageCors} />
     </Paper>
   );
 };

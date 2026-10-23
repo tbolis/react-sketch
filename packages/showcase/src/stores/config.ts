@@ -6,7 +6,11 @@ import sampleImage from "../assets/sample.png";
  * The usage scenarios of the component, each one is shown in its own tab
  */
 export type Scenario =
-  "playground" | "default-value" | "controlled-value" | "add-img";
+  | "playground"
+  | "default-value"
+  | "controlled-value"
+  | "add-img"
+  | "background-image";
 
 export interface Config {
   scenario: Scenario;
@@ -25,6 +29,8 @@ export interface Config {
   stretchedY: boolean;
   text: string;
   imageUrl: string;
+  imageCors: boolean;
+  backgroundImageUrl: string;
   controlledValue: object | undefined;
   forceValue: boolean;
   canUndo: boolean;
@@ -69,6 +75,8 @@ export class ConfigStore implements Config {
   public stretchedY = false;
   public text = "a text, cool!";
   public imageUrl = sampleImage;
+  public imageCors = false;
+  public backgroundImageUrl = sampleImage;
   public controlledValue: object | undefined = undefined;
   public forceValue = true;
   public canUndo = false;

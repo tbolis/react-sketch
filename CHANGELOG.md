@@ -18,6 +18,9 @@ Features that forks of react-sketch had, written again for the TypeScript code a
   cross-origin image can be exported. The background and the overlay images are requested with
   `"anonymous"` as before, and `null` shows an image of a server without CORS headers, at the cost of a
   tainted canvas. From `react-sketch2` of @x5engine.
+- The showcase has an Overlay section (a sample outline, an image of your own, remove), a
+  `backgroundImage` tab that uses the property, and a CORS switch for "Load Image from URL". The fit
+  switches of the Background section also apply to the background image that is already set.
 
 ### Changed
 
