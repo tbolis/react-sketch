@@ -7,6 +7,8 @@ const theme = createTheme({
     primary: cyan,
     mode: "dark",
   },
+  // The font of the page, no font is loaded from another site
+  typography: { fontFamily: "inherit" },
 });
 
 const ShowcaseTheme = ({ children }: { children: ReactNode }) => {

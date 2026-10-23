@@ -1,6 +1,7 @@
 import "./App.css";
 import type { ReactElement } from "react";
-import { Config } from "./stores/config";
+import { Config, CONFIG } from "./stores/config";
+import Snackbar from "@mui/material/Snackbar";
 import Grid from "@mui/material/Grid";
 import ThemeProvider from "./components/theme";
 import { Header, SketchCanvas, SketchTools } from "./components";
@@ -23,6 +24,12 @@ export const App = (props: Config): ReactElement => {
           <SketchTools {...props} />
         </Grid>
       </Grid>
+      <Snackbar
+        open={props.notice !== ""}
+        autoHideDuration={8000}
+        message={props.notice}
+        onClose={() => (CONFIG.notice = "")}
+      />
     </ThemeProvider>
   );
 };

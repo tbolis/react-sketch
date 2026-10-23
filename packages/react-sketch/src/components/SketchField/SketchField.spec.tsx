@@ -1,5 +1,6 @@
 import { createRef, StrictMode } from "react";
 import { render } from "@testing-library/react";
+import { renderToString } from "react-dom/server";
 import * as fabric from "fabric";
 import SketchField from "./SketchField";
 import { SketchProperties, Tool } from "../../types";
@@ -63,6 +64,32 @@ const layout = (width: number, height: number): void => {
   jest.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(height);
 };
 
+/**
+ * The error that a failed load of a value throws. It is thrown outside the
+ * promise, so it comes out of the timers, a few promise steps after the load
+ * started. Needs fake timers. Resolves with undefined when nothing was thrown.
+ */
+const errorOfLoad = async (): Promise<unknown> => {
+  const errors: unknown[] = [];
+  for (let round = 0; round < 2; round++) {
+    await jest.advanceTimersByTimeAsync(100).catch((error) => errors.push(error));
+    for (let step = 0; step < 20; step++) await Promise.resolve();
+  }
+  return errors[0];
+};
+
+/** An image of 200 by 100 pixels, which loads as soon as its source is set */
+const stubImageLoads = () =>
+  jest.spyOn(window, "Image").mockImplementation(() => {
+    const img = document.createElement("img");
+    img.width = 200;
+    img.height = 100;
+    Object.defineProperty(img, "src", {
+      set: () => img.onload?.(new Event("load")),
+    });
+    return img;
+  });
+
 const rect = (left: number, top: number, fill = "red") => ({
   type: "rect",
   left,
@@ -114,16 +141,6 @@ describe("SketchField", () => {
       expect(container.firstElementChild).toHaveStyle({ height: "512px" });
     });
 
-    it("keeps its canvas id when it renders again", () => {
-      const { container, rerender } = render(<SketchField />);
-      const id = container.querySelector("canvas")?.id;
-
-      rerender(<SketchField className="other" />);
-
-      expect(id).toBeTruthy();
-      expect(container.querySelector("canvas")?.id).toEqual(id);
-    });
-
     it("mounts, unmounts and mounts again in strict mode", () => {
       const ref = createRef<SketchField>();
       const { container } = render(
@@ -139,6 +156,14 @@ describe("SketchField", () => {
       expect(canvas.getObjects()).toHaveLength(1);
       sketch.undo();
       expect(canvas.getObjects()).toHaveLength(0);
+    });
+  });
+
+  describe("server rendering", () => {
+    it("renders the same markup every time, so the page of a server hydrates", () => {
+      expect(renderToString(<SketchField width={300} />)).toEqual(
+        renderToString(<SketchField width={300} />)
+      );
     });
   });
 
@@ -374,6 +399,22 @@ describe("SketchField", () => {
       window.dispatchEvent(new Event("resize"));
 
       expect(canvas.getWidth()).toEqual(500);
+    });
+
+    it("scales the background image with the canvas, as the objects", () => {
+      stubImageLoads();
+      layout(400, 300);
+      const { sketch, canvas } = mount();
+      sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
+        stretched: true,
+      });
+
+      layout(800, 600);
+      window.dispatchEvent(new Event("resize"));
+
+      // 200 by 100 pixels, stretched to 400 by 300, then to 800 by 600
+      const image = canvas.backgroundImage as fabric.FabricImage;
+      expect([image.scaleX, image.scaleY]).toEqual([4, 6]);
     });
 
     it("does not follow the window when autoresize is off", () => {
@@ -858,6 +899,86 @@ describe("SketchField", () => {
     });
   });
 
+  describe("a value that cannot be loaded", () => {
+    beforeEach(() => jest.useFakeTimers());
+    // fabric does not know the type, so the load fails after it started
+    const unknownType = { objects: [{ type: "NoSuchShape", left: 1 }] };
+    it("leaves the objects and the history of the canvas as they were", async () => {
+      const { sketch, canvas } = mount({ tool: Tool.RECTANGLE });
+      objectFromDrag(canvas, START, END);
+
+      sketch.fromJSON(unknownType);
+      await errorOfLoad();
+
+      expect(canvas.getObjects()).toHaveLength(1);
+      expect(sketch.canUndo()).toBe(true);
+    });
+
+    it("leaves the canvas drawing the objects which are added afterwards", async () => {
+      const { sketch, canvas } = mount();
+
+      sketch.fromJSON(unknownType);
+      await errorOfLoad();
+
+      // fabric turns this off while it loads, and on again only when the load works
+      expect(canvas.renderOnAddRemove).toBe(true);
+    });
+
+    it("does not hide the error, for an unknown type or for JSON that is not valid", async () => {
+      const { sketch } = mount();
+
+      sketch.fromJSON(unknownType);
+      expect(String(await errorOfLoad())).toMatch(/NoSuchShape/);
+
+      sketch.fromJSON("{not json");
+      expect(await errorOfLoad()).toBeInstanceOf(SyntaxError);
+    });
+  });
+
+  describe("values loaded one after the other", () => {
+    beforeEach(() => jest.useFakeTimers());
+
+    it("cancels the load which is still running when a newer value starts", async () => {
+      const { sketch, canvas } = mount();
+      const signals: (AbortSignal | undefined)[] = [];
+      jest.spyOn(canvas, "loadFromJSON").mockImplementation((...args) => {
+        signals.push(args[2]?.signal);
+        return new Promise(() => undefined);
+      });
+
+      sketch.fromJSON({ objects: [rect(1, 1)] });
+      await jest.advanceTimersByTimeAsync(100);
+      sketch.fromJSON({ objects: [rect(2, 2)] });
+      await jest.advanceTimersByTimeAsync(100);
+
+      expect(signals).toHaveLength(2);
+      expect(signals[0]?.aborted).toBe(true);
+      expect(signals[1]?.aborted).toBe(false);
+    });
+
+    it("does not take a cancelled load for an error", async () => {
+      const { sketch, canvas } = mount();
+      let calls = 0;
+      jest.spyOn(canvas, "loadFromJSON").mockImplementation((...args) => {
+        const signal = args[2]?.signal;
+        return calls++ === 0
+          ? new Promise((resolve, reject) =>
+              // as fabric does when its signal is aborted
+              signal?.addEventListener("abort", () => reject(new Error("aborted")))
+            )
+          : Promise.resolve(canvas);
+      });
+
+      sketch.fromJSON({ objects: [rect(1, 1)] });
+      await jest.advanceTimersByTimeAsync(100);
+      sketch.fromJSON({ objects: [rect(2, 2)] });
+
+      // An error for the cancelled load would come out of the timers
+      expect(await errorOfLoad()).toBeUndefined();
+      expect(calls).toBe(2);
+    });
+  });
+
   describe("methods", () => {
     describe("enableTouchScroll and disableTouchScroll", () => {
       it("switch the touch scrolling of the canvas", () => {
@@ -996,6 +1117,22 @@ describe("SketchField", () => {
         sketch.zoom(0.5);
         expect([object.left, object.top]).toEqual([10, 10]);
         expect([object.scaleX, object.scaleY]).toEqual([1, 1]);
+      });
+
+      it("scales the background image too, so the drawing stays on it", () => {
+        stubImageLoads();
+        const { sketch, canvas } = mount();
+        sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
+          left: 10,
+          top: 20,
+        });
+
+        sketch.zoom(2);
+
+        const image = canvas.backgroundImage as fabric.FabricImage;
+        expect([image.left, image.top, image.scaleX, image.scaleY]).toEqual([
+          20, 40, 2, 2,
+        ]);
       });
     });
 

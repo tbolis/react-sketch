@@ -122,8 +122,11 @@ in 0.5.x.
 - `value` is loaded when it changes (a different object, compared by identity). Pass a new object, for
   example `{ ...saved }`, to load the same drawing again, or set `forceValue` to load `value` on every
   update of the component.
-- The drawing is loaded 100 ms later, the undo history is reset, and `onChange` is called when the load
-  is done.
+- The drawing is loaded 100 ms later, and `onChange` is called when the load is done. The undo history starts
+  again with the loaded objects, so each of them can be undone, and `onObjectAdded` is called for each.
+- A value which cannot be loaded (not valid JSON, or an object type which is not known) leaves the canvas and
+  its undo history as they were, and the error is thrown as an uncaught error: it is not hidden. A newer value
+  cancels the load of an older one which is still running, so the last value is the one shown.
 - `value` is not updated while the user draws. Read the drawing with `toJSON()`. Do not store the result
   of `toJSON()` in `value` from `onChange`: loading a value calls `onChange`, so the value would be
   loaded again and again.
@@ -219,7 +222,7 @@ All properties are optional.
 | `className`        | `string`                             |                 | Class name of the container element of the canvas.                                                                                                                                                                                                                       |
 | `style`            | `CSS.Properties`                     |                 | Style of the container element of the canvas.                                                                                                                                                                                                                            |
 | `onChange`         | `(event?: Event) => void`            |                 | Called 10 ms after every mouse up and mouse out on the canvas, whether or not the drawing changed (see [Known limitations](#known-limitations)), and after `undo`, `redo` and the load of a value. The argument is the DOM event after a mouse event, nothing otherwise. |
-| `onObjectAdded`    | `(event: Types.SketchEvent) => void` | no-op           | An object was added by the user. Not called when `undo` or `redo` add an object back.                                                                                                                                                                                    |
+| `onObjectAdded`    | `(event: Types.SketchEvent) => void` | no-op           | An object was added: drawn, pasted, or loaded with a value. Not called when `undo` or `redo` add an object back.                                                                                                                                                         |
 | `onObjectModified` | `(event: Types.SketchEvent) => void` | no-op           | An object was modified by the user (moved, scaled, rotated).                                                                                                                                                                                                             |
 | `onObjectRemoved`  | `(event: Types.SketchEvent) => void` | no-op           | An object was removed from the sketch.                                                                                                                                                                                                                                   |
 | `onObjectMoving`   | `(event: Types.SketchEvent) => void` | no-op           | An object is being moved.                                                                                                                                                                                                                                                |
@@ -248,13 +251,13 @@ throws.
 | `canRedo()`                                   | `boolean`          | Whether `redo()` has something to redo.                                                                                                                                                                                         |
 | `toDataURL(options?)`                         | `string`           | The sketch as a data URL. Options: `format` (`"png"` or `"jpeg"`, default `imageFormat`, then `"png"`), `quality` (0 to 1, jpeg only, default 1), `multiplier` (default 1), and the crop area `left`, `top`, `width`, `height`. |
 | `toJSON(propertiesToInclude?)`                | `Types.SketchData` | The sketch as an object. `propertiesToInclude` lists additional properties of the objects to include.                                                                                                                           |
-| `fromJSON(json?)`                             | `void`             | Load a drawing (object or JSON string). Loads after 100 ms, resets the undo history, applies the tool configuration again and calls `onChange`. Does nothing for an empty argument.                                             |
+| `fromJSON(json?)`                             | `void`             | Load a drawing (object or JSON string). Loads after 100 ms, starts the undo history again with the loaded objects, applies the tool configuration again and calls `onChange`. Does nothing for an empty argument.               |
 | `clear(propertiesToInclude?)`                 | `Types.SketchData` | Remove all objects and the background image, and reset the undo history. Returns the discarded content as JSON. The `backgroundColor` property is kept.                                                                         |
 | `addImg(dataUrl, options?)`                   | `void`             | Add an image, given as URL or data URL, as an object. It is added when it has loaded. Options: `left`, `top` (default: random position), `scale` (default `0.5`).                                                               |
 | `addText(text, options?)`                     | `void`             | Add an editable text. It is centered unless `left` or `top` are given. `options` are the options of a fabric text object, for example `fontSize`, `fill`.                                                                       |
 | `setBackgroundFromDataUrl(dataUrl, options?)` | `void`             | Use an image as background. Options: `stretched` (fill the canvas, the proportions change), `stretchedX` (fit the width), `stretchedY` (fit the height), both together are `stretched`; any other option is an image option.    |
 | `removeBackgroundImage()`                     | `void`             | Remove the background image, also one that is still loading. The objects and the `backgroundColor` are kept. Like `setBackgroundFromDataUrl`, it is not part of the undo history.                                               |
-| `zoom(factor)`                                | `void`             | Scale the objects by a factor: 2 doubles their size, 0.5 halves it.                                                                                                                                                             |
+| `zoom(factor)`                                | `void`             | Scale the objects and the background image by a factor: 2 doubles their size, 0.5 halves it.                                                                                                                                    |
 | `hasSelection()`                              | `boolean`          | Whether an object is selected.                                                                                                                                                                                                  |
 | `clearSelection()`                            | `void`             | Deselect the selected object or objects.                                                                                                                                                                                        |
 | `removeSelected()`                            | `void`             | Remove the selected object or objects. It can be undone.                                                                                                                                                                        |
@@ -338,6 +341,8 @@ library does not have to be built first.
 | `yarn lint`      | Lint the TypeScript sources with ESLint. `yarn lint:fix` fixes what it can.                         |
 | `yarn format`    | Format the repository with Prettier. `yarn format:check` only checks.                               |
 | `yarn clean`     | Remove the build output.                                                                            |
+
+The tests run on React 19. `REACT=18 yarn test` runs them on React 18, and CI does both.
 
 ## Upgrading from 0.5.x
 

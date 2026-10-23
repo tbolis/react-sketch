@@ -1,6 +1,28 @@
 import * as fabric from "fabric";
 
 /**
+ * Scale the content of the canvas, the objects and the background image, and
+ * move it by the same factors.
+ *
+ * The background image is scaled and not resized: a bigger width of an image
+ * does not stretch it.
+ */
+export const scaleContent = (
+  canvas: fabric.Canvas,
+  xFactor: number,
+  yFactor: number
+): void => {
+  [canvas.backgroundImage, ...canvas.getObjects()].forEach((obj) => {
+    if (!obj) return;
+    obj.scaleX = (obj.scaleX ?? 1) * xFactor;
+    obj.scaleY = (obj.scaleY ?? 1) * yFactor;
+    obj.left = (obj.left ?? 0) * xFactor;
+    obj.top = (obj.top ?? 0) * yFactor;
+    obj.setCoords();
+  });
+};
+
+/**
  * Fit the canvas to the size of its container, and scale the objects of the
  * canvas by the same factors, so the drawing keeps its proportions.
  *
@@ -28,20 +50,7 @@ export const autoresize = (
   const hfactor = parseFloat((height / prevHeight).toFixed(2));
   canvas.setDimensions({ width, height });
 
-  // Need to scale background images as well
-  const bi = canvas.backgroundImage;
-  if (bi instanceof fabric.FabricImage) {
-    bi.width = (bi.width ?? 0) * wfactor;
-    bi.height = (bi.height ?? 0) * hfactor;
-  }
-
-  canvas.getObjects().forEach((obj) => {
-    obj.scaleX = (obj.scaleX ?? 1) * wfactor;
-    obj.scaleY = (obj.scaleY ?? 1) * hfactor;
-    obj.left = (obj.left ?? 0) * wfactor;
-    obj.top = (obj.top ?? 0) * hfactor;
-    obj.setCoords();
-  });
+  scaleContent(canvas, wfactor, hfactor);
   canvas.renderAll();
   canvas.calcOffset();
 };
