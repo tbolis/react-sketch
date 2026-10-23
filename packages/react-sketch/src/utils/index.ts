@@ -4,26 +4,6 @@ interface Point {
 }
 
 /**
- * Determine the mouse (or touch) position relative to the event target,
- * excluding the target border
- *
- * @param event the mouse or touch event
- * @returns tuple of position x,y
- */
-export const pointerPosition = (
-  event: MouseEvent | TouchEvent
-): [number, number] => {
-  const target = event.target as HTMLElement;
-  const style = window.getComputedStyle(target);
-  const rect = target.getBoundingClientRect();
-  const point = "changedTouches" in event ? event.changedTouches[0] : event;
-  return [
-    point.clientX - parseInt(style.borderLeftWidth, 10) - rect.left,
-    point.clientY - parseInt(style.borderTopWidth, 10) - rect.top,
-  ];
-};
-
-/**
  * Calculate the distance of two x,y points
  *
  * @param point1 an object with x,y attributes representing the start point
@@ -35,35 +15,6 @@ export const linearDistance = (point1: Point, point2: Point): number => {
   const xs = point2.x - point1.x;
   const ys = point2.y - point1.y;
   return Math.sqrt(xs * xs + ys * ys);
-};
-
-/**
- * Return a random uuid of the form xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
- * @returns {string}
- */
-export const uuid4 = (): string => {
-  let uuid = "",
-    ii;
-  for (ii = 0; ii < 32; ii += 1) {
-    switch (ii) {
-      case 8:
-      case 20:
-        uuid += "-";
-        uuid += ((Math.random() * 16) | 0).toString(16);
-        break;
-      case 12:
-        uuid += "-";
-        uuid += "4";
-        break;
-      case 16:
-        uuid += "-";
-        uuid += ((Math.random() * 4) | 8).toString(16);
-        break;
-      default:
-        uuid += ((Math.random() * 16) | 0).toString(16);
-    }
-  }
-  return uuid;
 };
 
 /**
