@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.1.0 (unreleased)
+
+Features that forks of react-sketch had, written again for the TypeScript code and fabric 7.
+
+### Added
+
+- The overlay image: `setOverlayFromDataUrl()` and `removeOverlayImage()` (#73). The image is drawn above
+  the objects and takes no mouse events, so it can be an outline to draw within. It is saved by
+  `toJSON()`, drawn by `toDataURL()`, scaled when the canvas is resized, and removed by `clear()`. It
+  takes the options of `setBackgroundFromDataUrl()`. From `addOverlayImg` of @yerffejytnac.
+- The `backgroundImage` and `backgroundImageOptions` properties (#51): the background image from a
+  property, set when the component mounts and when it changes. It takes the place of the background image
+  of `value` and `defaultValue`. From the `backgroundImage` property of @subforce-solutions.
+- The `crossOrigin` option of `addImg()`, `setBackgroundFromDataUrl()` and `setOverlayFromDataUrl()` (#33,
+  #95). `addImg()` requests the image without CORS as before, unless it is given, so a canvas with a
+  cross-origin image can be exported. The background and the overlay images are requested with
+  `"anonymous"` as before, and `null` shows an image of a server without CORS headers, at the cost of a
+  tainted canvas. From `react-sketch2` of @x5engine.
+
+### Changed
+
+- `clear()` also removes the overlay image.
+- When several images are asked for the overlay (or the background), only the last request is set.
+
 ## 1.0.1 (unreleased)
 
 ### Fixed

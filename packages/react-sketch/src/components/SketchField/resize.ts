@@ -1,25 +1,27 @@
 import * as fabric from "fabric";
 
 /**
- * Scale the content of the canvas, the objects and the background image, and
- * move it by the same factors.
+ * Scale the content of the canvas, the objects and the background and overlay
+ * images, and move it by the same factors.
  *
- * The background image is scaled and not resized: a bigger width of an image
- * does not stretch it.
+ * The images are scaled and not resized: a bigger width of an image does not
+ * stretch it.
  */
 export const scaleContent = (
   canvas: fabric.Canvas,
   xFactor: number,
   yFactor: number
 ): void => {
-  [canvas.backgroundImage, ...canvas.getObjects()].forEach((obj) => {
-    if (!obj) return;
-    obj.scaleX = (obj.scaleX ?? 1) * xFactor;
-    obj.scaleY = (obj.scaleY ?? 1) * yFactor;
-    obj.left = (obj.left ?? 0) * xFactor;
-    obj.top = (obj.top ?? 0) * yFactor;
-    obj.setCoords();
-  });
+  [canvas.backgroundImage, canvas.overlayImage, ...canvas.getObjects()].forEach(
+    (obj) => {
+      if (!obj) return;
+      obj.scaleX = (obj.scaleX ?? 1) * xFactor;
+      obj.scaleY = (obj.scaleY ?? 1) * yFactor;
+      obj.left = (obj.left ?? 0) * xFactor;
+      obj.top = (obj.top ?? 0) * yFactor;
+      obj.setCoords();
+    }
+  );
 };
 
 /**
