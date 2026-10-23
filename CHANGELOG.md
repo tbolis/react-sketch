@@ -54,6 +54,9 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
 - The `autoresize` property (default `true`). It switches the resize of the canvas on window resize on
   and off. In 0.5.x the canvas always followed the window.
 - The `Types` namespace, see Exports.
+- The `removeBackgroundImage()` method. In 0.5.x the background image set with `setBackgroundFromDataUrl`
+  could only be removed with `clear()`, which also removes the objects. When several background images
+  are asked for, or one is removed while it is loading, only the last request is set.
 
 ### Changed
 

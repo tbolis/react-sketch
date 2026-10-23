@@ -104,6 +104,8 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   private tool!: FabricCanvasTool;
   private history!: SketchHistory;
   private mounted = false;
+  /** Counts the background images asked for, so that only the last one is set */
+  private backgroundLoads = 0;
   private clipboard: Promise<fabric.FabricObject> | null = null;
   /** The pastes, which run one after the other as cloning is asynchronous */
   private pasting: Promise<unknown> = Promise.resolve();
@@ -560,11 +562,12 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     options: BackgroundOptions = {}
   ): void => {
     const canvas = this.canvas;
+    const load = ++this.backgroundLoads;
     const img = new Image();
     img.setAttribute("crossOrigin", "anonymous");
     const { stretched, stretchedX, stretchedY, ...imageOptions } = options;
     img.onload = () => {
-      if (!this.isCurrent(canvas)) return;
+      if (!this.isCurrent(canvas) || load !== this.backgroundLoads) return;
       const imgObj = new fabric.FabricImage(img, {
         originX: "left",
         originY: "top",
@@ -576,6 +579,17 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
       canvas.requestRenderAll();
     };
     img.src = dataUrl;
+  };
+
+  /**
+   * Removes the background image, also one that is still loading. The objects
+   * and the background color are kept, and the undo history is not changed
+   * (setting the background image is not part of it either).
+   */
+  removeBackgroundImage = (): void => {
+    this.backgroundLoads++;
+    this.canvas.backgroundImage = undefined;
+    this.canvas.requestRenderAll();
   };
 
   /**

@@ -1417,6 +1417,49 @@ describe("SketchField", () => {
 
         expect(setAttribute).toHaveBeenCalledWith("crossOrigin", "anonymous");
       });
+
+      describe("removeBackgroundImage", () => {
+        it("removes the background image and keeps the objects", () => {
+          stubImages();
+          const { sketch, canvas } = mount();
+          sketch.addText("hello");
+          sketch.setBackgroundFromDataUrl("data:image/png;base64,00");
+          expect(canvas.backgroundImage).toBeTruthy();
+
+          sketch.removeBackgroundImage();
+
+          expect(canvas.backgroundImage).toBeFalsy();
+          expect(sketch.toJSON().backgroundImage).toBeUndefined();
+          expect(canvas.getObjects()).toHaveLength(1);
+        });
+
+        it("does nothing when there is no background image", () => {
+          const { sketch, canvas } = mount();
+
+          expect(() => sketch.removeBackgroundImage()).not.toThrow();
+          expect(canvas.backgroundImage).toBeFalsy();
+        });
+
+        it("keeps the image that is still loading from being set", () => {
+          let load: () => void = () => undefined;
+          jest.spyOn(window, "Image").mockImplementation(() => {
+            const img = document.createElement("img");
+            Object.defineProperty(img, "src", {
+              set: () => {
+                load = () => img.onload?.(new Event("load"));
+              },
+            });
+            return img;
+          });
+          const { sketch, canvas } = mount();
+          sketch.setBackgroundFromDataUrl("data:image/png;base64,00");
+
+          sketch.removeBackgroundImage();
+          load();
+
+          expect(canvas.backgroundImage).toBeFalsy();
+        });
+      });
     });
 
     describe("addText", () => {
