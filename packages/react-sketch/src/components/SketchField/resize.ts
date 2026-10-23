@@ -28,12 +28,13 @@ export const autoresize = (
   const hfactor = parseFloat((height / prevHeight).toFixed(2));
   canvas.setDimensions({ width, height });
 
-  // Need to scale background images as well
-  const bi = canvas.backgroundImage;
-  if (bi instanceof fabric.FabricImage) {
-    bi.width = (bi.width ?? 0) * wfactor;
-    bi.height = (bi.height ?? 0) * hfactor;
-  }
+  // Need to scale the background and the overlay images as well
+  [canvas.backgroundImage, canvas.overlayImage].forEach((image) => {
+    if (image instanceof fabric.FabricImage) {
+      image.width = (image.width ?? 0) * wfactor;
+      image.height = (image.height ?? 0) * hfactor;
+    }
+  });
 
   canvas.getObjects().forEach((obj) => {
     obj.scaleX = (obj.scaleX ?? 1) * wfactor;

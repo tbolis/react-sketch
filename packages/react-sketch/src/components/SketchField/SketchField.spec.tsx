@@ -63,6 +63,33 @@ const layout = (width: number, height: number): void => {
   jest.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(height);
 };
 
+/** An image of 200 by 100 pixels, which loads as soon as its source is set */
+const stubImageLoads = () =>
+  jest.spyOn(window, "Image").mockImplementation(() => {
+    const img = document.createElement("img");
+    img.width = 200;
+    img.height = 100;
+    Object.defineProperty(img, "src", {
+      set: () => img.onload?.(new Event("load")),
+    });
+    return img;
+  });
+
+/** Images that load when the test says so. Returns the loads, in the order they were asked for */
+const deferImageLoads = (): (() => void)[] => {
+  const loads: (() => void)[] = [];
+  jest.spyOn(window, "Image").mockImplementation(() => {
+    const img = document.createElement("img");
+    img.width = 200;
+    img.height = 100;
+    Object.defineProperty(img, "src", {
+      set: () => loads.push(() => img.onload?.(new Event("load"))),
+    });
+    return img;
+  });
+  return loads;
+};
+
 const rect = (left: number, top: number, fill = "red") => ({
   type: "rect",
   left,
@@ -308,6 +335,83 @@ describe("SketchField", () => {
     });
   });
 
+  describe("backgroundImage property", () => {
+    const url = "data:image/png;base64,00";
+
+    it("sets the background image when the component mounts", () => {
+      stubImageLoads();
+
+      const { canvas } = mount({ backgroundImage: url });
+
+      expect(canvas.backgroundImage).toBeInstanceOf(fabric.FabricImage);
+    });
+
+    it("fits the image as backgroundImageOptions say", () => {
+      stubImageLoads();
+      layout(400, 300);
+
+      const { canvas } = mount({
+        backgroundImage: url,
+        backgroundImageOptions: { stretched: true },
+      });
+
+      const image = canvas.backgroundImage as fabric.FabricImage;
+      expect([image.scaleX, image.scaleY]).toEqual([2, 3]);
+    });
+
+    it("follows the property, and removes the image when the property is gone", () => {
+      stubImageLoads();
+      const { canvas, update } = mount({ backgroundImage: url });
+      const first = canvas.backgroundImage;
+
+      update({ backgroundImage: `${url}1` });
+      expect(canvas.backgroundImage).toBeTruthy();
+      expect(canvas.backgroundImage).not.toBe(first);
+
+      update({});
+      expect(canvas.backgroundImage).toBeFalsy();
+    });
+
+    it("does not load the image again when the property and the options stay the same", () => {
+      const image = stubImageLoads();
+      const { update } = mount({
+        backgroundImage: url,
+        backgroundImageOptions: { stretched: true },
+      });
+
+      // The options are a new object with the same content
+      update({ backgroundImage: url, backgroundImageOptions: { stretched: true } });
+
+      expect(image).toHaveBeenCalledTimes(1);
+    });
+
+    it("loads the image again when the options change", () => {
+      const image = stubImageLoads();
+      const { update } = mount({
+        backgroundImage: url,
+        backgroundImageOptions: { stretched: true },
+      });
+
+      update({ backgroundImage: url, backgroundImageOptions: { stretchedX: true } });
+
+      expect(image).toHaveBeenCalledTimes(2);
+    });
+
+    it("is not dropped by the loading of a value", async () => {
+      jest.useFakeTimers();
+      stubImageLoads();
+
+      const { canvas } = mount({
+        backgroundImage: url,
+        defaultValue: { objects: [rect(10, 10)] },
+      });
+      await jest.advanceTimersByTimeAsync(100);
+
+      expect(canvas.getObjects()).toHaveLength(1);
+      expect(canvas.backgroundImage).toBeTruthy();
+    });
+  });
+
   describe("size", () => {
     it("fits the canvas to its container when it mounts", () => {
       layout(400, 300);
@@ -374,6 +478,20 @@ describe("SketchField", () => {
       window.dispatchEvent(new Event("resize"));
 
       expect(canvas.getWidth()).toEqual(500);
+    });
+
+    it("scales the overlay image with the canvas, as the background image", () => {
+      stubImageLoads();
+      layout(400, 300);
+      const { sketch, canvas } = mount();
+      sketch.setBackgroundFromDataUrl("data:image/png;base64,00");
+      sketch.setOverlayFromDataUrl("data:image/png;base64,00");
+
+      layout(800, 600);
+      window.dispatchEvent(new Event("resize"));
+
+      expect((canvas.backgroundImage as fabric.FabricImage).width).toEqual(400);
+      expect((canvas.overlayImage as fabric.FabricImage).width).toEqual(400);
     });
 
     it("does not follow the window when autoresize is off", () => {
@@ -1316,17 +1434,7 @@ describe("SketchField", () => {
     });
 
     describe("setBackgroundFromDataUrl", () => {
-      /** An image loads as soon as its source is set */
-      const stubImages = () =>
-        jest.spyOn(window, "Image").mockImplementation(() => {
-          const img = document.createElement("img");
-          img.width = 200;
-          img.height = 100;
-          Object.defineProperty(img, "src", {
-            set: () => img.onload?.(new Event("load")),
-          });
-          return img;
-        });
+      const stubImages = stubImageLoads;
 
       it("sets the image as the background of the canvas", () => {
         stubImages();
@@ -1486,6 +1594,163 @@ describe("SketchField", () => {
 
           expect(canvas.backgroundImage).toBeFalsy();
         });
+      });
+    });
+
+    describe("setOverlayFromDataUrl and removeOverlayImage", () => {
+      const url = "data:image/png;base64,00";
+
+      it("sets the image above the objects, and leaves the background alone", () => {
+        stubImageLoads();
+        const { sketch, canvas } = mount();
+
+        sketch.setOverlayFromDataUrl(url);
+
+        expect(canvas.overlayImage).toBeInstanceOf(fabric.FabricImage);
+        expect(canvas.backgroundImage).toBeFalsy();
+      });
+
+      it("takes the options of the background image", () => {
+        stubImageLoads();
+        layout(400, 300);
+        const { sketch, canvas } = mount();
+
+        sketch.setOverlayFromDataUrl(url, { stretched: true, opacity: 0.5 });
+
+        const image = canvas.overlayImage as fabric.FabricImage;
+        expect([image.scaleX, image.scaleY, image.opacity]).toEqual([2, 3, 0.5]);
+      });
+
+      it("is saved in the JSON", () => {
+        stubImageLoads();
+        const { sketch } = mount();
+
+        sketch.setOverlayFromDataUrl(url);
+
+        expect(sketch.toJSON().overlayImage).toBeDefined();
+      });
+
+      it("is removed by removeOverlayImage, which keeps the objects and the background image", () => {
+        stubImageLoads();
+        const { sketch, canvas } = mount();
+        sketch.addText("hello");
+        sketch.setBackgroundFromDataUrl(url);
+        sketch.setOverlayFromDataUrl(url);
+
+        sketch.removeOverlayImage();
+
+        expect(canvas.overlayImage).toBeFalsy();
+        expect(sketch.toJSON().overlayImage).toBeUndefined();
+        expect(canvas.backgroundImage).toBeTruthy();
+        expect(canvas.getObjects()).toHaveLength(1);
+      });
+
+      it("is not removed by removeBackgroundImage", () => {
+        stubImageLoads();
+        const { sketch, canvas } = mount();
+        sketch.setBackgroundFromDataUrl(url);
+        sketch.setOverlayFromDataUrl(url);
+
+        sketch.removeBackgroundImage();
+
+        expect(canvas.backgroundImage).toBeFalsy();
+        expect(canvas.overlayImage).toBeTruthy();
+      });
+
+      it("is removed by clear(), with the objects", () => {
+        stubImageLoads();
+        const { sketch, canvas } = mount();
+        sketch.setOverlayFromDataUrl(url);
+
+        sketch.clear();
+
+        expect(canvas.overlayImage).toBeFalsy();
+      });
+
+      it("keeps the image that is still loading from being set once it is removed", () => {
+        const loads = deferImageLoads();
+        const { sketch, canvas } = mount();
+        sketch.setOverlayFromDataUrl(url);
+
+        sketch.removeOverlayImage();
+        loads.forEach((load) => load());
+
+        expect(canvas.overlayImage).toBeFalsy();
+      });
+
+      it("does not cancel a background image that is loading too", () => {
+        const loads = deferImageLoads();
+        const { sketch, canvas } = mount();
+        sketch.setBackgroundFromDataUrl(url);
+        sketch.setOverlayFromDataUrl(url);
+
+        loads.forEach((load) => load());
+
+        expect(canvas.backgroundImage).toBeTruthy();
+        expect(canvas.overlayImage).toBeTruthy();
+      });
+    });
+
+    describe("crossOrigin of the images", () => {
+      const url = "data:image/png;base64,00";
+      const crossOriginOf = (setAttribute: jest.SpyInstance) =>
+        setAttribute.mock.calls
+          .filter(([name]) => name === "crossOrigin")
+          .map(([, value]) => value);
+
+      it("is the one of the options for the background image", () => {
+        const setAttribute = jest.spyOn(HTMLImageElement.prototype, "setAttribute");
+        const { sketch } = mount();
+
+        sketch.setBackgroundFromDataUrl(url, { crossOrigin: "use-credentials" });
+
+        expect(crossOriginOf(setAttribute)).toEqual(["use-credentials"]);
+      });
+
+      it("is not asked for when it is null, so a server without CORS headers can be used", () => {
+        const setAttribute = jest.spyOn(HTMLImageElement.prototype, "setAttribute");
+        const { sketch } = mount();
+
+        sketch.setBackgroundFromDataUrl(url, { crossOrigin: null });
+
+        expect(crossOriginOf(setAttribute)).toEqual([]);
+      });
+
+      it("is anonymous for the overlay image, and null switches it off", () => {
+        const setAttribute = jest.spyOn(HTMLImageElement.prototype, "setAttribute");
+        const { sketch } = mount();
+
+        sketch.setOverlayFromDataUrl(url);
+        sketch.setOverlayFromDataUrl(url, { crossOrigin: null });
+
+        expect(crossOriginOf(setAttribute)).toEqual(["anonymous"]);
+      });
+
+      it("is passed to the image of addImg when it is given, and not otherwise", async () => {
+        const fromURL = jest
+          .spyOn(fabric.FabricImage, "fromURL")
+          .mockImplementation(() =>
+            Promise.resolve(
+              new fabric.FabricImage(document.createElement("img"), {
+                width: 100,
+                height: 60,
+              })
+            )
+          );
+        const { sketch } = mount();
+
+        sketch.addImg("a", { crossOrigin: "anonymous" });
+        sketch.addImg("b");
+        await settle();
+
+        const imageOptions = { originX: "left", originY: "top" };
+        expect(fromURL).toHaveBeenNthCalledWith(
+          1,
+          "a",
+          { crossOrigin: "anonymous" },
+          imageOptions
+        );
+        expect(fromURL).toHaveBeenNthCalledWith(2, "b", {}, imageOptions);
       });
     });
 
