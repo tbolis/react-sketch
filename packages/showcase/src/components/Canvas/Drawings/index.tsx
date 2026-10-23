@@ -1,9 +1,11 @@
 import type { ReactElement } from "react";
 import ClearIcon from "@mui/icons-material/Clear";
+import DownloadIcon from "@mui/icons-material/Download";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { CONFIG, type Config } from "../../../stores/config";
+import { downloadUrl } from "../../../utils/files";
 
 /**
  * The drawings saved with the save action
@@ -27,15 +29,26 @@ const Drawings = ({ drawings }: Pick<Config, "drawings">): ReactElement | null =
               alt={`Saved drawing ${index + 1}`}
               sx={{ width: 1 }}
             />
-            <IconButton
-              size="small"
-              aria-label={`Remove saved drawing ${index + 1}`}
-              sx={{ position: "absolute", top: 0, right: 0, color: "common.black" }}
-              onClick={() =>
-                (CONFIG.drawings = drawings.filter((d) => d.id !== drawing.id))
-              }>
-              <ClearIcon fontSize="small" />
-            </IconButton>
+            <Box sx={{ position: "absolute", top: 0, right: 0, display: "flex" }}>
+              <IconButton
+                size="small"
+                aria-label={`Download saved drawing ${index + 1}`}
+                sx={{ color: "common.black" }}
+                onClick={() =>
+                  downloadUrl(drawing.src, `drawing-${drawing.id}.png`)
+                }>
+                <DownloadIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                aria-label={`Remove saved drawing ${index + 1}`}
+                sx={{ color: "common.black" }}
+                onClick={() =>
+                  (CONFIG.drawings = drawings.filter((d) => d.id !== drawing.id))
+                }>
+                <ClearIcon fontSize="small" />
+              </IconButton>
+            </Box>
           </Box>
         ))}
       </Box>
