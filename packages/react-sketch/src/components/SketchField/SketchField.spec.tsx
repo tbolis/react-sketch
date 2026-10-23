@@ -1353,6 +1353,33 @@ describe("SketchField", () => {
         expect(image.scaleY).toEqual(canvas.getHeight() / 100);
       });
 
+      it("stretches the image to a canvas of another shape", () => {
+        stubImages();
+        layout(400, 300);
+        const { sketch, canvas } = mount();
+
+        sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
+          stretched: true,
+        });
+
+        const image = canvas.backgroundImage as fabric.FabricImage;
+        expect([image.scaleX, image.scaleY]).toEqual([2, 3]);
+      });
+
+      it("stretches both ways when the width and the height are asked for", () => {
+        stubImages();
+        layout(400, 300);
+        const { sketch, canvas } = mount();
+
+        sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
+          stretchedX: true,
+          stretchedY: true,
+        });
+
+        const image = canvas.backgroundImage as fabric.FabricImage;
+        expect([image.scaleX, image.scaleY]).toEqual([2, 3]);
+      });
+
       it("stretches the image to the width, or the height, only", () => {
         stubImages();
         const { sketch, canvas } = mount();

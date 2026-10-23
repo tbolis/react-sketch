@@ -572,8 +572,18 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
         originX: "left",
         originY: "top",
       });
-      if (stretched || stretchedX) imgObj.scaleToWidth(canvas.getWidth());
-      if (stretched || stretchedY) imgObj.scaleToHeight(canvas.getHeight());
+      if (stretched || (stretchedX && stretchedY)) {
+        // scaleToWidth and scaleToHeight keep the proportions of the image, so
+        // the second would undo the first
+        imgObj.set({
+          scaleX: canvas.getWidth() / imgObj.width,
+          scaleY: canvas.getHeight() / imgObj.height,
+        });
+      } else if (stretchedX) {
+        imgObj.scaleToWidth(canvas.getWidth());
+      } else if (stretchedY) {
+        imgObj.scaleToHeight(canvas.getHeight());
+      }
       imgObj.set(imageOptions);
       canvas.backgroundImage = imgObj;
       canvas.requestRenderAll();
