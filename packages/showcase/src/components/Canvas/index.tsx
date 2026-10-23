@@ -17,7 +17,11 @@ const SketchCanvas = (props: Config): ReactElement => {
   return (
     <Paper sx={{ width: "100%", height: "100%", p: 1, color: "text.secondary" }}>
       <ScenarioTabs scenario={props.scenario} />
-      <ScenarioControls scenario={props.scenario} forceValue={props.forceValue} />
+      <ScenarioControls
+        scenario={props.scenario}
+        forceValue={props.forceValue}
+        backgroundImageUrl={props.backgroundImageUrl}
+      />
       <CanvasActions
         canUndo={props.canUndo}
         canRedo={props.canRedo}
@@ -44,6 +48,17 @@ const SketchCanvas = (props: Config): ReactElement => {
         }
         width={props.controlledSize ? props.sketchWidth : undefined}
         height={props.controlledSize ? props.sketchHeight : undefined}
+        backgroundImage={
+          props.scenario === "background-image"
+            ? props.backgroundImageUrl || undefined
+            : undefined
+        }
+        // A new object on every render, with the same content: the canvas does not load the image again
+        backgroundImageOptions={{
+          stretched: props.stretched,
+          stretchedX: props.stretchedX,
+          stretchedY: props.stretchedY,
+        }}
         defaultValue={props.scenario === "default-value" ? defaultValue : undefined}
         value={controlled ? props.controlledValue : undefined}
         forceValue={controlled && props.forceValue}
