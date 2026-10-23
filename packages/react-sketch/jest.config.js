@@ -1,5 +1,21 @@
 /** @type {import('jest').Config} */
+// REACT=18 runs the tests on React 18, which is installed under another name
+// (react-18, react-dom-18) next to React 19. Testing Library 16 supports 18 and 19,
+// not 17, so 17 is not tested.
+const react18 =
+  process.env.REACT === "18"
+    ? {
+        moduleNameMapper: {
+          "^react$": "react-18",
+          "^react/(.*)$": "react-18/$1",
+          "^react-dom$": "react-dom-18",
+          "^react-dom/(.*)$": "react-dom-18/$1",
+        },
+      }
+    : {};
+
 module.exports = {
+  ...react18,
   testEnvironment: "jsdom",
   roots: ["<rootDir>/src"],
   testMatch: ["<rootDir>/src/**/*.spec.ts?(x)"],
