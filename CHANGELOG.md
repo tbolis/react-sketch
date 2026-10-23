@@ -54,6 +54,9 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
 - The `autoresize` property (default `true`). It switches the resize of the canvas on window resize on
   and off. In 0.5.x the canvas always followed the window.
 - The `Types` namespace, see Exports.
+- The `removeBackgroundImage()` method. In 0.5.x the background image set with `setBackgroundFromDataUrl`
+  could only be removed with `clear()`, which also removes the objects. When several background images
+  are asked for, or one is removed while it is loading, only the last request is set.
 
 ### Changed
 
@@ -105,6 +108,8 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
 - The Rectangle and RectangleLabel tools follow the pointer when dragging in every direction.
 - The Arrow tool no longer adds the previous arrow again on a mouse up that follows a finished arrow.
 - The Pencil tool uses the default cursor, not the crosshair of fabric (#181).
+- `setBackgroundFromDataUrl()` with `stretched`, or with `stretchedX` and `stretchedY` together, fills the
+  canvas on both axes. They kept the proportions of the image, so the height fit undid the width fit.
 - Three wrong entries of the color name table used by the Highlighter are corrected.
 
 ### Known limitations

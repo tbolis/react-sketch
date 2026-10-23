@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { DragEvent, ReactElement } from "react";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
@@ -30,25 +31,44 @@ const visuallyHidden = {
 } as const;
 
 /**
+ * Use the image as the background of the canvas, fitted as the switches say
+ */
+const setBackground = (dataUrl: string): void => {
+  const { stretched, stretchedX, stretchedY } = CONFIG;
+  withSketch((sketch) =>
+    sketch.setBackgroundFromDataUrl(dataUrl, {
+      stretched,
+      stretchedX,
+      stretchedY,
+      originX: "left",
+      originY: "top",
+    })
+  );
+};
+
+/**
  * Use the first image of the files as the background of the canvas
  */
 const setBackgroundImage = async (files: FileList | null): Promise<void> => {
   const image = Array.from(files ?? []).find((file) =>
     file.type.startsWith("image/")
   );
-  if (image) {
-    const dataUrl = await readAsDataUrl(image);
-    const { stretched, stretchedX, stretchedY } = CONFIG;
-    withSketch((sketch) =>
-      sketch.setBackgroundFromDataUrl(dataUrl, {
-        stretched,
-        stretchedX,
-        stretchedY,
-        originX: "left",
-        originY: "top",
-      })
-    );
-  }
+  if (image) setBackground(await readAsDataUrl(image));
+};
+
+/**
+ * The fit is applied when an image is set, so a switch sets the image of the
+ * canvas again. Nothing happens when the canvas has no background image.
+ */
+const setFit = (
+  fit: "stretched" | "stretchedX" | "stretchedY",
+  on: boolean
+): void => {
+  CONFIG[fit] = on;
+  withSketch((sketch) => {
+    const { src } = (sketch.toJSON().backgroundImage ?? {}) as { src?: string };
+    if (src) setBackground(src);
+  });
 };
 
 const DropArea = (): ReactElement => {
@@ -128,7 +148,7 @@ const Background = (props: BackgroundProps): ReactElement => {
         control={
           <Switch
             checked={props.stretched}
-            onChange={(event) => (CONFIG.stretched = event.target.checked)}
+            onChange={(event) => setFit("stretched", event.target.checked)}
           />
         }
       />
@@ -137,7 +157,7 @@ const Background = (props: BackgroundProps): ReactElement => {
         control={
           <Switch
             checked={props.stretchedX}
-            onChange={(event) => (CONFIG.stretchedX = event.target.checked)}
+            onChange={(event) => setFit("stretchedX", event.target.checked)}
           />
         }
       />
@@ -146,11 +166,17 @@ const Background = (props: BackgroundProps): ReactElement => {
         control={
           <Switch
             checked={props.stretchedY}
-            onChange={(event) => (CONFIG.stretchedY = event.target.checked)}
+            onChange={(event) => setFit("stretchedY", event.target.checked)}
           />
         }
       />
       <DropArea />
+      <Button
+        variant="outlined"
+        sx={{ mt: 1 }}
+        onClick={() => withSketch((sketch) => sketch.removeBackgroundImage())}>
+        Remove image
+      </Button>
     </Section>
   );
 };

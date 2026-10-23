@@ -104,6 +104,8 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   private tool!: FabricCanvasTool;
   private history!: SketchHistory;
   private mounted = false;
+  /** Counts the background images asked for, so that only the last one is set */
+  private backgroundLoads = 0;
   private clipboard: Promise<fabric.FabricObject> | null = null;
   /** The pastes, which run one after the other as cloning is asynchronous */
   private pasting: Promise<unknown> = Promise.resolve();
@@ -560,22 +562,44 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     options: BackgroundOptions = {}
   ): void => {
     const canvas = this.canvas;
+    const load = ++this.backgroundLoads;
     const img = new Image();
     img.setAttribute("crossOrigin", "anonymous");
     const { stretched, stretchedX, stretchedY, ...imageOptions } = options;
     img.onload = () => {
-      if (!this.isCurrent(canvas)) return;
+      if (!this.isCurrent(canvas) || load !== this.backgroundLoads) return;
       const imgObj = new fabric.FabricImage(img, {
         originX: "left",
         originY: "top",
       });
-      if (stretched || stretchedX) imgObj.scaleToWidth(canvas.getWidth());
-      if (stretched || stretchedY) imgObj.scaleToHeight(canvas.getHeight());
+      if (stretched || (stretchedX && stretchedY)) {
+        // scaleToWidth and scaleToHeight keep the proportions of the image, so
+        // the second would undo the first
+        imgObj.set({
+          scaleX: canvas.getWidth() / imgObj.width,
+          scaleY: canvas.getHeight() / imgObj.height,
+        });
+      } else if (stretchedX) {
+        imgObj.scaleToWidth(canvas.getWidth());
+      } else if (stretchedY) {
+        imgObj.scaleToHeight(canvas.getHeight());
+      }
       imgObj.set(imageOptions);
       canvas.backgroundImage = imgObj;
       canvas.requestRenderAll();
     };
     img.src = dataUrl;
+  };
+
+  /**
+   * Removes the background image, also one that is still loading. The objects
+   * and the background color are kept, and the undo history is not changed
+   * (setting the background image is not part of it either).
+   */
+  removeBackgroundImage = (): void => {
+    this.backgroundLoads++;
+    this.canvas.backgroundImage = undefined;
+    this.canvas.requestRenderAll();
   };
 
   /**
