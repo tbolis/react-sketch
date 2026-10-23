@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { DragEvent, ReactElement } from "react";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
@@ -151,6 +152,12 @@ const Background = (props: BackgroundProps): ReactElement => {
         }
       />
       <DropArea />
+      <Button
+        variant="outlined"
+        sx={{ mt: 1 }}
+        onClick={() => withSketch((sketch) => sketch.removeBackgroundImage())}>
+        Remove image
+      </Button>
     </Section>
   );
 };
