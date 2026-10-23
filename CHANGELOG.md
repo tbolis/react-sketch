@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 (unreleased)
+## 1.0.0 (2026-10-23)
 
 Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, the named exports
 `SketchField` and `Tools`, and the default export). The differences in behavior are listed below.
@@ -10,7 +10,7 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
 - The repository is a Yarn 1 workspaces monorepo: `packages/react-sketch` (the library) and
   `packages/showcase` (the demo application, private). The legacy JavaScript sources in `src/`, the
   `examples/` folder and the `webpack/` configurations of 0.5.x are removed.
-- The library is written in TypeScript and ships its type declarations (`dist/index.d.ts`). The
+- The library is written in TypeScript and ships its type declarations (`dist/index.d.ts`, #94). The
   hand-written `types/index.d.ts` of 0.5.x is removed.
 - React 17, 18 and 19 are supported. `react` is a peer dependency (`^17.0.0 || ^18.0.0 || ^19.0.0`).
   `react-dom` and `prop-types` are no longer dependencies of the library.
@@ -26,12 +26,15 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
   Built with webpack 5, ts-loader and `tsc`. `main`, `types` and `files` of the package point to it.
 - The showcase replaces `examples/`: React 19, `@mui/material` 9 and MobX 7, with a tools panel, an
   actions toolbar and the scenarios `defaultValue`, `value` with `forceValue`, and `addImg`. It runs
-  with `yarn start` on port 23000 and uses the sources of the library, no build needed first.
+  with `yarn start` on port 23000 and uses the sources of the library, no build needed first (#163).
+  Text is added in the line color (#78).
 - Toolchain: TypeScript 6, ESLint 10 (flat config) with typescript-eslint and @eslint-react, Prettier 3, Jest 30 with
   ts-jest and Testing Library (replacing karma, enzyme and the Jest 23 setup of 0.5.x), husky 9 with
   lint-staged. GitHub Actions (`.github/workflows/ci.yml`, Node.js 22 and 24) replaces Travis CI.
-- Documentation: README rewritten, code of conduct updated to Contributor Covenant 2.1, README files
-  added for the package and the showcase.
+- Documentation: README rewritten (#108), with every property, method and callback (#120, #130),
+  examples of saving and loading drawings (#158, #165), of images, text and export (#71, #155), and the
+  note that the JSON includes the added images and the background image (#58). Code of conduct updated to
+  Contributor Covenant 2.1, README files added for the package and the showcase.
 
 ### Removed
 
@@ -43,7 +46,7 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
 - Named exports: `SketchField`, `Tools` and `Types`. The default export is the component, which also
   carries `SketchField` and `Tools`, so `import Sketch from "react-sketch"` with `<Sketch />`,
   `Sketch.SketchField` and `Sketch.Tools.Pencil` work as in 0.5.x.
-- `Tools` has the keys and values of 0.5.x: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`,
+- `Tools` has the keys and values of 0.5.x: `Select`, `Pencil`, `Line`, `Arrow` (#166), `Rectangle`,
   `RectangleLabel`, `Circle`, `Pan`, `DefaultTool` and `Highlighter`.
 - `Types` is new: the `Tool` enumeration (the values of `Tools`, including `"rectangle-label"` and
   `"default-tool"`), `Tools`, and the types `SketchProperties`, `SketchEvent`, `SketchObject`,
@@ -60,13 +63,14 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
 
 ### Changed
 
-- The default `tool` is `"select"`. In 0.5.x it was `null`, which meant no tool: objects could be moved
-  and nothing was drawn. `null` is still accepted and is treated as `"select"`. An unknown tool name
-  selects `"pencil"`, as before.
+- The default `tool` is `"select"`. In the published 0.5.1 it was `"pencil"`, so a click started a stroke
+  and objects present at start could not be selected or dragged (#100). In the unreleased 0.5.2 to 0.5.6
+  it was `null`, which meant no tool: objects could be moved and nothing was drawn. `null` is still
+  accepted and is treated as `"select"`. An unknown tool name selects `"pencil"`, as before (#14).
 - The Highlighter tool no longer throws for a `lineColor` it cannot convert (for example `rgb(0, 0, 0)`
   or `"transparent"`): it uses the default color.
 - `imageFormat` is the default format of `toDataURL`, used when the options of the call have no `format`
-  (it was not used in 0.5.x).
+  (it was not used in 0.5.x, #39).
 - `fromJSON()` resets the undo history and applies the tool configuration to the loaded objects again, so
   for example they cannot be selected while a drawing tool is active.
 - `toJSON()` is typed as an object. The declaration file of 0.5.x said string, the value was always an
@@ -89,8 +93,13 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
 
 ### Fixed
 
+- The package no longer requires `jsdom` at runtime. The 0.5.1 bundle did, and through it `fs`,
+  `acorn`, `parse5`, `whatwg-url` and `tough-cookie`, which broke builds and production bundles with
+  errors such as `Can't resolve 'jsdom'` and `Cannot find module 'fs'` (#56, #61, #66, #88, #118, #119,
+  #129, #172).
 - `lineColor`, `lineWidth` and `fillColor` changes apply right away. In 0.5.x they were applied only
-  after the tool changed.
+  after the tool changed (#114).
+- `backgroundColor` is applied when the component mounts and when the property changes (#87).
 - Undo, then modify an object, then undo again, restores the right state.
 - Redo of `removeSelected()` removes the objects again.
 - `removeSelected()` leaves the selection first, so the objects keep their own position.
@@ -109,7 +118,8 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
 - The Arrow tool no longer adds the previous arrow again on a mouse up that follows a finished arrow.
 - The Pencil tool uses the default cursor, not the crosshair of fabric (#181).
 - `setBackgroundFromDataUrl()` with `stretched`, or with `stretchedX` and `stretchedY` together, fills the
-  canvas on both axes. They kept the proportions of the image, so the height fit undid the width fit.
+  canvas on both axes. They kept the proportions of the image, so the height fit undid the width fit
+  (#173).
 - Three wrong entries of the color name table used by the Highlighter are corrected.
 
 ### Known limitations
