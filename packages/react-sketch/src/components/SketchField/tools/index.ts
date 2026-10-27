@@ -2,7 +2,7 @@
 
 import * as fabric from "fabric";
 import { SketchProperties, Tool } from "../../../types";
-import { EraserBrush } from "@erase2d/fabric";
+import { EraserBrush } from "@react-sketch/eraser";
 import { CanvasEvent, EventInput } from "../events";
 
 /**

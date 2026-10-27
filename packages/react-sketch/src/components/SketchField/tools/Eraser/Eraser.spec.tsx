@@ -1,7 +1,7 @@
 import { createRef } from "react";
 import { render } from "@testing-library/react";
 import * as fabric from "fabric";
-import { EraserBrush } from "@erase2d/fabric";
+import { EraserBrush } from "@react-sketch/eraser";
 import SketchField from "../../SketchField";
 import { SketchProperties, Tool, Tools } from "../../../../types";
 

@@ -497,11 +497,6 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.4.0.tgz#5e13fac887f08c44f76b0ccaf3370eb00fec9bb6"
   integrity sha512-snKqtPW01tN0ui7yu9rGv69aJXr/a/Ywvl11sUjNtEcRc+ng/mQriFL0wLXMef74iHa/EkftbDzU9F8iFbH+zg==
 
-"@erase2d/fabric@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@erase2d/fabric/-/fabric-1.2.2.tgz#fccb515824c59a9a3b75d2a625f76157b11074a0"
-  integrity sha512-tltv9hwdlluKkhBKanwj40jdz6ATJ+G5/lF7qQXKV5kNFsbQPWYpojgrWyRi0FB6dOYIHf4U/RjbS3+27dFnuQ==
-
 "@eslint-community/eslint-utils@^4.8.0", "@eslint-community/eslint-utils@^4.9.1":
   version "4.10.1"
   resolved "https://registry.yarnpkg.com/@eslint-community/eslint-utils/-/eslint-utils-4.10.1.tgz#8911bd72b2c3640a543609e0400b8c4d2e7e7cb6"

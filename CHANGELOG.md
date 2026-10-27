@@ -7,7 +7,7 @@
 - The eraser tool (#82): `tool="eraser"`, `Tools.Eraser`, `Types.Tool.ERASER`. It erases parts of the
   objects with the width of `lineWidth`, one stroke is one undo step, and the erased parts are saved by
   `toJSON()` and loaded by `fromJSON()`. The background color and the background image are not erased.
-  It uses `@erase2d/fabric`, which is part of the bundle.
+  Its brush is the code of `@erase2d/fabric` (MIT), kept in `packages/eraser` and part of the bundle.
 
 ## 1.0.1 (unreleased)
 

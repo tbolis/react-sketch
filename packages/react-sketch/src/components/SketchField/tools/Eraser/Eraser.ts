@@ -1,5 +1,5 @@
 import * as fabric from "fabric";
-import { ClippingGroup, EraserBrush, type ErasingEvent } from "@erase2d/fabric";
+import { ClippingGroup, EraserBrush, type ErasingEvent } from "@react-sketch/eraser";
 import { FabricCanvasTool } from "../index";
 import { SketchProperties, Tool } from "../../../../types";
 
