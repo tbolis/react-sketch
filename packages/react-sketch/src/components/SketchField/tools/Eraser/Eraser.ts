@@ -59,9 +59,10 @@ export class Eraser extends FabricCanvasTool {
     brush: EraserBrush,
     stroke: { path: fabric.Path; targets: fabric.FabricObject[] }
   ): Promise<void> {
-    const created = new Map(
-      stroke.targets.map((o) => [o, !(o.clipPath instanceof ClippingGroup)])
-    );
+    // An object with a clip path of its own gets it wrapped in the erasing group
+    // by the first stroke, and undo takes only the stroke off that group, so the
+    // clip path is not lost
+    const created = new Map(stroke.targets.map((o) => [o, !o.clipPath]));
     const sources = await brush.commit(stroke);
     const erasures: Erasure[] = [];
     sources.forEach((source, object) => {
