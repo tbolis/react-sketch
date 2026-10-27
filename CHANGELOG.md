@@ -4,11 +4,25 @@
 
 ### Added
 
-- The eraser tool (#82): `tool="eraser"`, `Tools.Eraser`, `Types.Tool.ERASER`. It erases parts of the
-  objects with the width of `lineWidth`, one stroke is one undo step, and the erased parts are saved by
-  `toJSON()` and loaded by `fromJSON()`. The background color and the background image are not erased. The cursor is a circle of the size
-  of the brush (the crosshair for a brush over 124 pixels).
-  Its brush is the code of `@erase2d/fabric` (MIT), kept in `packages/eraser` and part of the bundle.
+- The eraser tool (#82): `tool="eraser"`, `Tools.Eraser` and `Types.Tool.ERASER`. It erases parts of the
+  objects (lines, shapes, images, text) with the width of `lineWidth`, and its cursor is a circle of the
+  size of the brush (the crosshair for a brush over 124 pixels, the most a browser shows). One stroke is
+  one undo step. The erased parts are kept on the objects, so `toJSON()` saves them and `value`,
+  `defaultValue` and `fromJSON()` load them. The background color and the background image are not
+  erased. The brush is the code of `@erase2d/fabric` by @ShaMan123 (MIT).
+- The showcase has an Eraser button in the tool selector.
+
+### Changed
+
+- Each tool starts from the default cursor of free drawing (the crosshair), so the cursor of the pencil or
+  of the eraser is not kept by the highlighter.
+
+### Packaging and tooling
+
+- The code of `@erase2d/fabric` 1.2.2 is in the private package `packages/eraser`
+  (`@react-sketch/eraser`), with its license, and `react-sketch` bundles it. Nothing new is installed for
+  the users of the library, and the externals of the bundle are still `react` and `fabric`. The license is
+  in `dist/index.js.LICENSE.txt`. `yarn typecheck`, `yarn build` and `yarn test` build the package first.
 
 ## 1.0.1 (unreleased)
 
