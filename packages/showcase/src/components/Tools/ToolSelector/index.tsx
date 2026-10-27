@@ -9,6 +9,7 @@ import RectangleLabelIcon from "@mui/icons-material/Label";
 import CircleIcon from "@mui/icons-material/RadioButtonUnchecked";
 import PanIcon from "@mui/icons-material/PanTool";
 import HighlighterIcon from "@mui/icons-material/Highlight";
+import EraserIcon from "@mui/icons-material/AutoFixNormal";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Section from "../Section";
@@ -32,6 +33,7 @@ const TOOLS = [
   { value: Types.Tool.CIRCLE, label: "Circle", icon: <CircleIcon /> },
   { value: Types.Tool.PAN, label: "Pan", icon: <PanIcon /> },
   { value: Types.Tool.HIGHLIGHTER, label: "Highlighter", icon: <HighlighterIcon /> },
+  { value: Types.Tool.ERASER, label: "Eraser", icon: <EraserIcon /> },
 ];
 
 const ToolSelector = (props: ToolSelectorProps): ReactElement => {

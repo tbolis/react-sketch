@@ -16,6 +16,7 @@ import { SketchHistory } from "./history/SketchHistory";
 import { autoresize, scaleContent } from "./resize";
 import { FabricCanvasTool } from "./tools";
 import { create_tool } from "./tools/factory";
+import { Eraser } from "./tools/Eraser";
 
 /**
  * The properties which always have a value, because SketchField provides
@@ -272,6 +273,13 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   private selectTool(): void {
     this.withToolProps((props) => {
       this.tool = create_tool(this.canvas, props);
+      if (this.tool instanceof Eraser) {
+        this.tool.onErase = (erasures) => {
+          if (!this.mounted) return;
+          this.history.onErased(erasures);
+          this.props.onChange?.();
+        };
+      }
     });
   }
 

@@ -11,16 +11,17 @@
   },
   "scripts": {
     "start": "yarn workspace showcase start",
-    "build": "yarn workspace react-sketch build && yarn workspace showcase build",
-    "typecheck": "yarn workspace react-sketch typecheck && yarn workspace showcase typecheck",
-    "clean": "node -e \"for (const d of ['packages/react-sketch/dist', 'packages/showcase/build']) require('fs').rmSync(d, { recursive: true, force: true })\"",
+    "build:eraser": "yarn workspace @react-sketch/eraser build",
+    "build": "yarn build:eraser && yarn workspace react-sketch build && yarn workspace showcase build",
+    "typecheck": "yarn workspace @react-sketch/eraser typecheck && yarn build:eraser && yarn workspace react-sketch typecheck && yarn workspace showcase typecheck",
+    "clean": "node -e \"for (const d of ['packages/eraser/dist', 'packages/react-sketch/dist', 'packages/showcase/build']) require('fs').rmSync(d, { recursive: true, force: true })\"",
     "lint": "eslint \"packages/**/*.{ts,tsx}\"",
     "lint:fix": "eslint --fix \"packages/**/*.{ts,tsx}\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "yarn workspace react-sketch test",
-    "test:watch": "yarn workspace react-sketch test --watch",
-    "test:coverage": "yarn workspace react-sketch test:coverage",
+    "test": "yarn build:eraser && yarn workspace react-sketch test",
+    "test:watch": "yarn build:eraser && yarn workspace react-sketch test --watch",
+    "test:coverage": "yarn build:eraser && yarn workspace react-sketch test:coverage",
     "prepare": "husky"
   },
   "devDependencies": {
