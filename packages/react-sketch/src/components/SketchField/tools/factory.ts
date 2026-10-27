@@ -62,8 +62,9 @@ export const create_tool = (
       toolInstance = new Pencil(canvas);
   }
 
-  // Bring the cursor back to default, in case the previous tool changed it
+  // Bring the cursors back to default, in case the previous tool changed them
   canvas.defaultCursor = "default";
+  canvas.freeDrawingCursor = "crosshair";
   toolInstance.configureCanvas(props);
   return toolInstance;
 };

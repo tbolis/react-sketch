@@ -271,19 +271,19 @@ throws.
 Use the tools by name (`"pencil"`), with `Tools` (`Tools.Pencil`) or with the enumeration
 `Types.Tool` (`Types.Tool.PENCIL`).
 
-| Tool            | `Tools`                | Value             | Description                                                                                                                                      |
-| --------------- | ---------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Select          | `Tools.Select`         | `select`          | Disables drawing. Objects can be selected, moved, scaled and rotated.                                                                            |
-| Pencil          | `Tools.Pencil`         | `pencil`          | Free drawing.                                                                                                                                    |
-| Line            | `Tools.Line`           | `line`            | Straight lines.                                                                                                                                  |
-| Arrow           | `Tools.Arrow`          | `arrow`           | Lines with an arrow head.                                                                                                                        |
-| Rectangle       | `Tools.Rectangle`      | `rectangle`       | Rectangles, filled with `fillColor`.                                                                                                             |
-| Rectangle label | `Tools.RectangleLabel` | `rectangle-label` | Rectangles with a text box above them. The text box follows the rectangle when it is moved or scaled.                                            |
-| Circle          | `Tools.Circle`         | `circle`          | Circles, filled with `fillColor`. The drag from the first to the second point is the diameter.                                                   |
-| Pan             | `Tools.Pan`            | `pan`             | Disables drawing. Dragging moves the whole canvas, useful after zooming (contributed by [wmaillard](https://github.com/wmaillard)).              |
-| Highlighter     | `Tools.Highlighter`    | `highlighter`     | Free drawing in a semi-transparent color. `lineColor` must be a hex code or a color name; any other value falls back to the default color.       |
-| Eraser          | `Tools.Eraser`         | `eraser`          | Erases parts of the objects, with the width of `lineWidth`. The background color and the background image are not erased. See [Eraser](#eraser). |
-| Default tool    | `Tools.DefaultTool`    | `default-tool`    | Disables drawing and selection. Use it to show a drawing that is not edited.                                                                     |
+| Tool            | `Tools`                | Value             | Description                                                                                                                                                                              |
+| --------------- | ---------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Select          | `Tools.Select`         | `select`          | Disables drawing. Objects can be selected, moved, scaled and rotated.                                                                                                                    |
+| Pencil          | `Tools.Pencil`         | `pencil`          | Free drawing.                                                                                                                                                                            |
+| Line            | `Tools.Line`           | `line`            | Straight lines.                                                                                                                                                                          |
+| Arrow           | `Tools.Arrow`          | `arrow`           | Lines with an arrow head.                                                                                                                                                                |
+| Rectangle       | `Tools.Rectangle`      | `rectangle`       | Rectangles, filled with `fillColor`.                                                                                                                                                     |
+| Rectangle label | `Tools.RectangleLabel` | `rectangle-label` | Rectangles with a text box above them. The text box follows the rectangle when it is moved or scaled.                                                                                    |
+| Circle          | `Tools.Circle`         | `circle`          | Circles, filled with `fillColor`. The drag from the first to the second point is the diameter.                                                                                           |
+| Pan             | `Tools.Pan`            | `pan`             | Disables drawing. Dragging moves the whole canvas, useful after zooming (contributed by [wmaillard](https://github.com/wmaillard)).                                                      |
+| Highlighter     | `Tools.Highlighter`    | `highlighter`     | Free drawing in a semi-transparent color. `lineColor` must be a hex code or a color name; any other value falls back to the default color.                                               |
+| Eraser          | `Tools.Eraser`         | `eraser`          | Erases parts of the objects, with the width of `lineWidth`. The cursor shows the size of the brush. The background color and the background image are not erased. See [Eraser](#eraser). |
+| Default tool    | `Tools.DefaultTool`    | `default-tool`    | Disables drawing and selection. Use it to show a drawing that is not edited.                                                                                                             |
 
 ### Eraser
 

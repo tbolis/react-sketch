@@ -60,6 +60,44 @@ describe("Eraser", () => {
     expect(canvas.freeDrawingBrush?.width).toEqual(40);
   });
 
+  describe("the cursor", () => {
+    it("is a circle of the size of the brush, with its center as hotspot", () => {
+      const { canvas } = mount({ lineWidth: 24 });
+
+      const cursor = canvas.freeDrawingCursor;
+      expect(cursor).toMatch(/^url\("data:image\/svg\+xml,/);
+      const svg = decodeURIComponent(
+        cursor.split('"')[1].split(",").slice(1).join(",")
+      );
+      expect(svg).toContain('width="28"');
+      expect(svg).toContain('r="12"');
+      // 24 pixels of brush, 2 of margin on each side
+      expect(cursor).toMatch(/ 14 14, crosshair$/);
+    });
+
+    it("follows the line width", () => {
+      const { canvas, rerender } = mount({ lineWidth: 24 });
+
+      rerender(<SketchField tool={Tool.ERASER} lineWidth={40} />);
+
+      expect(decodeURIComponent(canvas.freeDrawingCursor)).toContain('width="44"');
+    });
+
+    it("is the crosshair for a brush too big for a cursor", () => {
+      const { canvas } = mount({ lineWidth: 200 });
+
+      expect(canvas.freeDrawingCursor).toEqual("crosshair");
+    });
+
+    it("is not kept by the next tool", () => {
+      const { canvas, rerender } = mount({ lineWidth: 24 });
+
+      rerender(<SketchField tool={Tool.HIGHLIGHTER} lineWidth={24} />);
+
+      expect(canvas.freeDrawingCursor).toEqual("crosshair");
+    });
+  });
+
   it("gives the pencil its own brush again, when the tool changes", () => {
     const { canvas, rerender } = mount();
 
