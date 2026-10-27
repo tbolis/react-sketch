@@ -30,3 +30,7 @@ jobs:
       - run: yarn typecheck
       - run: yarn build
       - run: yarn test
+      - name: Test with React 18
+        run: yarn test
+        env:
+          REACT: "18"

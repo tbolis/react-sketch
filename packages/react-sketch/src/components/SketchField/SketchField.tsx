@@ -11,10 +11,9 @@ import {
   TextOptions,
   Tool,
 } from "../../types";
-import { uuid4 } from "../../utils";
 import { CanvasEvent, FabricCanvasEventsManager, SketchEventAware } from "./events";
 import { SketchHistory } from "./history/SketchHistory";
-import { autoresize } from "./resize";
+import { autoresize, scaleContent } from "./resize";
 import { FabricCanvasTool } from "./tools";
 import { create_tool } from "./tools/factory";
 
@@ -80,6 +79,8 @@ const defaultProps: DefaultedProps = {
  */
 class SketchCanvas extends fabric.Canvas {
   clearing = false;
+  /** Called after the canvas is cleared, also when a value is loaded, before its objects are added */
+  onClear?: () => void;
 
   clear(): void {
     this.clearing = true;
@@ -88,6 +89,7 @@ class SketchCanvas extends fabric.Canvas {
     } finally {
       this.clearing = false;
     }
+    this.onClear?.();
   }
 }
 
@@ -109,10 +111,11 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   private clipboard: Promise<fabric.FabricObject> | null = null;
   /** The pastes, which run one after the other as cloning is asynchronous */
   private pasting: Promise<unknown> = Promise.resolve();
+  /** The load of a value which is running. A newer value cancels it, as the one which ends last would win */
+  private loading: AbortController | null = null;
   private readonly timers = new Set<number>();
   private readonly canvasEl = React.createRef<HTMLCanvasElement>();
   private readonly containerEl = React.createRef<HTMLDivElement>();
-  private readonly canvasId = uuid4();
 
   /**
    * Listener function for the resize of canvas and objects
@@ -193,6 +196,9 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
 
     // Initialize History, with maximum number of undo steps
     this.history = new SketchHistory(this.canvas, undoSteps);
+    // Loading a value clears the canvas first: the history starts again with the
+    // loaded objects, and only when the load works
+    this.canvas.onClear = () => this.history.clear();
 
     // Bind Events to Actions
     this._bind_canvas_events(
@@ -234,6 +240,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
 
   componentWillUnmount(): void {
     this.mounted = false;
+    this.loading?.abort();
     window.removeEventListener("resize", this._resize_listener);
     this.timers.forEach((id) => window.clearTimeout(id));
     this.timers.clear();
@@ -363,13 +370,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * @param factor the zoom factor
    */
   zoom = (factor: number): void => {
-    this.canvas.getObjects().forEach((obj) => {
-      obj.scaleX = (obj.scaleX ?? 1) * factor;
-      obj.scaleY = (obj.scaleY ?? 1) * factor;
-      obj.left = (obj.left ?? 0) * factor;
-      obj.top = (obj.top ?? 0) * factor;
-      obj.setCoords();
-    });
+    scaleContent(this.canvas, factor, factor);
     this.canvas.renderAll();
     this.canvas.calcOffset();
   };
@@ -450,17 +451,37 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     if (!json) return;
     const canvas = this.canvas;
     this.schedule(() => {
-      this.history.clear();
-      void canvas.loadFromJSON(json).then(() => {
-        if (!this.isCurrent(canvas)) return;
-        // Loading a value drops the background color unless the value has one
-        if (!canvas.backgroundColor) this.setBackground(this.props.backgroundColor);
-        // The loaded objects follow the tool in use, for example they can't be
-        // selected when drawing
-        this.configureTool();
-        canvas.renderAll();
-        this.props.onChange?.();
-      });
+      this.loading?.abort();
+      const loading = (this.loading = new AbortController());
+      // fabric turns the rendering of added objects off while it loads, and on
+      // again only when the load works
+      const { renderOnAddRemove } = canvas;
+      // A value which is not valid JSON throws at once, so it is made a rejection too
+      new Promise((resolve) =>
+        resolve(canvas.loadFromJSON(json, undefined, { signal: loading.signal }))
+      )
+        .then(() => {
+          if (!this.isCurrent(canvas)) return;
+          // Loading a value drops the background color unless the value has one
+          if (!canvas.backgroundColor)
+            this.setBackground(this.props.backgroundColor);
+          // The loaded objects follow the tool in use, for example they can't be
+          // selected when drawing
+          this.configureTool();
+          canvas.renderAll();
+          this.props.onChange?.();
+        })
+        .catch((error: unknown) => {
+          canvas.renderOnAddRemove = renderOnAddRemove;
+          // A load which a newer value cancelled is not an error. Any other is
+          // not hidden: it is thrown outside the promise, as an uncaught error,
+          // and the canvas keeps what it had.
+          if (!loading.signal.aborted) {
+            window.setTimeout(() => {
+              throw error;
+            });
+          }
+        });
     }, 100);
   };
 
@@ -474,7 +495,6 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   clear = (propertiesToInclude?: string[]): SketchData => {
     const discarded = this.toJSON(propertiesToInclude);
     this.canvas.clear();
-    this.history.clear();
     // Clearing a canvas drops its background color
     this.setBackground(this.props.backgroundColor);
     return discarded;
@@ -634,7 +654,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     };
     return (
       <div className={className} style={canvasDivStyle} ref={this.containerEl}>
-        <canvas id={this.canvasId} ref={this.canvasEl}>
+        <canvas ref={this.canvasEl}>
           Sorry, Canvas HTML5 element is not supported by your browser :(
         </canvas>
       </div>

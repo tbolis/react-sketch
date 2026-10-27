@@ -1,5 +1,34 @@
 # Changelog
 
+## 1.0.1 (unreleased)
+
+### Fixed
+
+- A value which cannot be loaded (`value`, `defaultValue`, `fromJSON()`) no longer breaks the canvas. Its
+  undo history is kept, and the canvas draws the objects added afterwards again: fabric turned that off
+  while it loaded and on again only when the load worked. The error is not hidden: it is thrown as an
+  uncaught error, as it was.
+- A value which loads slowly (an image) can no longer replace a newer value which loaded faster. A newer
+  value cancels the load of the older one.
+- Server rendering no longer warns about a mismatch when the page hydrates: the canvas element has no random
+  `id` any more, which nothing used.
+- The background image follows the canvas when it is resized, and `zoom()` scales it too, so the drawing stays
+  on it. Before, the resize changed its width and height, which does not stretch an image.
+- The README and the CHANGELOG say what loading a value does to the undo history: it starts again with the
+  loaded objects, so each of them can be undone, as in 0.5.x.
+
+### Removed
+
+- The unused helpers `pointerPosition` and `uuid4`. They were not exported by the package.
+
+### Packaging and tooling
+
+- CI also runs the tests on React 18 (`REACT=18 yarn test`; React 18 is installed as `react-18` and
+  `react-dom-18` for it), as the peer range says React 17 to 19. React 17 is not tested, Testing Library 16
+  does not support it.
+- The showcase loads no font or script from another site, it uses the system font, and it tells the user when
+  the canvas cannot be exported because an image of another site does not allow it (CORS).
+
 ## 1.0.0 (2026-10-23)
 
 Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, the named exports
@@ -71,8 +100,8 @@ Rewrite in TypeScript. The component API of 0.5.x is kept (properties, methods, 
   or `"transparent"`): it uses the default color.
 - `imageFormat` is the default format of `toDataURL`, used when the options of the call have no `format`
   (it was not used in 0.5.x, #39).
-- `fromJSON()` resets the undo history and applies the tool configuration to the loaded objects again, so
-  for example they cannot be selected while a drawing tool is active.
+- `fromJSON()` starts the undo history again with the loaded objects and applies the tool configuration to
+  them, so for example they cannot be selected while a drawing tool is active.
 - `toJSON()` is typed as an object. The declaration file of 0.5.x said string, the value was always an
   object.
 - Every tool falls back to line width 1, color black and fill `"transparent"` when the properties are

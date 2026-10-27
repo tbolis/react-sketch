@@ -32,6 +32,8 @@ export interface Config {
   hasSelection: boolean;
   canPaste: boolean;
   drawings: Drawing[];
+  /** A message for the user, shown for a moment. Empty when there is none */
+  notice: string;
 }
 
 /**
@@ -76,6 +78,7 @@ export class ConfigStore implements Config {
   public hasSelection = false;
   public canPaste = false;
   public drawings: Drawing[] = [];
+  public notice = "";
 
   constructor() {
     // The controlled value is handed to the canvas as is, do not wrap it in a proxy

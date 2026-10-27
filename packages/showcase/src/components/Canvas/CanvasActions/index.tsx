@@ -1,4 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
+import type { SketchField } from "react-sketch";
 import UndoIcon from "@mui/icons-material/Undo";
 import RedoIcon from "@mui/icons-material/Redo";
 import CopyIcon from "@mui/icons-material/ContentCopy";
@@ -64,14 +65,31 @@ const copy = () =>
     CONFIG.canPaste = true;
   });
 
+/**
+ * The canvas as a data URL. A canvas with an image of another site that does not allow
+ * it (CORS) cannot be exported: the user is told, and there is no URL.
+ */
+const exportPng = (sketch: SketchField): string | undefined => {
+  try {
+    return sketch.toDataURL();
+  } catch {
+    CONFIG.notice =
+      "The canvas cannot be exported: an image on it comes from another site that does not allow it (CORS).";
+    return undefined;
+  }
+};
+
 const save = () =>
   withSketch((sketch) => {
-    CONFIG.drawings = [...CONFIG.drawings, createDrawing(sketch.toDataURL())];
+    const src = exportPng(sketch);
+    if (src) CONFIG.drawings = [...CONFIG.drawings, createDrawing(src)];
   });
 
 const download = () =>
   withSketch((sketch) => {
-    downloadUrl(sketch.toDataURL(), "toPNG.png");
+    const src = exportPng(sketch);
+    if (!src) return;
+    downloadUrl(src, "toPNG.png");
     downloadText(JSON.stringify(sketch.toJSON()), "toDataJSON.json");
   });
 

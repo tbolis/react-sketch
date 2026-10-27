@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="">
+<html class="no-js" lang="en">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -9,26 +9,8 @@
     <meta
       name="description"
       content="<%= htmlWebpackPlugin.options.description %>" />
-    <link
-      href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet" />
   </head>
   <body>
     <div id="container"></div>
-    <script>
-      const WebFontConfig = {
-        google: { families: ["Roboto:400,300,500:latin"] },
-      };
-      (function () {
-        let wf = document.createElement("script");
-        wf.src =
-          ("https:" === document.location.protocol ? "https" : "http") +
-          "://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js";
-        wf.type = "text/javascript";
-        wf.async = "true";
-        let s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(wf, s);
-      })();
-    </script>
   </body>
 </html>
