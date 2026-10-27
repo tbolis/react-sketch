@@ -20,7 +20,16 @@ module.exports = {
   roots: ["<rootDir>/src"],
   testMatch: ["<rootDir>/src/**/*.spec.ts?(x)"],
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],
+  // @erase2d/fabric is published as ES modules only, so it is compiled too
+  transformIgnorePatterns: ["/node_modules/(?!@erase2d)"],
   transform: {
+    "^.+\\.m?js$": [
+      "ts-jest",
+      {
+        tsconfig: { allowJs: true, module: "commonjs", target: "es2020" },
+        diagnostics: false,
+      },
+    ],
     "^.+\\.tsx?$": [
       "ts-jest",
       {

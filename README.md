@@ -271,25 +271,33 @@ throws.
 Use the tools by name (`"pencil"`), with `Tools` (`Tools.Pencil`) or with the enumeration
 `Types.Tool` (`Types.Tool.PENCIL`).
 
-| Tool            | `Tools`                | Value             | Description                                                                                                                                |
-| --------------- | ---------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Select          | `Tools.Select`         | `select`          | Disables drawing. Objects can be selected, moved, scaled and rotated.                                                                      |
-| Pencil          | `Tools.Pencil`         | `pencil`          | Free drawing.                                                                                                                              |
-| Line            | `Tools.Line`           | `line`            | Straight lines.                                                                                                                            |
-| Arrow           | `Tools.Arrow`          | `arrow`           | Lines with an arrow head.                                                                                                                  |
-| Rectangle       | `Tools.Rectangle`      | `rectangle`       | Rectangles, filled with `fillColor`.                                                                                                       |
-| Rectangle label | `Tools.RectangleLabel` | `rectangle-label` | Rectangles with a text box above them. The text box follows the rectangle when it is moved or scaled.                                      |
-| Circle          | `Tools.Circle`         | `circle`          | Circles, filled with `fillColor`. The drag from the first to the second point is the diameter.                                             |
-| Pan             | `Tools.Pan`            | `pan`             | Disables drawing. Dragging moves the whole canvas, useful after zooming (contributed by [wmaillard](https://github.com/wmaillard)).        |
-| Highlighter     | `Tools.Highlighter`    | `highlighter`     | Free drawing in a semi-transparent color. `lineColor` must be a hex code or a color name; any other value falls back to the default color. |
-| Default tool    | `Tools.DefaultTool`    | `default-tool`    | Disables drawing and selection. Use it to show a drawing that is not edited.                                                               |
+| Tool            | `Tools`                | Value             | Description                                                                                                                                      |
+| --------------- | ---------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Select          | `Tools.Select`         | `select`          | Disables drawing. Objects can be selected, moved, scaled and rotated.                                                                            |
+| Pencil          | `Tools.Pencil`         | `pencil`          | Free drawing.                                                                                                                                    |
+| Line            | `Tools.Line`           | `line`            | Straight lines.                                                                                                                                  |
+| Arrow           | `Tools.Arrow`          | `arrow`           | Lines with an arrow head.                                                                                                                        |
+| Rectangle       | `Tools.Rectangle`      | `rectangle`       | Rectangles, filled with `fillColor`.                                                                                                             |
+| Rectangle label | `Tools.RectangleLabel` | `rectangle-label` | Rectangles with a text box above them. The text box follows the rectangle when it is moved or scaled.                                            |
+| Circle          | `Tools.Circle`         | `circle`          | Circles, filled with `fillColor`. The drag from the first to the second point is the diameter.                                                   |
+| Pan             | `Tools.Pan`            | `pan`             | Disables drawing. Dragging moves the whole canvas, useful after zooming (contributed by [wmaillard](https://github.com/wmaillard)).              |
+| Highlighter     | `Tools.Highlighter`    | `highlighter`     | Free drawing in a semi-transparent color. `lineColor` must be a hex code or a color name; any other value falls back to the default color.       |
+| Eraser          | `Tools.Eraser`         | `eraser`          | Erases parts of the objects, with the width of `lineWidth`. The background color and the background image are not erased. See [Eraser](#eraser). |
+| Default tool    | `Tools.DefaultTool`    | `default-tool`    | Disables drawing and selection. Use it to show a drawing that is not edited.                                                                     |
+
+### Eraser
+
+The eraser cuts the strokes it draws out of the objects it crosses: a line, a shape, an image or a text.
+A stroke is one undo step. The erased parts are kept on the objects, so `toJSON()` saves them and `value`,
+`defaultValue` and `fromJSON()` load them. An object is only cut where the eraser crosses it, the rest of
+the sketch stays, and the background color and the background image are not erased.
 
 ## Exports
 
 | Export         | Description                                                                                                                                                                                                  |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `SketchField`  | The component (named export). Also usable as a type, for the `ref`.                                                                                                                                          |
-| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`.                                                                        |
+| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`, `Eraser`.                                                              |
 | `Types`        | Namespace of the types: `Tool` (enumeration), `Tools`, `SketchProperties`, `SketchEvent`, `SketchObject`, `SketchValue`, `SketchData`, `DataUrlOptions`, `ImageOptions`, `BackgroundOptions`, `TextOptions`. |
 | default export | The component, which also carries `SketchField` and `Tools` (as in 0.5.x).                                                                                                                                   |
 

@@ -2,6 +2,7 @@
 
 import * as fabric from "fabric";
 import { SketchProperties, Tool } from "../../../types";
+import { EraserBrush } from "@erase2d/fabric";
 import { CanvasEvent, EventInput } from "../events";
 
 /**
@@ -97,10 +98,14 @@ export abstract class FabricCanvasTool {
 
   /**
    * The brush of the free drawing tools. Fabric does not create one by
-   * itself, so it is created the first time it is needed.
+   * itself, so it is created the first time it is needed. The brush of the
+   * eraser is not one to draw with, it is replaced.
    */
   protected get brush(): fabric.BaseBrush {
-    return (this.canvas.freeDrawingBrush ??= new fabric.PencilBrush(this.canvas));
+    const current = this.canvas.freeDrawingBrush;
+    if (current && !(current instanceof EraserBrush)) return current;
+    current?.dispose();
+    return (this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas));
   }
 
   /**

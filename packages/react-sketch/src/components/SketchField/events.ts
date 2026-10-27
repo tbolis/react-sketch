@@ -65,6 +65,8 @@ export class FabricCanvasEventsManager
    * redo add back are not new, so they are not recorded nor announced.
    */
   public onObjectAdded({ event, props }: EventInput): void {
+    // Only erasable objects are affected by the eraser
+    if (event.target) (event.target as { erasable?: boolean }).erasable = true;
     if (this.history.replaying) return;
     if (event.target) this.history.onObjectAdded(event.target);
     props.onObjectAdded?.(sketchEvent(event));
