@@ -47,6 +47,7 @@
   },
   "devDependencies": {
     "@react-sketch/eraser": "1.2.2",
+    "@react-sketch/laserpointer": "1.1.0",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",

@@ -6,6 +6,7 @@ import { Circle } from "./Circle";
 import { DefaultTool } from "./DefaultTool";
 import { Eraser } from "./Eraser";
 import { Highlighter } from "./Highlighter";
+import { LaserPointer } from "./LaserPointer";
 import { Line } from "./Line";
 import { Pan } from "./Pan";
 import { Pencil } from "./Pencil";
@@ -53,6 +54,9 @@ export const create_tool = (
       break;
     case Tool.ERASER:
       toolInstance = new Eraser(canvas);
+      break;
+    case Tool.LASER_POINTER:
+      toolInstance = new LaserPointer(canvas);
       break;
     case Tool.DEFAULT_TOOL:
       toolInstance = new DefaultTool(canvas);
