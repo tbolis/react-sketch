@@ -231,6 +231,9 @@ All properties are optional.
 | `widthCorrection`        | `number`                             | `0`             | Pixels subtracted from the width of the container when the canvas is resized. Compensates a border or padding of the container.                                                                                                                                          |
 | `heightCorrection`       | `number`                             | `0`             | Pixels subtracted from the height of the container when the canvas is resized.                                                                                                                                                                                           |
 | `autoresize`             | `boolean`                            | `true`          | Resize the canvas, and scale its objects, when the window is resized. The canvas is always fitted to its container on mount and when `width` or `height` change.                                                                                                         |
+| `pinchZoom`              | `boolean`                            | `true`          | Zoom and pan the view of the canvas with two fingers on a touch screen. See [Pinch zoom](#pinch-zoom).                                                                                                                                                                   |
+| `minZoom`                | `number`                             | `0.5`           | The smallest zoom of the view, 1 being the whole canvas.                                                                                                                                                                                                                 |
+| `maxZoom`                | `number`                             | `8`             | The largest zoom of the view.                                                                                                                                                                                                                                            |
 | `width`                  | `number`                             | undefined       | Width of the sketch in pixels. When not set, the sketch takes the width of its parent element.                                                                                                                                                                           |
 | `height`                 | `number`                             | `512`           | Height of the sketch in pixels.                                                                                                                                                                                                                                          |
 | `className`              | `string`                             |                 | Class name of the container element of the canvas.                                                                                                                                                                                                                       |
@@ -246,6 +249,7 @@ All properties are optional.
 | `onMouseMove`            | `(event: Types.SketchEvent) => void` | no-op           | Mouse move on the canvas.                                                                                                                                                                                                                                                |
 | `onMouseUp`              | `(event: Types.SketchEvent) => void` | no-op           | Mouse up on the canvas.                                                                                                                                                                                                                                                  |
 | `onMouseOut`             | `(event: Types.SketchEvent) => void` | no-op           | The mouse left the canvas.                                                                                                                                                                                                                                               |
+| `onViewChange`           | `(view: Types.SketchView) => void`   |                 | The view changed (two fingers, or `resetView()`): `zoom` (1 is the whole canvas) and the origin `x`, `y` of the canvas, in pixels.                                                                                                                                       |
 
 `Types.SketchEvent` is `{ e?: Event; target?: Types.SketchObject; [key: string]: unknown }`: `e` is the
 DOM event, `target` is the object the event is about (object events only). `Types.SketchObject` is
@@ -274,6 +278,7 @@ throws.
 | `setOverlayFromDataUrl(dataUrl, options?)`    | `void`             | Use an image as overlay, above the objects. It takes no mouse events, `toJSON` and `toDataURL` include it, and it is not part of the undo history. The options are those of `setBackgroundFromDataUrl`.                         |
 | `removeOverlayImage()`                        | `void`             | Remove the overlay image, also one that is still loading. The objects, the background image and the `backgroundColor` are kept.                                                                                                 |
 | `zoom(factor)`                                | `void`             | Scale the objects, the background image and the overlay image by a factor: 2 doubles their size, 0.5 halves it.                                                                                                                 |
+| `resetView()`                                 | `void`             | Put the view back to the whole canvas, after it was zoomed or panned with two fingers.                                                                                                                                          |
 | `hasSelection()`                              | `boolean`          | Whether an object is selected.                                                                                                                                                                                                  |
 | `clearSelection()`                            | `void`             | Deselect the selected object or objects.                                                                                                                                                                                        |
 | `removeSelected()`                            | `void`             | Remove the selected object or objects. It can be undone.                                                                                                                                                                        |
@@ -361,6 +366,23 @@ const vertices = polygon.points.map(({ x, y }) =>
 ```
 
 Moving the vertices of a polygon which is closed is not supported.
+
+### Pinch zoom
+
+On a touch screen, two fingers on the canvas zoom and pan its view: the point between the fingers stays under
+them while the distance between them sets the zoom (between `minZoom` and `maxZoom`), and moving them together
+pans. The canvas cannot be taken out of sight, a quarter of its smaller side stays in the window. Set
+`pinchZoom` to `false` to turn it off, call `resetView()` to go back to the whole canvas, and use `onViewChange`
+to show the zoom.
+
+The view is the viewport of the canvas, the objects stay where they are. So it is not saved by `toJSON()`, not
+an undo step, `onChange` is not called for it, and `toDataURL()` draws the whole drawing, not the part which
+the view shows. This is different from `zoom(factor)`, which scales the objects.
+
+The second finger makes the first one a gesture of the view: what the first finger started is dropped, a line,
+a shape or a free stroke is not drawn and leaves no undo step, and a polygon in progress keeps its vertices
+and places none. Drawing with two fingers at once is not possible. The mouse is not used for this: on a
+desktop the Pan tool moves the view.
 
 ### Eraser
 

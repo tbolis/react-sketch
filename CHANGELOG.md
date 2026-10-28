@@ -2,7 +2,7 @@
 
 ## 1.1.0 (unreleased)
 
-The eraser, laser pointer and polygon tools, and features that forks of react-sketch had, written again for the TypeScript code and fabric 7.
+The eraser, laser pointer and polygon tools, pinch zoom, and features that forks of react-sketch had, written again for the TypeScript code and fabric 7.
 
 ### Added
 
@@ -53,11 +53,19 @@ The eraser, laser pointer and polygon tools, and features that forks of react-sk
   change is for the next drawing. It is saved by `toJSON()` and loaded by `fromJSON()` with the object.
   The highlighter, the eraser and the laser pointer do not draw it.
 - The showcase has the line styles in the Line section.
+- Pinch zoom (#84): two fingers on the canvas zoom and pan its view, about the point between the fingers. The
+  `pinchZoom` (default `true`), `minZoom` (0.5) and `maxZoom` (8) properties, the `onViewChange` callback and
+  the `resetView()` method. The view is the viewport of the canvas, the objects stay where they are: it is not
+  in `toJSON()`, not an undo step, and `onChange` is not called for it. The canvas cannot be taken out of sight.
+  When the second finger comes, what the first one started (a line, a shape, a free stroke, the eraser, a vertex
+  of a polygon) is dropped and leaves no object nor undo step, so a polygon in progress is not disturbed.
 
 ### Changed
 
 - Each tool starts from the default cursor of free drawing (the crosshair), so the cursor of the pencil or
   of the eraser is not kept by the highlighter.
+- `toDataURL()` draws the whole drawing, whatever the zoom and pan of the view of the canvas (pinch zoom, and
+  the pan tool, which moved what the image showed).
 - `clear()` also removes the overlay image.
 - When several images are asked for the overlay (or the background), only the last request is set.
 
