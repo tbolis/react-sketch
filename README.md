@@ -294,12 +294,51 @@ Use the tools by name (`"pencil"`), with `Tools` (`Tools.Pencil`) or with the en
 | Arrow           | `Tools.Arrow`          | `arrow`           | Lines with an arrow head.                                                                                                                                                                |
 | Rectangle       | `Tools.Rectangle`      | `rectangle`       | Rectangles, filled with `fillColor`.                                                                                                                                                     |
 | Rectangle label | `Tools.RectangleLabel` | `rectangle-label` | Rectangles with a text box above them. The text box follows the rectangle when it is moved or scaled.                                                                                    |
+| Polygon         | `Tools.Polygon`        | `polygon`         | Closed shapes of straight sides, filled with `fillColor`. Each click or tap is a vertex. See [Polygon](#polygon).                                                                        |
 | Circle          | `Tools.Circle`         | `circle`          | Circles, filled with `fillColor`. The drag from the first to the second point is the diameter.                                                                                           |
 | Pan             | `Tools.Pan`            | `pan`             | Disables drawing. Dragging moves the whole canvas, useful after zooming (contributed by [wmaillard](https://github.com/wmaillard)).                                                      |
 | Highlighter     | `Tools.Highlighter`    | `highlighter`     | Free drawing in a semi-transparent color. `lineColor` must be a hex code or a color name; any other value falls back to the default color.                                               |
 | Eraser          | `Tools.Eraser`         | `eraser`          | Erases parts of the objects, with the width of `lineWidth`. The cursor shows the size of the brush. The background color and the background image are not erased. See [Eraser](#eraser). |
 | Laser pointer   | `Tools.LaserPointer`   | `laser-pointer`   | A line that follows the pointer, fades out and disappears. It is not part of the drawing. See [Laser pointer](#laser-pointer).                                                           |
 | Default tool    | `Tools.DefaultTool`    | `default-tool`    | Disables drawing and selection. Use it to show a drawing that is not edited.                                                                                                             |
+
+### Polygon
+
+Each click or tap places a vertex of the polygon, where the pointer is released, and a line follows the
+pointer from the last vertex (with a finger, while it is down, so the vertex is where it is lifted). A
+polygon needs three vertices, and it is closed in one of three ways, which do nothing with fewer:
+
+- a click or tap on the first vertex, within 10 pixels (20 with a finger), which is ringed when the pointer
+  is near enough;
+- a double click or double tap, which closes with the vertices placed so far;
+- the Enter key.
+
+The Escape key cancels the polygon in progress. The keys are listened to on the document only while a
+polygon is in progress, and not when the focus is in a field to type in.
+
+The polygon in progress is drawn on the top canvas of fabric only. It is not an object of the sketch (it is
+not in `toJSON()`, `toDataURL()` or the undo history) until it is closed. Then it is one `fabric.Polygon`
+with the color (`lineColor`), the weight (`lineWidth`) and the fill (`fillColor`, transparent by default) of
+the line, and it is one undo step: `onObjectAdded` is called once with the polygon as `target`, and
+`onChange` is called once, not for each vertex. `onMouseDown` and `onMouseUp` are called for every click.
+Switching to another tool closes a polygon which has three vertices and keeps it, and drops one with fewer.
+Unmounting drops the polygon in progress. A polygon which crosses itself is drawn as it is.
+
+Once it is closed the polygon is a shape like the others: the select tool moves, scales and rotates it as a
+whole, the eraser cuts it, and `toJSON()` and `fromJSON()` save and load it. The vertices are the `points` of
+the object, in its own space, which is centered on `pathOffset`. To get them in canvas coordinates:
+
+```js
+const matrix = polygon.calcTransformMatrix();
+const vertices = polygon.points.map(({ x, y }) =>
+  fabric.util.transformPoint(
+    new fabric.Point(x - polygon.pathOffset.x, y - polygon.pathOffset.y),
+    matrix
+  )
+);
+```
+
+Moving the vertices of a polygon which is closed is not supported.
 
 ### Eraser
 
@@ -323,7 +362,7 @@ not called when it is drawn. Switching to another tool clears what is left of th
 | Export         | Description                                                                                                                                                                                                  |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `SketchField`  | The component (named export). Also usable as a type, for the `ref`.                                                                                                                                          |
-| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`, `Eraser`, `LaserPointer`.                                              |
+| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Polygon`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`, `Eraser`, `LaserPointer`.                                   |
 | `Types`        | Namespace of the types: `Tool` (enumeration), `Tools`, `SketchProperties`, `SketchEvent`, `SketchObject`, `SketchValue`, `SketchData`, `DataUrlOptions`, `ImageOptions`, `BackgroundOptions`, `TextOptions`. |
 | default export | The component, which also carries `SketchField` and `Tools` (as in 0.5.x).                                                                                                                                   |
 
