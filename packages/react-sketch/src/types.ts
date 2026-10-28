@@ -101,12 +101,25 @@ export interface ImageOptions {
   top?: number;
   /** Initial scale of the image. Defaults to 0.5 */
   scale?: number;
+  /**
+   * How the image is requested: with "anonymous" or "use-credentials" the server
+   * must send CORS headers, and the canvas can be exported afterwards. Without it
+   * the image is requested as before, and a cross-origin image taints the canvas
+   * (`toDataURL` throws)
+   */
+  crossOrigin?: "anonymous" | "use-credentials" | null;
 }
 
 /**
- * Options of `setBackgroundFromDataUrl`
+ * Options of `setBackgroundFromDataUrl` and `setOverlayFromDataUrl`
  */
 export interface BackgroundOptions {
+  /**
+   * How the image is requested. Defaults to "anonymous", so the canvas can be
+   * exported. Use null for a server without CORS headers: the image is shown,
+   * and a cross-origin image taints the canvas (`toDataURL` throws)
+   */
+  crossOrigin?: "anonymous" | "use-credentials" | null;
   /** Scale the image to the width and the height of the canvas */
   stretched?: boolean;
   /** Scale the image to the width of the canvas */
@@ -141,6 +154,14 @@ export interface SketchProperties {
   fillColor?: string;
   /** The background color of the sketch, in rgba or hex format. Defaults to "transparent" */
   backgroundColor?: string;
+  /**
+   * URL or data URL of the background image. It is set when the component
+   * mounts and when it changes, and removed when it is gone. It takes the place
+   * of the background image of `value` and `defaultValue`
+   */
+  backgroundImage?: string;
+  /** Options of `backgroundImage`, the ones of `setBackgroundFromDataUrl` */
+  backgroundImageOptions?: BackgroundOptions;
   /** The opacity of the object. Accepted for compatibility, it is not applied (as in 0.5.x). Defaults to 1.0 */
   opacity?: number;
   /** Number of undo/redo steps to maintain, read when the component mounts. Defaults to 25 */
