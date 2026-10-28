@@ -298,6 +298,7 @@ Use the tools by name (`"pencil"`), with `Tools` (`Tools.Pencil`) or with the en
 | Pan             | `Tools.Pan`            | `pan`             | Disables drawing. Dragging moves the whole canvas, useful after zooming (contributed by [wmaillard](https://github.com/wmaillard)).                                                      |
 | Highlighter     | `Tools.Highlighter`    | `highlighter`     | Free drawing in a semi-transparent color. `lineColor` must be a hex code or a color name; any other value falls back to the default color.                                               |
 | Eraser          | `Tools.Eraser`         | `eraser`          | Erases parts of the objects, with the width of `lineWidth`. The cursor shows the size of the brush. The background color and the background image are not erased. See [Eraser](#eraser). |
+| Laser pointer   | `Tools.LaserPointer`   | `laser-pointer`   | A line that follows the pointer, fades out and disappears. It is not part of the drawing. See [Laser pointer](#laser-pointer).                                                           |
 | Default tool    | `Tools.DefaultTool`    | `default-tool`    | Disables drawing and selection. Use it to show a drawing that is not edited.                                                                                                             |
 
 ### Eraser
@@ -307,12 +308,22 @@ A stroke is one undo step. The erased parts are kept on the objects, so `toJSON(
 `defaultValue` and `fromJSON()` load them. An object is only cut where the eraser crosses it, the rest of
 the sketch stays, and the background color and the background image are not erased.
 
+### Laser pointer
+
+The laser pointer points at something on the sketch: the line follows the pointer, gets thinner towards its
+start and disappears about a second after it was drawn. It has the color (`lineColor`) and the weight
+(`lineWidth`) of the line, and it glows in its color.
+
+The line is drawn on the top canvas of fabric only, it is never an object of the sketch. It is not in
+`toJSON()` or `toDataURL()`, it is not an undo step, `onObjectAdded` is not called for it, and `onChange` is
+not called when it is drawn. Switching to another tool clears what is left of the line.
+
 ## Exports
 
 | Export         | Description                                                                                                                                                                                                  |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `SketchField`  | The component (named export). Also usable as a type, for the `ref`.                                                                                                                                          |
-| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`, `Eraser`.                                                              |
+| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`, `Eraser`, `LaserPointer`.                                              |
 | `Types`        | Namespace of the types: `Tool` (enumeration), `Tools`, `SketchProperties`, `SketchEvent`, `SketchObject`, `SketchValue`, `SketchData`, `DataUrlOptions`, `ImageOptions`, `BackgroundOptions`, `TextOptions`. |
 | default export | The component, which also carries `SketchField` and `Tools` (as in 0.5.x).                                                                                                                                   |
 
@@ -338,6 +349,8 @@ This is a Yarn 1 workspaces monorepo.
 | Path                    | Description                                                                                                                                                                     |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/react-sketch` | The library, published to npm as `react-sketch`. The build output is `dist/index.js` (UMD bundle, `react` and `fabric` are external) and `dist/index.d.ts` (type declarations). |
+| `packages/eraser`       | The eraser brush, from `@erase2d/fabric` (private, bundled into `react-sketch`).                                                                                                |
+| `packages/laserpointer` | The laser pointer brush (private, bundled into `react-sketch`).                                                                                                                 |
 | `packages/showcase`     | Demo application (not published): a tools panel and the `defaultValue`, `value` and `addImg` scenarios.                                                                         |
 | `.github/workflows`     | Continuous integration ([ci.yml](.github/workflows/ci.yml)).                                                                                                                    |
 
