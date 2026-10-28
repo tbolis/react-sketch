@@ -118,6 +118,10 @@ export class RectangleLabel extends FabricCanvasTool {
     this.canvas.renderAll();
   }
 
+  cancel(): void {
+    this.isDown = false;
+  }
+
   type(): Tool {
     return Tool.RECTANGLE_LABEL;
   }

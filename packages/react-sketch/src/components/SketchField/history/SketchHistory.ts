@@ -61,6 +61,21 @@ export class SketchHistory {
   }
 
   /**
+   * Forget the objects which were added, and which are taken off the canvas
+   * before the drawing of them was finished. They were the last actions.
+   */
+  discard(objects: fabric.FabricObject[]): void {
+    for (
+      let last = this.entries.getCurrent();
+      last?.action === "add" && objects.includes(last.object);
+      last = this.entries.getCurrent()
+    ) {
+      this.entries.pop();
+    }
+    if (this.pending && objects.includes(this.pending)) this.pending = null;
+  }
+
+  /**
    * Record an object modified on the canvas. Objects which were not added
    * through {@link onObjectAdded} (for example a multiple selection) are ignored.
    */

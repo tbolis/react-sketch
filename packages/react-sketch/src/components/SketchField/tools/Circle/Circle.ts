@@ -70,6 +70,10 @@ export class Circle extends FabricCanvasTool {
     this.isDown = false;
   }
 
+  cancel(): void {
+    this.isDown = false;
+  }
+
   type(): Tool {
     return Tool.CIRCLE;
   }

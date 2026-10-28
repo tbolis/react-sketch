@@ -13,6 +13,7 @@ import {
 } from "../../types";
 import { CanvasEvent, FabricCanvasEventsManager, SketchEventAware } from "./events";
 import { SketchHistory } from "./history/SketchHistory";
+import { IDENTITY_VIEW, PinchZoom } from "./pinch";
 import { autoresize, scaleContent } from "./resize";
 import { FabricCanvasTool } from "./tools";
 import { create_tool } from "./tools/factory";
@@ -37,6 +38,9 @@ type DefaultedProps = Required<
     | "heightCorrection"
     | "forceValue"
     | "autoresize"
+    | "pinchZoom"
+    | "minZoom"
+    | "maxZoom"
     | "onObjectAdded"
     | "onObjectModified"
     | "onObjectRemoved"
@@ -62,6 +66,9 @@ const defaultProps: DefaultedProps = {
   heightCorrection: 0,
   forceValue: false,
   autoresize: true,
+  pinchZoom: true,
+  minZoom: 0.5,
+  maxZoom: 8,
   onObjectAdded: () => undefined,
   onObjectModified: () => undefined,
   onObjectRemoved: () => undefined,
@@ -83,6 +90,14 @@ class SketchCanvas extends fabric.Canvas {
   clearing = false;
   /** Called after the canvas is cleared, also when a value is loaded, before its objects are added */
   onClear?: () => void;
+
+  /** Stop the free drawing stroke in progress, nothing is drawn of it */
+  abortDrawing(): void {
+    if (!this._isCurrentlyDrawing) return;
+    (this.freeDrawingBrush as { cancel?: () => void } | undefined)?.cancel?.();
+    this._isCurrentlyDrawing = false;
+    this.clearContext(this.contextTop);
+  }
 
   clear(): void {
     this.clearing = true;
@@ -127,6 +142,9 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   private canvas!: SketchCanvas;
   private tool!: FabricCanvasTool;
   private history!: SketchHistory;
+  private pinch?: PinchZoom;
+  /** The objects of the canvas when the last touch began, to know the ones it added */
+  private objectsBeforeTouch: fabric.FabricObject[] = [];
   private mounted = false;
   /** Counts the images asked for by layer, so that only the last one of a layer is set */
   private readonly imageLoads: Record<ImageLayer, number> = {
@@ -231,7 +249,25 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
 
     // Bind Events to Actions
     this._bind_canvas_events(
-      new FabricCanvasEventsManager(this.history, this.schedule)
+      new FabricCanvasEventsManager(
+        this.history,
+        this.schedule,
+        () => this.pinch?.gesturing ?? false
+      )
+    );
+
+    this.pinch = new PinchZoom(
+      this.canvas,
+      {
+        enabled: () => this.props.pinchZoom,
+        minZoom: () => this.props.minZoom,
+        maxZoom: () => this.props.maxZoom,
+      },
+      {
+        onTouch: () => (this.objectsBeforeTouch = this.canvas.getObjects().slice()),
+        onGesture: () => this.cancelInteraction(),
+        onChange: (view) => this.props.onViewChange?.(view),
+      }
     );
 
     window.addEventListener("resize", this._resize_listener);
@@ -283,6 +319,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     window.removeEventListener("resize", this._resize_listener);
     this.timers.forEach((id) => window.clearTimeout(id));
     this.timers.clear();
+    this.pinch?.dispose();
     this.tool.dispose();
     // The canvas element is released at once, so it can be used again (React
     // strict mode mounts twice). The rest is freed once the pending render is done.
@@ -427,6 +464,34 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   };
 
   /**
+   * Put the view of the canvas back to the whole canvas, as it is before it
+   * is zoomed or panned with two fingers
+   */
+  resetView = (): void => {
+    this.canvas.setViewportTransform([...IDENTITY_VIEW]);
+    this.props.onViewChange?.({ zoom: 1, x: 0, y: 0 });
+  };
+
+  /**
+   * What the first finger started is dropped, as the second one makes them a
+   * gesture of the view: the objects it added are taken off the canvas (they
+   * are not an undo step), the stroke it was drawing stops, and the tool forgets
+   * the press
+   */
+  private cancelInteraction(): void {
+    const { canvas } = this;
+    const added = canvas
+      .getObjects()
+      .filter((object) => !this.objectsBeforeTouch.includes(object));
+    if (added.length) {
+      this.history.discard(added);
+      canvas.remove(...added);
+    }
+    canvas.abortDrawing();
+    this.tool.cancel();
+  }
+
+  /**
    * Zoom the drawing by the factor specified
    *
    * The zoom factor is a percentage with regards the original, for example if factor is set to 2
@@ -494,11 +559,19 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    *
    * @returns URL containing a representation of the object in the format specified by options.format
    */
-  toDataURL = (options?: DataUrlOptions): string =>
-    this.canvas.toDataURL({
-      format: this.props.imageFormat,
-      ...options,
-    } as fabric.TDataUrlOptions);
+  toDataURL = (options?: DataUrlOptions): string => {
+    // The image is of the drawing, not of the part which the view shows
+    const view = this.canvas.viewportTransform;
+    this.canvas.viewportTransform = [...IDENTITY_VIEW];
+    try {
+      return this.canvas.toDataURL({
+        format: this.props.imageFormat,
+        ...options,
+      } as fabric.TDataUrlOptions);
+    } finally {
+      this.canvas.viewportTransform = view;
+    }
+  };
 
   /**
    * Returns JSON representation of canvas

@@ -109,6 +109,11 @@ export class Arrow extends FabricCanvasTool {
     return object === this.line || object === this.head;
   }
 
+  cancel(): void {
+    this.isDown = false;
+    this.line = this.head = null;
+  }
+
   type(): Tool {
     return Tool.ARROW;
   }

@@ -53,6 +53,16 @@ export interface SketchObject {
 }
 
 /**
+ * The view of the canvas: how much it is zoomed (1 is the whole canvas), and
+ * where the origin of the canvas is, in pixels
+ */
+export interface SketchView {
+  zoom: number;
+  x: number;
+  y: number;
+}
+
+/**
  * Event passed to the object and mouse callbacks of {@link SketchProperties}
  */
 export interface SketchEvent {
@@ -203,6 +213,18 @@ export interface SketchProperties {
    * and when `width` or `height` change. Defaults to true
    */
   autoresize?: boolean;
+  /**
+   * Zoom and pan the view of the canvas with two fingers, on a touch screen. The
+   * objects stay where they are, so the view is not saved nor undone, and it is
+   * not in the image of `toDataURL`. Defaults to true
+   */
+  pinchZoom?: boolean;
+  /** The smallest zoom of the view, with 1 being the whole canvas. Defaults to 0.5 */
+  minZoom?: number;
+  /** The largest zoom of the view. Defaults to 8 */
+  maxZoom?: number;
+  /** Called each time the view changes, by the fingers or by `resetView()` */
+  onViewChange?: (view: SketchView) => void;
   /** Width of the sketch container, in pixels */
   width?: number;
   /** Height of the sketch container, in pixels. Defaults to 512 */

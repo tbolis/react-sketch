@@ -79,6 +79,13 @@ export abstract class FabricCanvasTool {
   abstract configureCanvas(props: SketchProperties): void;
 
   /**
+   * Called when what the pointer started, with the mouse down, must not
+   * go on or end in something drawn (two fingers on the screen are a gesture
+   * of the view, not a stroke). The objects it added are taken off the canvas.
+   */
+  cancel(): void {}
+
+  /**
    * Called when another tool takes over, before `dispose()`, for the tools
    * which have something unfinished to complete (it is not called when the
    * canvas goes away)

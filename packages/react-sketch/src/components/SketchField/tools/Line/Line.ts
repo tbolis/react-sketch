@@ -62,6 +62,10 @@ export class Line extends FabricCanvasTool {
     this.isDown = false;
   }
 
+  cancel(): void {
+    this.isDown = false;
+  }
+
   type(): Tool {
     return Tool.LINE;
   }
