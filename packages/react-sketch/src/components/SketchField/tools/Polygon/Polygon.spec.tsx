@@ -1,6 +1,7 @@
 import { createRef } from "react";
 import { act, render, waitFor } from "@testing-library/react";
 import * as fabric from "fabric";
+import { EraserBrush } from "@react-sketch/eraser";
 import SketchField from "../../SketchField";
 import { SketchProperties, Tool, Tools } from "../../../../types";
 
@@ -100,6 +101,57 @@ const keydown = (key: string, target: EventTarget = document) => {
   });
   target.dispatchEvent(event);
   return event;
+};
+
+/** Press the mouse at `from`, drag it to `to` and release it, on the canvas */
+const drag = (canvas: fabric.Canvas, from: Point, to: Point) => {
+  const middle: Point = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2];
+  canvas.upperCanvasEl.dispatchEvent(mouseEvent("mousedown", from));
+  document.dispatchEvent(mouseEvent("mousemove", middle));
+  document.dispatchEvent(mouseEvent("mousemove", to));
+  document.dispatchEvent(mouseEvent("mouseup", to));
+};
+
+/** Erase with one stroke from `from` to `to`, and wait for it to be committed */
+const erase = async (canvas: fabric.Canvas, from: Point, to: Point) => {
+  const brush = canvas.freeDrawingBrush as EraserBrush;
+  const event = (type: string) => ({ e: new MouseEvent(type) }) as never;
+  brush.onMouseDown(new fabric.Point(...from), event("mousedown"));
+  brush.onMouseMove(new fabric.Point(...to), event("mousemove"));
+  brush.onMouseUp(event("mouseup"));
+  await act(async () => {
+    await jest.advanceTimersByTimeAsync(20);
+  });
+};
+
+/**
+ * What the export of the sketch draws: the canvas element which `toDataURL()`
+ * turns into the image, and the kinds of drawing it received.
+ */
+const exported = (sketch: SketchField): string[] => {
+  const spy = jest
+    .spyOn(HTMLCanvasElement.prototype, "toDataURL")
+    .mockImplementation(() => "data:,");
+  let image: HTMLCanvasElement;
+  try {
+    sketch.toDataURL();
+    [image] = spy.mock.contexts as HTMLCanvasElement[];
+  } finally {
+    spy.mockRestore();
+  }
+  const context = image.getContext("2d") as unknown as {
+    __getDrawCalls(): { type: string }[];
+  };
+  return context.__getDrawCalls().map(({ type }) => type);
+};
+
+/** The lengths of the sides of the polygon, which do not change when it is moved or rotated */
+const sides = (polygon: fabric.Polygon): number[] => {
+  const points = vertices(polygon);
+  return points.map(([x, y], i) => {
+    const [nx, ny] = points[(i + 1) % points.length];
+    return Math.hypot(nx - x, ny - y);
+  });
 };
 
 /** Three vertices, a triangle which is not closed yet */
@@ -578,15 +630,21 @@ describe("Polygon", () => {
       expect(onChange).not.toHaveBeenCalled();
     });
 
-    it("is not in the export, and the preview is there after it", () => {
+    it("is not in the export until it is closed, and the preview is there after it", () => {
       const { sketch, canvas } = mount();
       triangle(canvas);
-
-      expect(() => sketch.toDataURL()).not.toThrow();
-
-      (canvas.contextTop.lineTo as jest.Mock).mockClear();
       hover(canvas, [150, 300]);
-      expect(drawn(canvas, "lineTo").at(-1)).toEqual([150, 300]);
+
+      // Nothing is drawn but the background: an object is drawn from its own cache (drawImage)
+      const before = exported(sketch);
+      expect(before).not.toContain("drawImage");
+      expect(before).not.toContain("stroke");
+      (canvas.contextTop.lineTo as jest.Mock).mockClear();
+      hover(canvas, [160, 310]);
+      expect(drawn(canvas, "lineTo").at(-1)).toEqual([160, 310]);
+
+      keydown("Enter");
+      expect(exported(sketch)).toContain("drawImage");
     });
 
     it("is one undo step, which undo and redo take off and put back", () => {
@@ -674,25 +732,92 @@ describe("Polygon", () => {
       expect(loaded.fill).toEqual("#00ff00");
     });
 
-    it("can be selected and moved as a whole, once the tool is another", () => {
-      const { canvas, rerender } = mount();
-      triangle(canvas);
-      keydown("Enter");
-      const [polygon] = polygons(canvas);
-      expect(polygon.selectable).toBe(false);
+    describe("with the select tool", () => {
+      /** A closed triangle, and the select tool in use */
+      const closedTriangle = () => {
+        const view = mount();
+        triangle(view.canvas);
+        keydown("Enter");
+        view.rerender(<SketchField tool={Tool.SELECT} />);
+        return { ...view, polygon: polygons(view.canvas)[0] };
+      };
 
-      rerender(<SketchField tool={Tool.SELECT} />);
+      it("moves as a whole when it is dragged, and the move can be undone", () => {
+        const { sketch, canvas, polygon } = closedTriangle();
+        const before = vertices(polygon);
 
-      expect(polygon.selectable).toBe(true);
-      expect(polygon.evented).toBe(true);
+        drag(canvas, [150, 140], [190, 160]);
+
+        expect(canvas.getActiveObject()).toBe(polygon);
+        expect(vertices(polygon)).toEqual(before.map(([x, y]) => [x + 40, y + 20]));
+        sketch.undo();
+        expect(vertices(polygon)).toEqual(before);
+      });
+
+      it("scales as a whole when a corner is dragged", () => {
+        const { canvas, polygon } = closedTriangle();
+        drag(canvas, [150, 140], [150, 140]);
+        const before = sides(polygon);
+        const { x, y } = polygon.oCoords.br;
+
+        drag(canvas, [x, y], [x + 60, y + 60]);
+
+        const ratios = sides(polygon).map((side, i) => side / before[i]);
+        expect(ratios[0]).toBeGreaterThan(1.1);
+        ratios.forEach((ratio) => expect(ratio).toBeCloseTo(ratios[0], 1));
+      });
+
+      it("rotates as a whole when its handle is dragged", () => {
+        const { canvas, polygon } = closedTriangle();
+        drag(canvas, [150, 140], [150, 140]);
+        const before = sides(polygon);
+        const beforeVertices = vertices(polygon);
+        const center = polygon.getCenterPoint();
+        const { x, y } = polygon.oCoords.mtr;
+        // The handle goes a quarter of a turn around the center
+        const to: Point = [center.x - (y - center.y), center.y + (x - center.x)];
+
+        drag(canvas, [x, y], to);
+
+        expect(Math.abs(polygon.angle)).toBeGreaterThan(45);
+        expect(vertices(polygon)).not.toEqual(beforeVertices);
+        sides(polygon).forEach((side, i) => expect(side).toBeCloseTo(before[i], 0));
+      });
     });
 
-    it("can be cut by the eraser", () => {
-      const { canvas } = mount();
-      triangle(canvas);
-      keydown("Enter");
+    describe("with the eraser", () => {
+      it("is cut where a stroke crosses it, and the cut is saved and can be undone", async () => {
+        const { sketch, canvas, rerender } = mount();
+        triangle(canvas);
+        keydown("Enter");
+        const [polygon] = polygons(canvas);
+        rerender(<SketchField tool={Tool.ERASER} lineWidth={20} />);
 
-      expect((polygons(canvas)[0] as { erasable?: boolean }).erasable).toBe(true);
+        await erase(canvas, [90, 130], [210, 130]);
+
+        expect(polygon.clipPath?.type).toEqual("clipping");
+        expect(
+          (sketch.toJSON().objects as { clipPath?: { type: string } }[])[0].clipPath
+            ?.type
+        ).toEqual("clipping");
+        sketch.undo();
+        expect(polygon.clipPath).toBeUndefined();
+        expect(polygons(canvas)).toHaveLength(1);
+        sketch.redo();
+        expect(polygon.clipPath?.type).toEqual("clipping");
+      });
+
+      it("is not cut by a stroke which misses it", async () => {
+        const { canvas, rerender } = mount();
+        triangle(canvas);
+        keydown("Enter");
+        const [polygon] = polygons(canvas);
+        rerender(<SketchField tool={Tool.ERASER} lineWidth={20} />);
+
+        await erase(canvas, [300, 400], [400, 400]);
+
+        expect(polygon.clipPath).toBeUndefined();
+      });
     });
   });
 
