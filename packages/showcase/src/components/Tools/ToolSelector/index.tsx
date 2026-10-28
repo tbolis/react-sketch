@@ -66,8 +66,8 @@ const ToolSelector = (props: ToolSelectorProps): ReactElement => {
       </ToggleButtonGroup>
       {props.selected === Types.Tool.POLYGON && (
         <Typography variant="caption" component="p" sx={{ mt: 1 }}>
-          Click to add the points. Click the first point or double-click to close the
-          polygon, or press Enter. Escape cancels it.
+          Click to add points. Close: first point, double-click or Enter. Cancel:
+          Esc.
         </Typography>
       )}
       {props.selected === Types.Tool.LASER_POINTER && (
