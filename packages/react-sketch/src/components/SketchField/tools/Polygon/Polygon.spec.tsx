@@ -901,6 +901,100 @@ describe("Polygon", () => {
     });
   });
 
+  /**
+   * A pinch zoom moves the view of the canvas (its viewport transform), the
+   * objects stay where they are. The vertices are in canvas coordinates, so
+   * the view can change in the middle of a polygon.
+   */
+  describe("when the view changes on the way", () => {
+    /** Two vertices at the first view, which are (100, 100) and (200, 100) */
+    const started = () => {
+      const view = mount();
+      click(view.canvas, [100, 100]);
+      click(view.canvas, [200, 100]);
+      return view;
+    };
+
+    it("keeps the vertices placed, and places the next in the new view, when it zooms", () => {
+      const { canvas } = started();
+
+      // The zoom is about the point (150, 100) of the canvas, which stays where it is on the screen
+      canvas.zoomToPoint(new fabric.Point(150, 100), 2);
+      canvas.renderAll();
+      click(canvas, [150, 180]);
+      keydown("Enter");
+
+      expect(canvas.getZoom()).toEqual(2);
+      expect(vertices(polygons(canvas)[0])).toEqual([
+        [100, 100],
+        [200, 100],
+        [150, 140],
+      ]);
+    });
+
+    it("keeps the vertices placed, and places the next in the new view, when it pans", () => {
+      const { canvas } = started();
+
+      canvas.relativePan(new fabric.Point(30, 40));
+      canvas.renderAll();
+      click(canvas, [150, 180]);
+      keydown("Enter");
+
+      expect(vertices(polygons(canvas)[0])).toEqual([
+        [100, 100],
+        [200, 100],
+        [120, 140],
+      ]);
+    });
+
+    it("draws the preview in the new view, from the same vertices", () => {
+      const { canvas } = started();
+      (canvas.contextTop.lineTo as jest.Mock).mockClear();
+
+      canvas.zoomToPoint(new fabric.Point(150, 100), 2);
+      canvas.renderAll();
+
+      // The sides keep their canvas coordinates, and the context carries the zoom
+      expect(drawn(canvas, "lineTo").at(-1)).toEqual([200, 100]);
+      expect((canvas.contextTop.transform as jest.Mock).mock.calls.at(-1)).toEqual([
+        2, 0, 0, 2, -150, -100,
+      ]);
+    });
+
+    it("follows the pointer in the new view", () => {
+      const { canvas } = started();
+      canvas.zoomToPoint(new fabric.Point(150, 100), 2);
+      canvas.renderAll();
+      (canvas.contextTop.lineTo as jest.Mock).mockClear();
+
+      hover(canvas, [150, 180]);
+
+      expect(drawn(canvas, "lineTo").slice(-2)).toEqual([
+        [200, 100],
+        [150, 140],
+      ]);
+    });
+
+    it("closes by the first vertex within 10 screen pixels of it in the new view", () => {
+      const { canvas } = started();
+      click(canvas, [150, 180]);
+
+      canvas.setZoom(2);
+      canvas.renderAll();
+      // The first vertex is at (200, 200) of the screen now
+      click(canvas, [200, 212]);
+      expect(polygons(canvas)).toHaveLength(0);
+      click(canvas, [200, 192]);
+
+      expect(vertices(polygons(canvas)[0])).toEqual([
+        [100, 100],
+        [200, 100],
+        [150, 180],
+        [100, 106],
+      ]);
+    });
+  });
+
   describe("a second finger", () => {
     // The canvas does not pass its events on, so it is not a vertex nor a pointer
     it("is not a pointer of the polygon", () => {
