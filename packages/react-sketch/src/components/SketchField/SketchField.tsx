@@ -17,6 +17,7 @@ import { autoresize, scaleContent } from "./resize";
 import { FabricCanvasTool } from "./tools";
 import { create_tool } from "./tools/factory";
 import { Eraser } from "./tools/Eraser";
+import { Polygon } from "./tools/Polygon";
 
 /**
  * The properties which always have a value, because SketchField provides
@@ -305,9 +306,15 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * Use the tool of the properties, from now on
    */
   private selectTool(): void {
+    this.tool?.finish();
     this.tool?.dispose();
     this.withToolProps((props) => {
       this.tool = create_tool(this.canvas, props);
+      if (this.tool instanceof Polygon) {
+        this.tool.onComplete = () => {
+          if (this.mounted) this.props.onChange?.();
+        };
+      }
       if (this.tool instanceof Eraser) {
         this.tool.onErase = (erasures) => {
           if (!this.mounted) return;

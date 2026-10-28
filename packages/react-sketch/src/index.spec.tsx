@@ -15,6 +15,7 @@ describe("exports", () => {
       Arrow: "arrow",
       Rectangle: "rectangle",
       RectangleLabel: "rectangle-label",
+      Polygon: "polygon",
       Circle: "circle",
       Pan: "pan",
       DefaultTool: "default-tool",
