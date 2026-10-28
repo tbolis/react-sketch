@@ -2,10 +2,17 @@
 
 ## 1.1.0 (unreleased)
 
-Features that forks of react-sketch had, written again for the TypeScript code and fabric 7.
+The eraser tool, and features that forks of react-sketch had, written again for the TypeScript code and fabric 7.
 
 ### Added
 
+- The eraser tool (#82): `tool="eraser"`, `Tools.Eraser` and `Types.Tool.ERASER`. It erases parts of the
+  objects (lines, shapes, images, text) with the width of `lineWidth`, and its cursor is a circle of the
+  size of the brush (the crosshair for a brush over 124 pixels, the most a browser shows). One stroke is
+  one undo step. The erased parts are kept on the objects, so `toJSON()` saves them and `value`,
+  `defaultValue` and `fromJSON()` load them. The background color and the background image are not
+  erased. The brush is the code of `@erase2d/fabric` by @ShaMan123 (MIT).
+- The showcase has an Eraser button in the tool selector.
 - The overlay image: `setOverlayFromDataUrl()` and `removeOverlayImage()` (#73). The image is drawn above
   the objects and takes no mouse events, so it can be an outline to draw within. It is saved by
   `toJSON()`, drawn by `toDataURL()`, scaled when the canvas is resized, and removed by `clear()`. It
@@ -24,8 +31,17 @@ Features that forks of react-sketch had, written again for the TypeScript code a
 
 ### Changed
 
+- Each tool starts from the default cursor of free drawing (the crosshair), so the cursor of the pencil or
+  of the eraser is not kept by the highlighter.
 - `clear()` also removes the overlay image.
 - When several images are asked for the overlay (or the background), only the last request is set.
+
+### Packaging and tooling
+
+- The code of `@erase2d/fabric` 1.2.2 is in the private package `packages/eraser`
+  (`@react-sketch/eraser`), with its license, and `react-sketch` bundles it. Nothing new is installed for
+  the users of the library, and the externals of the bundle are still `react` and `fabric`. The license is
+  in `dist/index.js.LICENSE.txt`. `yarn typecheck`, `yarn build` and `yarn test` build the package first.
 
 ## 1.0.1 (unreleased)
 

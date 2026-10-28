@@ -7,7 +7,7 @@ describe("exports", () => {
     expect(typeof SketchField).toEqual("function");
   });
 
-  it("exports Tools with the names and values of 0.5.x", () => {
+  it("exports Tools with the names and values of 0.5.x, and the Eraser", () => {
     expect(Tools).toEqual({
       Select: "select",
       Pencil: "pencil",
@@ -19,6 +19,7 @@ describe("exports", () => {
       Pan: "pan",
       DefaultTool: "default-tool",
       Highlighter: "highlighter",
+      Eraser: "eraser",
     });
   });
 

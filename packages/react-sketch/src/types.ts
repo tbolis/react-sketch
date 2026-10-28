@@ -14,6 +14,7 @@ export enum Tool {
   SELECT = "select",
   PAN = "pan",
   HIGHLIGHTER = "highlighter",
+  ERASER = "eraser",
   DEFAULT_TOOL = "default-tool",
 }
 
@@ -32,6 +33,7 @@ export const Tools = {
   Pan: Tool.PAN,
   DefaultTool: Tool.DEFAULT_TOOL,
   Highlighter: Tool.HIGHLIGHTER,
+  Eraser: Tool.ERASER,
 } as const;
 
 /**
