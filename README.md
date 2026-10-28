@@ -322,7 +322,8 @@ with the color (`lineColor`), the weight (`lineWidth`) and the fill (`fillColor`
 the line, and it is one undo step: `onObjectAdded` is called once with the polygon as `target`, and
 `onChange` is called once, not for each vertex. `onMouseDown` and `onMouseUp` are called for every click.
 Switching to another tool closes a polygon which has three vertices and keeps it, and drops one with fewer.
-Unmounting drops the polygon in progress. A polygon which crosses itself is drawn as it is.
+Unmounting drops the polygon in progress. `zoom()` and the resize of the canvas scale the polygon in progress
+with the objects. A polygon which crosses itself is drawn as it is.
 
 Once it is closed the polygon is a shape like the others: the select tool moves, scales and rotates it as a
 whole, the eraser cuts it, and `toJSON()` and `fromJSON()` save and load it. The vertices are the `points` of

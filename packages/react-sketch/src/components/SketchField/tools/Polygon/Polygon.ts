@@ -121,6 +121,16 @@ export class Polygon extends FabricCanvasTool {
     this.paint();
   }
 
+  /** The vertices follow the objects when the sketch is scaled (zoom, resize) */
+  scale(xFactor: number, yFactor: number): void {
+    const scaled = ({ x, y }: fabric.Point) =>
+      new fabric.Point(x * xFactor, y * yFactor);
+    this.vertices = this.vertices.map(scaled);
+    if (this.pointerAt) this.pointerAt = scaled(this.pointerAt);
+    this.lastRelease = undefined;
+    this.paint();
+  }
+
   /** Another tool takes over: the polygon is kept when it has the vertices for one */
   finish(): void {
     if (!this.close()) this.discard();

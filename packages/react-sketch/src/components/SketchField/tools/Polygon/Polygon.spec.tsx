@@ -154,6 +154,16 @@ const sides = (polygon: fabric.Polygon): number[] => {
   });
 };
 
+/** The spies of the layout of the container, which the test restores when it ends */
+const layouts: jest.SpyInstance[] = [];
+
+/** What the browser would lay out for the container of the sketch */
+const layout = (width: number, height: number) =>
+  layouts.push(
+    jest.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(width),
+    jest.spyOn(Element.prototype, "clientHeight", "get").mockReturnValue(height)
+  );
+
 /** Three vertices, a triangle which is not closed yet */
 const triangle = (canvas: fabric.Canvas) => {
   click(canvas, [100, 100]);
@@ -168,6 +178,7 @@ describe("Polygon", () => {
 
   afterEach(() => {
     jest.useRealTimers();
+    layouts.splice(0).forEach((spy) => spy.mockRestore());
   });
 
   it("is a tool of the component, with the legacy name", () => {
@@ -991,6 +1002,92 @@ describe("Polygon", () => {
         [200, 100],
         [150, 180],
         [100, 106],
+      ]);
+    });
+  });
+
+  /**
+   * `zoom()` and the resize of the canvas scale the objects, so they scale the
+   * polygon in progress too: it is closed where the objects of the sketch are.
+   */
+  describe("when the sketch is scaled on the way", () => {
+    /** A polygon which is closed, and another one with two vertices placed */
+    const started = () => {
+      const view = mount();
+      triangle(view.canvas);
+      keydown("Enter");
+      click(view.canvas, [300, 300]);
+      click(view.canvas, [400, 300]);
+      return view;
+    };
+
+    it("follows the objects when zoom() is called", () => {
+      const { sketch, canvas } = started();
+
+      sketch.zoom(2);
+      click(canvas, [700, 640]);
+      keydown("Enter");
+
+      const [closed, other] = polygons(canvas);
+      expect(vertices(closed)).toEqual([
+        [200, 200],
+        [400, 200],
+        [300, 360],
+      ]);
+      expect(vertices(other)).toEqual([
+        [600, 600],
+        [800, 600],
+        [700, 640],
+      ]);
+    });
+
+    it("draws the preview at the new size", () => {
+      const { sketch, canvas } = started();
+      hover(canvas, [350, 350]);
+      (canvas.contextTop.lineTo as jest.Mock).mockClear();
+
+      sketch.zoom(2);
+
+      expect(drawn(canvas, "lineTo").slice(-2)).toEqual([
+        [800, 600],
+        [700, 700],
+      ]);
+    });
+
+    it("follows the objects when the canvas is resized with the window", () => {
+      const { canvas } = started();
+      // The container is twice as wide and three times as high
+      layout(canvas.getWidth() * 2, canvas.getHeight() * 3);
+
+      window.dispatchEvent(new Event("resize"));
+      click(canvas, [700, 1500]);
+      keydown("Enter");
+
+      const [closed, other] = polygons(canvas);
+      expect(vertices(closed)).toEqual([
+        [200, 300],
+        [400, 300],
+        [300, 540],
+      ]);
+      expect(vertices(other)).toEqual([
+        [600, 900],
+        [800, 900],
+        [700, 1500],
+      ]);
+    });
+
+    it("is left alone by a resize which changes nothing", () => {
+      const { canvas } = started();
+
+      // The container has no size to fit to, as when it is hidden
+      window.dispatchEvent(new Event("resize"));
+      click(canvas, [350, 380]);
+      keydown("Enter");
+
+      expect(vertices(polygons(canvas)[1])).toEqual([
+        [300, 300],
+        [400, 300],
+        [350, 380],
       ]);
     });
   });

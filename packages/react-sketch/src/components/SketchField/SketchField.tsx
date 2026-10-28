@@ -339,7 +339,13 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     const container = this.containerEl.current;
     if (!container) return;
     const { widthCorrection, heightCorrection } = this.props;
-    autoresize(this.canvas, container, widthCorrection, heightCorrection);
+    const factors = autoresize(
+      this.canvas,
+      container,
+      widthCorrection,
+      heightCorrection
+    );
+    if (factors) this.tool.scale(factors.x, factors.y);
   }
 
   /**
@@ -426,6 +432,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    */
   zoom = (factor: number): void => {
     scaleContent(this.canvas, factor, factor);
+    this.tool.scale(factor, factor);
     this.canvas.renderAll();
     this.canvas.calcOffset();
   };

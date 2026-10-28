@@ -91,6 +91,12 @@ export abstract class FabricCanvasTool {
   dispose(): void {}
 
   /**
+   * Called when the sketch scales its objects (`zoom()`, and the resize of the
+   * canvas), for the tools which hold coordinates of their own
+   */
+  scale(xFactor: number, yFactor: number): void {}
+
+  /**
    * Whether the application is told about a change (`onChange`) when the
    * mouse is released or leaves the canvas. The tools which do not change the
    * sketch on every release say no, and tell the application themselves.

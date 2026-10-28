@@ -44,7 +44,8 @@ The eraser, laser pointer and polygon tools, and features that forks of react-sk
   polygon in progress is only drawn on the top canvas: when it is closed it is one `fabric.Polygon` and one
   undo step, `onObjectAdded` is called once with it, and `onChange` is called once, not for each vertex. Its
   vertices are in `points` of the object. Switching to another tool keeps a polygon with three vertices and
-  drops one with fewer.
+  drops one with fewer, and `zoom()` and the resize of the canvas scale the polygon in progress with the
+  objects.
 - The showcase has a Polygon button in the tool selector, with a hint of how to close the polygon.
 
 ### Changed
