@@ -77,6 +77,12 @@ export abstract class FabricCanvasTool {
 
   abstract configureCanvas(props: SketchProperties): void;
 
+  /**
+   * Called when another tool takes over, and when the canvas goes away, for
+   * the tools which keep something running on the canvas
+   */
+  dispose(): void {}
+
   doMouseUp(event: CanvasEvent): void {}
 
   doMouseDown(event: CanvasEvent): void {}

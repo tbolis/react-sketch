@@ -15,6 +15,7 @@ export enum Tool {
   PAN = "pan",
   HIGHLIGHTER = "highlighter",
   ERASER = "eraser",
+  LASER_POINTER = "laser-pointer",
   DEFAULT_TOOL = "default-tool",
 }
 
@@ -34,6 +35,7 @@ export const Tools = {
   DefaultTool: Tool.DEFAULT_TOOL,
   Highlighter: Tool.HIGHLIGHTER,
   Eraser: Tool.ERASER,
+  LaserPointer: Tool.LASER_POINTER,
 } as const;
 
 /**

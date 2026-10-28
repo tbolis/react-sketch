@@ -2,7 +2,7 @@
 
 ## 1.1.0 (unreleased)
 
-The eraser tool, and features that forks of react-sketch had, written again for the TypeScript code and fabric 7.
+The eraser and laser pointer tools, and features that forks of react-sketch had, written again for the TypeScript code and fabric 7.
 
 ### Added
 
@@ -28,6 +28,14 @@ The eraser tool, and features that forks of react-sketch had, written again for 
 - The showcase has an Overlay section (a sample outline, an image of your own, remove), a
   `backgroundImage` tab that uses the property, and a CORS switch for "Load Image from URL". The fit
   switches of the Background section also apply to the background image that is already set.
+- The laser pointer tool: `tool="laser-pointer"`, `Tools.LaserPointer` and `Types.Tool.LASER_POINTER`. A
+  line follows the pointer, gets thinner towards its start and disappears about a second after it was drawn,
+  with the color and the weight of the line (`lineColor`, `lineWidth`) and a glow. It is only drawn on the
+  top canvas of fabric, so it is not an object of the sketch: it is not in `toJSON()` or `toDataURL()`, it
+  is not an undo step, and neither `onObjectAdded` nor `onChange` is called for it. Another tool clears what
+  is left of the line.
+- The showcase has a Laser pointer button in the tool selector. The laser pointer keeps its own line color
+  and weight (red, 8px to start with), apart from the other tools.
 
 ### Changed
 
@@ -42,6 +50,9 @@ The eraser tool, and features that forks of react-sketch had, written again for 
   (`@react-sketch/eraser`), with its license, and `react-sketch` bundles it. Nothing new is installed for
   the users of the library, and the externals of the bundle are still `react` and `fabric`. The license is
   in `dist/index.js.LICENSE.txt`. `yarn typecheck`, `yarn build` and `yarn test` build the package first.
+- The laser pointer brush is in the private package `packages/laserpointer` (`@react-sketch/laserpointer`),
+  which `react-sketch` bundles too. `yarn build:packages` builds both private packages, and
+  `yarn typecheck`, `yarn build` and `yarn test` run it first.
 
 ## 1.0.1 (unreleased)
 
