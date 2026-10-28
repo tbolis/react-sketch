@@ -33,7 +33,13 @@ const TOOLS = [
     label: "Rectangle label",
     icon: <RectangleLabelIcon />,
   },
-  { value: Types.Tool.POLYGON, label: "Polygon", icon: <PolygonIcon /> },
+  {
+    value: Types.Tool.POLYGON,
+    label: "Polygon",
+    title:
+      "Polygon: click to add points, close it with the first point, a double click or Enter, Esc cancels",
+    icon: <PolygonIcon />,
+  },
   { value: Types.Tool.CIRCLE, label: "Circle", icon: <CircleIcon /> },
   { value: Types.Tool.PAN, label: "Pan", icon: <PanIcon /> },
   { value: Types.Tool.HIGHLIGHTER, label: "Highlighter", icon: <HighlighterIcon /> },
@@ -59,15 +65,14 @@ const ToolSelector = (props: ToolSelectorProps): ReactElement => {
             key={tool.value}
             value={tool.value}
             aria-label={tool.label}
-            title={tool.label}>
+            title={tool.title ?? tool.label}>
             {tool.icon}
           </ToggleButton>
         ))}
       </ToggleButtonGroup>
       {props.selected === Types.Tool.POLYGON && (
         <Typography variant="caption" component="p" sx={{ mt: 1 }}>
-          Click to add points. Close: first point, double-click or Enter. Cancel:
-          Esc.
+          Click points. First point closes.
         </Typography>
       )}
       {props.selected === Types.Tool.LASER_POINTER && (
