@@ -340,7 +340,7 @@ not called when it is drawn. Switching to another tool clears what is left of th
 - React: `^17.0.0 || ^18.0.0 || ^19.0.0` (peer dependency). The test suite runs on React 19.
 - Browsers: browsers with HTML5 canvas support. No polyfills are included and Internet Explorer 11 is not supported.
 - Server-side rendering has not been tested. Render the component in the browser only.
-- Node.js: the package has no runtime requirement for Node.js. Developing in this repository requires Node.js 22.22.1 or later (`.nvmrc` has 24) and Yarn 1.
+- Node.js: the package has no runtime requirement for Node.js. Developing in this repository requires Node.js 22.22.1 or later (`.nvmrc` has 24) and Yarn 1. The CI runs the checks and the tests on Node.js 22, 24 and 26.
 
 ## Repository layout
 

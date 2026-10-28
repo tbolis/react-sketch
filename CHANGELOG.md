@@ -53,6 +53,7 @@ The eraser and laser pointer tools, and features that forks of react-sketch had,
 - The laser pointer brush is in the private package `packages/laserpointer` (`@react-sketch/laserpointer`),
   which `react-sketch` bundles too. `yarn build:packages` builds both private packages, and
   `yarn typecheck`, `yarn build` and `yarn test` run it first.
+- CI also runs on Node.js 26, with 22 and 24 (`engines` already allowed it).
 
 ## 1.0.1 (unreleased)
 
