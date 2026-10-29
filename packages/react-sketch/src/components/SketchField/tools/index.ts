@@ -91,6 +91,13 @@ export abstract class FabricCanvasTool {
   dispose(): void {}
 
   /**
+   * Called when the content of the canvas is replaced (it is cleared, a value
+   * is loaded, an undo or a redo is done), for the tools which hold something
+   * drawn on it
+   */
+  reset(): void {}
+
+  /**
    * Called when the sketch scales its objects (`zoom()`, and the resize of the
    * canvas), for the tools which hold coordinates of their own
    */

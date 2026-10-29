@@ -10,18 +10,20 @@ const MIN_VERTICES = 3;
 const CLOSE_RADIUS = 10;
 const CLOSE_RADIUS_TOUCH = 20;
 
-/** Two releases this close in time (milliseconds) and in space (the radius above) are a double click */
+/**
+ * Two releases this close in time (milliseconds) and in space (screen pixels)
+ * are a double click. The radius is smaller than the one which closes the
+ * polygon, so that two vertices placed quickly, near one another, are not one.
+ */
 const DOUBLE_CLICK_TIME = 400;
+const DOUBLE_CLICK_RADIUS = 4;
+const DOUBLE_CLICK_RADIUS_TOUCH = 10;
 
-/** Whether the element is one the user types in, which keeps its keys */
-const isEditable = (target: EventTarget | null): boolean => {
-  const element = target as HTMLElement | null;
-  return (
-    !!element &&
-    (element.isContentEditable ||
-      ["INPUT", "TEXTAREA", "SELECT"].includes(element.tagName))
-  );
-};
+/**
+ * The canvas the pointer was last pressed on. Its polygon takes the keys when
+ * the focus is on no element, so that of two sketches on a page only one does.
+ */
+let pointed: fabric.Canvas | null = null;
 
 /**
  * Draws a closed shape of straight sides: each click or tap places a vertex.
@@ -72,6 +74,7 @@ export class Polygon extends FabricCanvasTool {
   }
 
   doMouseDown(event: CanvasEvent): void {
+    pointed = this.canvas;
     this.isDown = true;
     this.isTouch = this.touch(event);
     this.pointerAt = this.point(event);
@@ -100,7 +103,11 @@ export class Polygon extends FabricCanvasTool {
     const doubleClick =
       !!this.lastRelease &&
       now - this.lastRelease.time < DOUBLE_CLICK_TIME &&
-      this.isNear(point, this.lastRelease.point);
+      this.isNear(
+        point,
+        this.lastRelease.point,
+        this.reach(DOUBLE_CLICK_RADIUS, DOUBLE_CLICK_RADIUS_TOUCH)
+      );
     this.lastRelease = { time: now, point };
 
     // The first click of a double click has placed its vertex, the second is not another one
@@ -136,10 +143,14 @@ export class Polygon extends FabricCanvasTool {
     if (!this.close()) this.discard();
   }
 
+  /** The content of the canvas is replaced: the polygon in progress is dropped */
+  reset(): void {
+    this.discard();
+  }
+
   /** The polygon in progress is dropped, a closed one stays in the sketch */
   dispose(): void {
     this.discard();
-    this.lastRelease = undefined;
   }
 
   /**
@@ -169,6 +180,9 @@ export class Polygon extends FabricCanvasTool {
 
   /** Forget the polygon in progress and take it off the top canvas */
   private discard(): void {
+    // The next click does not follow a click of the polygon which is gone
+    this.lastRelease = undefined;
+    if (pointed === this.canvas) pointed = null;
     if (!this.vertices.length) return;
     this.vertices = [];
     this.pointerAt = null;
@@ -189,8 +203,20 @@ export class Polygon extends FabricCanvasTool {
     return this.canvas.upperCanvasEl.ownerDocument;
   }
 
+  /**
+   * Whether the key is for the polygon: not when the focus is on a button, a
+   * field or a dialog, which keep their keys. The canvas is not one to take
+   * the focus, so the focus is on no element (the page) after a click on it.
+   */
+  private takesKey(target: EventTarget | null): boolean {
+    const { body, documentElement } = this.keyTarget;
+    if (target === this.keyTarget || target === body || target === documentElement)
+      return pointed === this.canvas;
+    return this.canvas.wrapperEl.contains(target as Node | null);
+  }
+
   private readonly onKeyDown = (event: KeyboardEvent): void => {
-    if (isEditable(event.target)) return;
+    if (!this.takesKey(event.target)) return;
     if (event.key === "Escape") {
       event.preventDefault();
       this.discard();
@@ -216,12 +242,17 @@ export class Polygon extends FabricCanvasTool {
     return 1 / this.canvas.getZoom();
   }
 
-  private get radius(): number {
-    return (this.isTouch ? CLOSE_RADIUS_TOUCH : CLOSE_RADIUS) * this.pixel;
+  /** A radius in screen pixels, in canvas coordinates: the one for a finger when the last press was one */
+  private reach(mouse: number, touch: number): number {
+    return (this.isTouch ? touch : mouse) * this.pixel;
   }
 
-  private isNear(a: fabric.Point, b: fabric.Point): boolean {
-    return a.distanceFrom(b) <= this.radius;
+  private get radius(): number {
+    return this.reach(CLOSE_RADIUS, CLOSE_RADIUS_TOUCH);
+  }
+
+  private isNear(a: fabric.Point, b: fabric.Point, radius = this.radius): boolean {
+    return a.distanceFrom(b) <= radius;
   }
 
   /** Whether a click where the pointer is would close the polygon */

@@ -224,7 +224,10 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     this.history = new SketchHistory(this.canvas, undoSteps);
     // Loading a value clears the canvas first: the history starts again with the
     // loaded objects, and only when the load works
-    this.canvas.onClear = () => this.history.clear();
+    this.canvas.onClear = () => {
+      this.history.clear();
+      this.tool.reset();
+    };
 
     // Bind Events to Actions
     this._bind_canvas_events(
@@ -441,14 +444,20 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * Perform an undo operation on canvas, if it cannot undo it will leave the canvas intact
    */
   undo = (): void => {
-    if (this.history.undo()) this.props.onChange?.();
+    if (this.history.undo()) {
+      this.tool.reset();
+      this.props.onChange?.();
+    }
   };
 
   /**
    * Perform a redo operation on canvas, if it cannot redo it will leave the canvas intact
    */
   redo = (): void => {
-    if (this.history.redo()) this.props.onChange?.();
+    if (this.history.redo()) {
+      this.tool.reset();
+      this.props.onChange?.();
+    }
   };
 
   /**

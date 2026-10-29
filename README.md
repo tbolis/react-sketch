@@ -310,11 +310,15 @@ polygon needs three vertices, and it is closed in one of three ways, which do no
 
 - a click or tap on the first vertex, within 10 pixels (20 with a finger), which is ringed when the pointer
   is near enough;
-- a double click or double tap, which closes with the vertices placed so far;
+- a double click or double tap (two releases within 400 ms and 4 pixels, 10 with a finger), which closes with
+  the vertices placed so far;
 - the Enter key.
 
 The Escape key cancels the polygon in progress. The keys are listened to on the document only while a
-polygon is in progress, and not when the focus is in a field to type in.
+polygon is in progress, and only when the focus is on the page or in the sketch: a button, a field or a
+dialog which has the focus keeps its keys. With more than one sketch on a page, the keys go to the one which
+was pressed last. A polygon in progress is dropped when the sketch is cleared, when a value is loaded, and
+when an undo or a redo is done.
 
 The polygon in progress is drawn on the top canvas of fabric only. It is not an object of the sketch (it is
 not in `toJSON()`, `toDataURL()` or the undo history) until it is closed. Then it is one `fabric.Polygon`

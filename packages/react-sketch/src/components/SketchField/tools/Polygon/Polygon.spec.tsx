@@ -444,6 +444,25 @@ describe("Polygon", () => {
       expect(polygons(canvas)).toHaveLength(0);
     });
 
+    it("is not by two vertices placed quickly, near one another", () => {
+      const { canvas } = mount();
+      triangle(canvas);
+
+      click(canvas, [250, 250]);
+      wait(100);
+      canvas.upperCanvasEl.dispatchEvent(mouseEvent("mousedown", [258, 250]));
+      document.dispatchEvent(mouseEvent("mouseup", [258, 250]));
+      keydown("Enter");
+
+      expect(vertices(polygons(canvas)[0])).toEqual([
+        [100, 100],
+        [200, 100],
+        [150, 180],
+        [250, 250],
+        [258, 250],
+      ]);
+    });
+
     it("does nothing with fewer than three vertices", () => {
       const { canvas } = mount();
       click(canvas, [100, 100]);
@@ -533,6 +552,43 @@ describe("Polygon", () => {
     });
   });
 
+  describe("the first click of the next polygon", () => {
+    it("is a vertex, also right after a polygon was closed where it is", () => {
+      const { canvas } = mount();
+      triangle(canvas);
+      click(canvas, [101, 101]);
+      expect(polygons(canvas)).toHaveLength(1);
+
+      wait(100);
+      canvas.upperCanvasEl.dispatchEvent(mouseEvent("mousedown", [101, 101]));
+      document.dispatchEvent(mouseEvent("mouseup", [101, 101]));
+      click(canvas, [300, 100]);
+      click(canvas, [300, 200]);
+      keydown("Enter");
+
+      expect(polygons(canvas)).toHaveLength(2);
+      expect(vertices(polygons(canvas)[1])).toEqual([
+        [101, 101],
+        [300, 100],
+        [300, 200],
+      ]);
+    });
+
+    it("is a vertex, also right after a polygon was cancelled", () => {
+      const { canvas } = mount();
+      triangle(canvas);
+      keydown("Escape");
+
+      canvas.upperCanvasEl.dispatchEvent(mouseEvent("mousedown", [150, 180]));
+      document.dispatchEvent(mouseEvent("mouseup", [150, 180]));
+      click(canvas, [300, 100]);
+      click(canvas, [300, 200]);
+      keydown("Enter");
+
+      expect(vertices(polygons(canvas)[0])[0]).toEqual([150, 180]);
+    });
+  });
+
   describe("keys", () => {
     it("are listened to only while a polygon is in progress", () => {
       const { canvas } = mount();
@@ -563,6 +619,119 @@ describe("Polygon", () => {
       keydown("Enter");
       expect(polygons(canvas)).toHaveLength(1);
       input.remove();
+    });
+
+    it("are left to a button the focus is on", () => {
+      const { canvas } = mount();
+      const button = document.body.appendChild(document.createElement("button"));
+      triangle(canvas);
+
+      const enter = keydown("Enter", button);
+      keydown("Escape", button);
+
+      expect(polygons(canvas)).toHaveLength(0);
+      expect(enter.defaultPrevented).toBe(false);
+      keydown("Enter");
+      expect(polygons(canvas)).toHaveLength(1);
+      button.remove();
+    });
+
+    it("are taken when the focus is on the page, or in the sketch", () => {
+      const { canvas } = mount();
+      triangle(canvas);
+      keydown("Enter", document.body);
+      expect(polygons(canvas)).toHaveLength(1);
+
+      triangle(canvas);
+      keydown("Enter", canvas.wrapperEl);
+      expect(polygons(canvas)).toHaveLength(2);
+    });
+
+    it("are taken by the sketch which was pressed last, of two", () => {
+      const first = mount();
+      const second = mount();
+      triangle(first.canvas);
+      triangle(second.canvas);
+
+      keydown("Enter");
+      expect(polygons(second.canvas)).toHaveLength(1);
+      expect(polygons(first.canvas)).toHaveLength(0);
+
+      // The first is the one pressed now
+      click(first.canvas, [300, 300]);
+      keydown("Escape");
+      expect(polygons(first.canvas)).toHaveLength(0);
+      first.unmount();
+      second.unmount();
+    });
+  });
+
+  describe("when the content of the canvas is replaced", () => {
+    /** A polygon in progress, which the user has not closed */
+    const inProgress = (canvas: fabric.Canvas) => {
+      triangle(canvas);
+      keydown("Enter");
+      click(canvas, [300, 100]);
+      click(canvas, [350, 100]);
+      click(canvas, [320, 160]);
+    };
+
+    it("drops the polygon in progress when the sketch is cleared", () => {
+      const { sketch, canvas } = mount();
+      inProgress(canvas);
+
+      sketch.clear();
+      const enter = keydown("Enter");
+
+      expect(polygons(canvas)).toHaveLength(0);
+      expect(enter.defaultPrevented).toBe(false);
+      click(canvas, [100, 100]);
+      click(canvas, [200, 100]);
+      keydown("Enter");
+      expect(polygons(canvas)).toHaveLength(0);
+    });
+
+    it("drops the polygon in progress when a value is loaded", async () => {
+      const { sketch, canvas } = mount();
+      triangle(canvas);
+      keydown("Enter");
+      const value = sketch.toJSON();
+      click(canvas, [300, 100]);
+      click(canvas, [350, 100]);
+      click(canvas, [320, 160]);
+
+      sketch.fromJSON(value);
+      await act(async () => {
+        await jest.advanceTimersByTimeAsync(200);
+      });
+      keydown("Enter");
+
+      expect(polygons(canvas)).toHaveLength(1);
+    });
+
+    it("drops the polygon in progress when an undo or a redo is done", () => {
+      const { sketch, canvas } = mount();
+      inProgress(canvas);
+      sketch.undo();
+      keydown("Enter");
+      expect(polygons(canvas)).toHaveLength(0);
+
+      inProgress(canvas);
+      keydown("Escape");
+      sketch.redo();
+      keydown("Enter");
+      expect(polygons(canvas)).toHaveLength(1);
+    });
+
+    it("keeps the polygon in progress when there is nothing to undo or redo", () => {
+      const { sketch, canvas } = mount();
+      triangle(canvas);
+
+      sketch.undo();
+      sketch.redo();
+      keydown("Enter");
+
+      expect(polygons(canvas)).toHaveLength(1);
     });
   });
 
