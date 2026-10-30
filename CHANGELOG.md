@@ -55,6 +55,12 @@ The eraser, laser pointer and polygon tools, and features that forks of react-sk
 - `clear()` also removes the overlay image.
 - When several images are asked for the overlay (or the background), only the last request is set.
 
+### Fixed
+
+- The arrow tool: an arrow which is drawn is not selectable, as the other shapes are. A press on an earlier
+  arrow selected it and a drag moved it, instead of drawing the new arrow, so an arrow could not be drawn
+  over or across another one.
+
 ### Packaging and tooling
 
 - The code of `@erase2d/fabric` 1.2.2 is in the private package `packages/eraser`

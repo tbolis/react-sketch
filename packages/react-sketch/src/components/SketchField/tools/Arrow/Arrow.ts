@@ -82,11 +82,15 @@ export class Arrow extends FabricCanvasTool {
     this.isDown = false;
     if (!this.line || !this.head) return;
     this.canvas.remove(this.line, this.head);
-    // fabric 7 centers groups by default, the arrow keeps its top left origin
+    // fabric 7 centers groups by default, the arrow keeps its top left origin.
+    // A group is selectable and evented unless it says not: a press on it
+    // would select it and a drag would move it, instead of drawing the next arrow
     this.canvas.add(
       new fabric.Group([this.line, this.head], {
         originX: "left",
         originY: "top",
+        selectable: false,
+        evented: false,
       })
     );
     this.line = this.head = null;
