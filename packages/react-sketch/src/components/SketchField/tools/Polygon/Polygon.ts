@@ -1,7 +1,8 @@
 import * as fabric from "fabric";
 import { CanvasEvent } from "../../events";
 import { FabricCanvasTool } from "../index";
-import { SketchProperties, Tool } from "../../../../types";
+import { LineStyle, SketchProperties, Tool } from "../../../../types";
+import { lineStroke } from "../../../../utils";
 
 /** The fewest vertices of a polygon */
 const MIN_VERTICES = 3;
@@ -41,6 +42,7 @@ export class Polygon extends FabricCanvasTool {
   private width?: number;
   private color?: string;
   private fill?: string;
+  private style?: LineStyle;
   /** The vertices of the polygon in progress, in canvas coordinates */
   private vertices: fabric.Point[] = [];
   /** Where the pointer is, null while it is out of the canvas */
@@ -58,6 +60,7 @@ export class Polygon extends FabricCanvasTool {
     this.width = props.lineWidth ? props.lineWidth : 1;
     this.color = props.lineColor ? props.lineColor : "black";
     this.fill = props.fillColor ? props.fillColor : "transparent";
+    this.style = props.lineStyle;
     if (this.vertices.length) this.paint();
   }
 
@@ -165,6 +168,7 @@ export class Polygon extends FabricCanvasTool {
       {
         stroke: this.color,
         strokeWidth: this.width,
+        ...lineStroke(this.style, this.width ?? 1),
         fill: this.fill,
         strokeLineJoin: "round",
         strokeUniform: true,
@@ -287,11 +291,16 @@ export class Polygon extends FabricCanvasTool {
     ctx.fillStyle = color;
     ctx.lineWidth = width;
     ctx.lineJoin = "round";
-    ctx.lineCap = "round";
+    // The sides are in the line style of the polygon, the dots and the ring are not
+    const { strokeDashArray, strokeLineCap } = lineStroke(this.style, width);
+    ctx.lineCap = strokeLineCap ?? "round";
+    ctx.setLineDash(strokeDashArray ?? []);
     ctx.beginPath();
     vertices.forEach(({ x, y }, i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
     if (pointerAt) ctx.lineTo(pointerAt.x, pointerAt.y);
     ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.lineCap = "round";
     vertices.forEach(({ x, y }) => {
       ctx.beginPath();
       ctx.arc(x, y, dot, 0, Math.PI * 2);

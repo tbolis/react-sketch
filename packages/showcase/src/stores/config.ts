@@ -17,6 +17,7 @@ export interface Config {
   selectedTool: Types.Tool | string;
   lineColor: string;
   lineWidth: number;
+  lineStyle: Types.LineStyle;
   fillWithColor: boolean;
   fillColor: string;
   fillWithBackgroundColor: boolean;
@@ -65,6 +66,7 @@ export class ConfigStore implements Config {
   public selectedTool = "line";
   public lineColor = "#000000";
   public lineWidth = 1;
+  public lineStyle: Types.LineStyle = "solid";
   public fillWithColor = false;
   public fillColor = "#68ccca";
   public fillWithBackgroundColor = false;

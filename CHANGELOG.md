@@ -47,6 +47,12 @@ The eraser, laser pointer and polygon tools, and features that forks of react-sk
   drops one with fewer, and `zoom()` and the resize of the canvas scale the polygon in progress with the
   objects.
 - The showcase has a Polygon button in the tool selector, with a hint of how to close the polygon.
+- The `lineStyle` property and the `Types.LineStyle` type: `"solid"` (the default), `"dashed"`, `"dotted"` or
+  `"dash-dot"`, with the dashes and the dots following `lineWidth`. The pencil, line, arrow (its shaft),
+  rectangle, rectangle label, circle and polygon draw it, and the polygon in progress is shown in it. A
+  change is for the next drawing. It is saved by `toJSON()` and loaded by `fromJSON()` with the object.
+  The highlighter, the eraser and the laser pointer do not draw it.
+- The showcase has the line styles in the Line section.
 
 ### Changed
 

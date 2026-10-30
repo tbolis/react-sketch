@@ -217,6 +217,7 @@ All properties are optional.
 | `tool`                   | `Types.Tool` or `string`             | `"select"`      | The tool to use, see [Tools](#tools). `null` is treated as `"select"`, an unknown name selects `"pencil"`.                                                                                                                                                               |
 | `lineColor`              | `string`                             | `"black"`       | Color of the line.                                                                                                                                                                                                                                                       |
 | `lineWidth`              | `number`                             | `10`            | Width of the line.                                                                                                                                                                                                                                                       |
+| `lineStyle`              | `Types.LineStyle`                    | `"solid"`       | Style of the line: `"solid"`, `"dashed"`, `"dotted"` or `"dash-dot"`. See [Line style](#line-style).                                                                                                                                                                     |
 | `fillColor`              | `string`                             | `"transparent"` | Fill color of the shapes, where applicable (rectangle, rectangle-label, circle).                                                                                                                                                                                         |
 | `backgroundColor`        | `string`                             | `"transparent"` | Background color of the sketch, in hex or rgba format.                                                                                                                                                                                                                   |
 | `backgroundImage`        | `string`                             |                 | URL or data URL of the background image. It is set when the component mounts and when it changes, and removed when it is gone. It takes the place of the background image of `value` and `defaultValue`.                                                                 |
@@ -302,6 +303,22 @@ Use the tools by name (`"pencil"`), with `Tools` (`Tools.Pencil`) or with the en
 | Laser pointer   | `Tools.LaserPointer`   | `laser-pointer`   | A line that follows the pointer, fades out and disappears. It is not part of the drawing. See [Laser pointer](#laser-pointer).                                                           |
 | Default tool    | `Tools.DefaultTool`    | `default-tool`    | Disables drawing and selection. Use it to show a drawing that is not edited.                                                                                                             |
 
+### Line style
+
+`lineStyle` sets how the line is drawn: `"solid"` (the default), `"dashed"`, `"dotted"` or `"dash-dot"`. The
+dashes and the dots follow `lineWidth` (a line thinner than 2 pixels has the pattern of one of 2), so a
+thick line has long dashes and wide dots.
+
+```tsx
+<Sketch tool={Sketch.Tools.Rectangle} lineWidth={3} lineStyle="dashed" />
+```
+
+The pencil, line, arrow, rectangle, rectangle label, circle and polygon draw it. The head of an arrow and the
+text box of a rectangle label are not dashed, and the highlighter, the eraser and the laser pointer do not
+draw it. A change of `lineStyle` is for the next drawing: what is drawn already keeps its style. The style is
+saved by `toJSON()` and loaded by `fromJSON()` with the object (`strokeDashArray` and `strokeLineCap`), and
+the polygon in progress is shown in it.
+
 ### Polygon
 
 Each click or tap places a vertex of the polygon, where the pointer is released, and a line follows the
@@ -364,12 +381,12 @@ not called when it is drawn. Switching to another tool clears what is left of th
 
 ## Exports
 
-| Export         | Description                                                                                                                                                                                                  |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `SketchField`  | The component (named export). Also usable as a type, for the `ref`.                                                                                                                                          |
-| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Polygon`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`, `Eraser`, `LaserPointer`.                                   |
-| `Types`        | Namespace of the types: `Tool` (enumeration), `Tools`, `SketchProperties`, `SketchEvent`, `SketchObject`, `SketchValue`, `SketchData`, `DataUrlOptions`, `ImageOptions`, `BackgroundOptions`, `TextOptions`. |
-| default export | The component, which also carries `SketchField` and `Tools` (as in 0.5.x).                                                                                                                                   |
+| Export         | Description                                                                                                                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SketchField`  | The component (named export). Also usable as a type, for the `ref`.                                                                                                                                                       |
+| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Polygon`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`, `Eraser`, `LaserPointer`.                                                |
+| `Types`        | Namespace of the types: `Tool` (enumeration), `Tools`, `LineStyle`, `SketchProperties`, `SketchEvent`, `SketchObject`, `SketchValue`, `SketchData`, `DataUrlOptions`, `ImageOptions`, `BackgroundOptions`, `TextOptions`. |
+| default export | The component, which also carries `SketchField` and `Tools` (as in 0.5.x).                                                                                                                                                |
 
 ## Known limitations
 
