@@ -13,6 +13,7 @@ import LineStyleSelector from "./LineStyleSelector";
 import Overlay from "./Overlay";
 import Section from "./Section";
 import TextControls from "./TextControls";
+import ViewControls from "./ViewControls";
 import ToolSelector from "./ToolSelector";
 
 interface LineSettings {
@@ -98,6 +99,12 @@ const SketchTools = (props: Config): ReactElement => {
         stretched={props.stretched}
         stretchedX={props.stretchedX}
         stretchedY={props.stretchedY}
+      />
+      <ViewControls
+        pinchZoom={props.pinchZoom}
+        minZoom={props.minZoom}
+        maxZoom={props.maxZoom}
+        view={props.view}
       />
       <Overlay />
       <TextControls text={props.text} />

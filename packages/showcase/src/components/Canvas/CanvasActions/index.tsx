@@ -7,6 +7,7 @@ import PasteIcon from "@mui/icons-material/ContentPaste";
 import RemoveSelectedIcon from "@mui/icons-material/Delete";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
 import ZoomOutIcon from "@mui/icons-material/ZoomOut";
+import ResetViewIcon from "@mui/icons-material/CenterFocusStrong";
 import SaveIcon from "@mui/icons-material/Save";
 import DownloadIcon from "@mui/icons-material/Download";
 import ClearIcon from "@mui/icons-material/DeleteSweep";
@@ -139,6 +140,11 @@ const CanvasActions = ({
         label="Zoom out"
         onClick={() => withSketch((sketch) => sketch.zoom(0.8))}>
         <ZoomOutIcon />
+      </Action>
+      <Action
+        label="Reset view (the zoom and the pan of the fingers)"
+        onClick={() => withSketch((sketch) => sketch.resetView())}>
+        <ResetViewIcon />
       </Action>
     </Stack>
     <Stack direction="row">

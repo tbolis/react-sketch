@@ -12,12 +12,20 @@ export type Scenario =
   | "add-img"
   | "background-image";
 
+/** The view of a canvas which was not zoomed nor panned */
+export const INITIAL_VIEW: Types.SketchView = { zoom: 1, x: 0, y: 0 };
+
 export interface Config {
   scenario: Scenario;
   selectedTool: Types.Tool | string;
   lineColor: string;
   lineWidth: number;
   lineStyle: Types.LineStyle;
+  pinchZoom: boolean;
+  minZoom: number;
+  maxZoom: number;
+  /** The view of the canvas, as it reports it */
+  view: Types.SketchView;
   fillWithColor: boolean;
   fillColor: string;
   fillWithBackgroundColor: boolean;
@@ -67,6 +75,10 @@ export class ConfigStore implements Config {
   public lineColor = "#000000";
   public lineWidth = 1;
   public lineStyle: Types.LineStyle = "solid";
+  public pinchZoom = true;
+  public minZoom = 0.5;
+  public maxZoom = 8;
+  public view: Types.SketchView = INITIAL_VIEW;
   public fillWithColor = false;
   public fillColor = "#68ccca";
   public fillWithBackgroundColor = false;

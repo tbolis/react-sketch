@@ -9,7 +9,12 @@ import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
 import controlledValue from "../../../data/controlledValue";
 import imageDataUrl from "../../../data/imageDataUrl";
-import { CONFIG, type Config, type Scenario } from "../../../stores/config";
+import {
+  CONFIG,
+  INITIAL_VIEW,
+  type Config,
+  type Scenario,
+} from "../../../stores/config";
 import { withSketch } from "../sketchRef";
 
 const SCENARIOS: { value: Scenario; label: string }[] = [
@@ -29,6 +34,7 @@ const selectScenario = (scenario: Scenario) => {
   CONFIG.canRedo = false;
   CONFIG.hasSelection = false;
   CONFIG.canPaste = false;
+  CONFIG.view = INITIAL_VIEW;
 };
 
 const ScenarioTabs = ({ scenario }: Pick<Config, "scenario">): ReactElement => (

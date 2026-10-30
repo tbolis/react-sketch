@@ -1,15 +1,20 @@
 import type { ReactElement } from "react";
-import { SketchField } from "react-sketch";
+import { SketchField, type Types } from "react-sketch";
 import Paper from "@mui/material/Paper";
 import { teal } from "@mui/material/colors";
 import defaultValue from "../../data/defaultValue";
-import { Config } from "../../stores/config";
+import { CONFIG, type Config } from "../../stores/config";
 import CanvasActions from "./CanvasActions";
 import Drawings from "./Drawings";
 import { ScenarioControls, ScenarioTabs } from "./Scenarios";
 import { sketchRef, syncState } from "./sketchRef";
 
 const style = { backgroundColor: teal[50] };
+
+/** Stable, so that the canvas does not render again for it */
+const showView = (view: Types.SketchView) => {
+  CONFIG.view = view;
+};
 
 const SketchCanvas = (props: Config): ReactElement => {
   const controlled = props.scenario === "controlled-value";
@@ -43,6 +48,10 @@ const SketchCanvas = (props: Config): ReactElement => {
         lineColor={props.lineColor}
         lineWidth={props.lineWidth}
         lineStyle={props.lineStyle}
+        pinchZoom={props.pinchZoom}
+        minZoom={props.minZoom}
+        maxZoom={props.maxZoom}
+        onViewChange={showView}
         fillColor={props.fillWithColor ? props.fillColor : "transparent"}
         backgroundColor={
           props.fillWithBackgroundColor ? props.backgroundColor : "transparent"

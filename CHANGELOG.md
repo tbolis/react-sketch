@@ -59,6 +59,8 @@ The eraser, laser pointer and polygon tools, pinch zoom, and features that forks
   in `toJSON()`, not an undo step, and `onChange` is not called for it. The canvas cannot be taken out of sight.
   When the second finger comes, what the first one started (a line, a shape, a free stroke, the eraser, a vertex
   of a polygon) is dropped and leaves no object nor undo step, so a polygon in progress is not disturbed.
+- The showcase has a View section for the pinch zoom (the switch, the smallest and the largest zoom, and the
+  view as `onViewChange` reports it) and a reset view button above the canvas.
 
 ### Changed
 
