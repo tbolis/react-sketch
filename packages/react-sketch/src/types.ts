@@ -11,9 +11,12 @@ export enum Tool {
   PENCIL = "pencil",
   RECTANGLE = "rectangle",
   RECTANGLE_LABEL = "rectangle-label",
+  POLYGON = "polygon",
   SELECT = "select",
   PAN = "pan",
   HIGHLIGHTER = "highlighter",
+  ERASER = "eraser",
+  LASER_POINTER = "laser-pointer",
   DEFAULT_TOOL = "default-tool",
 }
 
@@ -28,10 +31,13 @@ export const Tools = {
   Arrow: Tool.ARROW,
   Rectangle: Tool.RECTANGLE,
   RectangleLabel: Tool.RECTANGLE_LABEL,
+  Polygon: Tool.POLYGON,
   Circle: Tool.CIRCLE,
   Pan: Tool.PAN,
   DefaultTool: Tool.DEFAULT_TOOL,
   Highlighter: Tool.HIGHLIGHTER,
+  Eraser: Tool.ERASER,
+  LaserPointer: Tool.LASER_POINTER,
 } as const;
 
 /**
@@ -44,6 +50,16 @@ export interface SketchObject {
   type?: string;
   /** Any other property of the object, including custom ones set by the application */
   [property: string]: unknown;
+}
+
+/**
+ * The view of the canvas: how much it is zoomed (1 is the whole canvas), and
+ * where the origin of the canvas is, in pixels
+ */
+export interface SketchView {
+  zoom: number;
+  x: number;
+  y: number;
 }
 
 /**
@@ -99,12 +115,25 @@ export interface ImageOptions {
   top?: number;
   /** Initial scale of the image. Defaults to 0.5 */
   scale?: number;
+  /**
+   * How the image is requested: with "anonymous" or "use-credentials" the server
+   * must send CORS headers, and the canvas can be exported afterwards. Without it
+   * the image is requested as before, and a cross-origin image taints the canvas
+   * (`toDataURL` throws)
+   */
+  crossOrigin?: "anonymous" | "use-credentials" | null;
 }
 
 /**
- * Options of `setBackgroundFromDataUrl`
+ * Options of `setBackgroundFromDataUrl` and `setOverlayFromDataUrl`
  */
 export interface BackgroundOptions {
+  /**
+   * How the image is requested. Defaults to "anonymous", so the canvas can be
+   * exported. Use null for a server without CORS headers: the image is shown,
+   * and a cross-origin image taints the canvas (`toDataURL` throws)
+   */
+  crossOrigin?: "anonymous" | "use-credentials" | null;
   /** Scale the image to the width and the height of the canvas */
   stretched?: boolean;
   /** Scale the image to the width of the canvas */
@@ -122,6 +151,12 @@ export interface BackgroundOptions {
 export type TextOptions = Record<string, unknown>;
 
 /**
+ * How a line is drawn: unbroken, in dashes, in dots, or in dashes and dots.
+ * The lengths follow `lineWidth`.
+ */
+export type LineStyle = "solid" | "dashed" | "dotted" | "dash-dot";
+
+/**
  * Properties of the SketchField component
  */
 export interface SketchProperties {
@@ -135,10 +170,24 @@ export interface SketchProperties {
   lineColor?: string;
   /** The width of the line. Defaults to 10 */
   lineWidth?: number;
+  /**
+   * The style of the line, see {@link LineStyle}. Defaults to "solid". The
+   * pencil, line, arrow (its shaft), rectangle, rectangle label, circle and
+   * polygon draw it, the highlighter, eraser and laser pointer do not.
+   */
+  lineStyle?: LineStyle;
   /** The fill color of the shape when applicable. Defaults to "transparent" */
   fillColor?: string;
   /** The background color of the sketch, in rgba or hex format. Defaults to "transparent" */
   backgroundColor?: string;
+  /**
+   * URL or data URL of the background image. It is set when the component
+   * mounts and when it changes, and removed when it is gone. It takes the place
+   * of the background image of `value` and `defaultValue`
+   */
+  backgroundImage?: string;
+  /** Options of `backgroundImage`, the ones of `setBackgroundFromDataUrl` */
+  backgroundImageOptions?: BackgroundOptions;
   /** The opacity of the object. Accepted for compatibility, it is not applied (as in 0.5.x). Defaults to 1.0 */
   opacity?: number;
   /** Number of undo/redo steps to maintain, read when the component mounts. Defaults to 25 */
@@ -164,6 +213,18 @@ export interface SketchProperties {
    * and when `width` or `height` change. Defaults to true
    */
   autoresize?: boolean;
+  /**
+   * Zoom and pan the view of the canvas with two fingers, on a touch screen. The
+   * objects stay where they are, so the view is not saved nor undone, and it is
+   * not in the image of `toDataURL`. Defaults to true
+   */
+  pinchZoom?: boolean;
+  /** The smallest zoom of the view, with 1 being the whole canvas. Defaults to 0.5 */
+  minZoom?: number;
+  /** The largest zoom of the view. Defaults to 8 */
+  maxZoom?: number;
+  /** Called each time the view changes, by the fingers or by `resetView()` */
+  onViewChange?: (view: SketchView) => void;
   /** Width of the sketch container, in pixels */
   width?: number;
   /** Height of the sketch container, in pixels. Defaults to 512 */

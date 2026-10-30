@@ -1,7 +1,9 @@
 /*eslint @typescript-eslint/no-unused-vars: 0,@typescript-eslint/no-empty-function: 0*/
 
 import * as fabric from "fabric";
-import { SketchProperties, Tool } from "../../../types";
+import { LineStyle, SketchProperties, Tool } from "../../../types";
+import { lineStroke } from "../../../utils";
+import { EraserBrush } from "@react-sketch/eraser";
 import { CanvasEvent, EventInput } from "../events";
 
 /**
@@ -76,6 +78,57 @@ export abstract class FabricCanvasTool {
 
   abstract configureCanvas(props: SketchProperties): void;
 
+  /**
+   * Called when what the pointer started, with the mouse down, must not
+   * go on or end in something drawn (two fingers on the screen are a gesture
+   * of the view, not a stroke). The objects it added are taken off the canvas.
+   */
+  cancel(): void {}
+
+  /**
+   * Called when another tool takes over, before `dispose()`, for the tools
+   * which have something unfinished to complete (it is not called when the
+   * canvas goes away)
+   */
+  finish(): void {}
+
+  /**
+   * Called when another tool takes over, and when the canvas goes away, for
+   * the tools which keep something running on the canvas
+   */
+  dispose(): void {}
+
+  /**
+   * Called when the content of the canvas is replaced (it is cleared, a value
+   * is loaded, an undo or a redo is done), for the tools which hold something
+   * drawn on it
+   */
+  reset(): void {}
+
+  /**
+   * Whether the object is one which the tool shows while it draws, and takes
+   * off for the final one. It is not an action of the user, so it is not in
+   * the history, and `onObjectAdded` and `onObjectRemoved` are not called for it.
+   */
+  isPreview(object: fabric.FabricObject): boolean {
+    return false;
+  }
+
+  /**
+   * Called when the sketch scales its objects (`zoom()`, and the resize of the
+   * canvas), for the tools which hold coordinates of their own
+   */
+  scale(xFactor: number, yFactor: number): void {}
+
+  /**
+   * Whether the application is told about a change (`onChange`) when the
+   * mouse is released or leaves the canvas. The tools which do not change the
+   * sketch on every release say no, and tell the application themselves.
+   */
+  notifiesChange(): boolean {
+    return true;
+  }
+
   doMouseUp(event: CanvasEvent): void {}
 
   doMouseDown(event: CanvasEvent): void {}
@@ -97,10 +150,26 @@ export abstract class FabricCanvasTool {
 
   /**
    * The brush of the free drawing tools. Fabric does not create one by
-   * itself, so it is created the first time it is needed.
+   * itself, so it is created the first time it is needed. The brush of the
+   * eraser is not one to draw with, it is replaced.
    */
   protected get brush(): fabric.BaseBrush {
-    return (this.canvas.freeDrawingBrush ??= new fabric.PencilBrush(this.canvas));
+    const current = this.canvas.freeDrawingBrush;
+    if (current && !(current instanceof EraserBrush)) return current;
+    current?.dispose();
+    return (this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas));
+  }
+
+  /**
+   * Set the line style of the brush. The brush is kept from a tool to the
+   * next, so a tool which does not draw a style (the highlighter) calls this
+   * with none, and the style of the pencil is not left on it.
+   */
+  protected setBrushStroke(style: LineStyle | undefined, width: number): void {
+    const brush = this.brush;
+    brush.strokeDashArray = null;
+    brush.strokeLineCap = "round";
+    Object.assign(brush, lineStroke(style, width));
   }
 
   /**

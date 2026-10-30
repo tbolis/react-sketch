@@ -4,10 +4,13 @@ import { FabricCanvasTool } from "./index";
 import { Arrow } from "./Arrow";
 import { Circle } from "./Circle";
 import { DefaultTool } from "./DefaultTool";
+import { Eraser } from "./Eraser";
 import { Highlighter } from "./Highlighter";
+import { LaserPointer } from "./LaserPointer";
 import { Line } from "./Line";
 import { Pan } from "./Pan";
 import { Pencil } from "./Pencil";
+import { Polygon } from "./Polygon";
 import { Rectangle } from "./Rectangle";
 import { RectangleLabel } from "./RectangleLabel";
 import { Select } from "./Select";
@@ -41,6 +44,9 @@ export const create_tool = (
     case Tool.RECTANGLE_LABEL:
       toolInstance = new RectangleLabel(canvas);
       break;
+    case Tool.POLYGON:
+      toolInstance = new Polygon(canvas);
+      break;
     case Tool.SELECT:
       toolInstance = new Select(canvas);
       break;
@@ -50,6 +56,12 @@ export const create_tool = (
     case Tool.HIGHLIGHTER:
       toolInstance = new Highlighter(canvas);
       break;
+    case Tool.ERASER:
+      toolInstance = new Eraser(canvas);
+      break;
+    case Tool.LASER_POINTER:
+      toolInstance = new LaserPointer(canvas);
+      break;
     case Tool.DEFAULT_TOOL:
       toolInstance = new DefaultTool(canvas);
       break;
@@ -58,8 +70,9 @@ export const create_tool = (
       toolInstance = new Pencil(canvas);
   }
 
-  // Bring the cursor back to default, in case the previous tool changed it
+  // Bring the cursors back to default, in case the previous tool changed them
   canvas.defaultCursor = "default";
+  canvas.freeDrawingCursor = "crosshair";
   toolInstance.configureCanvas(props);
   return toolInstance;
 };

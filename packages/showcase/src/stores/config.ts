@@ -6,13 +6,28 @@ import sampleImage from "../assets/sample.png";
  * The usage scenarios of the component, each one is shown in its own tab
  */
 export type Scenario =
-  "playground" | "default-value" | "controlled-value" | "add-img";
+  | "playground"
+  | "default-value"
+  | "controlled-value"
+  | "add-img"
+  | "background-image";
+
+/** The view of a canvas which was not zoomed nor panned */
+export const INITIAL_VIEW: Types.SketchView = { zoom: 1, x: 0, y: 0 };
 
 export interface Config {
   scenario: Scenario;
   selectedTool: Types.Tool | string;
   lineColor: string;
   lineWidth: number;
+  lineStyle: Types.LineStyle;
+  pinchZoom: boolean;
+  minZoom: number;
+  maxZoom: number;
+  /** The view of the canvas, as it reports it */
+  view: Types.SketchView;
+  /** What the zoom in and zoom out buttons scaled the drawing by, 1 when they did not */
+  zoomFactor: number;
   fillWithColor: boolean;
   fillColor: string;
   fillWithBackgroundColor: boolean;
@@ -25,6 +40,8 @@ export interface Config {
   stretchedY: boolean;
   text: string;
   imageUrl: string;
+  imageCors: boolean;
+  backgroundImageUrl: string;
   controlledValue: object | undefined;
   forceValue: boolean;
   canUndo: boolean;
@@ -56,9 +73,15 @@ export const createDrawing = (src: string): Drawing => ({
 
 export class ConfigStore implements Config {
   public scenario: Scenario = "playground";
-  public selectedTool = "line";
+  public selectedTool = Types.Tool.PENCIL;
   public lineColor = "#000000";
   public lineWidth = 1;
+  public lineStyle: Types.LineStyle = "solid";
+  public pinchZoom = true;
+  public minZoom = 0.5;
+  public maxZoom = 8;
+  public view: Types.SketchView = INITIAL_VIEW;
+  public zoomFactor = 1;
   public fillWithColor = false;
   public fillColor = "#68ccca";
   public fillWithBackgroundColor = false;
@@ -71,6 +94,8 @@ export class ConfigStore implements Config {
   public stretchedY = false;
   public text = "a text, cool!";
   public imageUrl = sampleImage;
+  public imageCors = false;
+  public backgroundImageUrl = sampleImage;
   public controlledValue: object | undefined = undefined;
   public forceValue = true;
   public canUndo = false;

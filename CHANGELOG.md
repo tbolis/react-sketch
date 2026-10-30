@@ -1,5 +1,97 @@
 # Changelog
 
+## 1.1.0 (unreleased)
+
+The eraser, laser pointer and polygon tools, pinch zoom, and features that forks of react-sketch had, written again for the TypeScript code and fabric 7.
+
+### Added
+
+- The eraser tool (#82): `tool="eraser"`, `Tools.Eraser` and `Types.Tool.ERASER`. It erases parts of the
+  objects (lines, shapes, images, text) with the width of `lineWidth`, and its cursor is a circle of the
+  size of the brush (the crosshair for a brush over 124 pixels, the most a browser shows). One stroke is
+  one undo step. The erased parts are kept on the objects, so `toJSON()` saves them and `value`,
+  `defaultValue` and `fromJSON()` load them. The background color and the background image are not
+  erased. The brush is the code of `@erase2d/fabric` by @ShaMan123 (MIT).
+- The showcase has an Eraser button in the tool selector.
+- The overlay image: `setOverlayFromDataUrl()` and `removeOverlayImage()` (#73). The image is drawn above
+  the objects and takes no mouse events, so it can be an outline to draw within. It is saved by
+  `toJSON()`, drawn by `toDataURL()`, scaled when the canvas is resized, and removed by `clear()`. It
+  takes the options of `setBackgroundFromDataUrl()`. From `addOverlayImg` of @yerffejytnac.
+- The `backgroundImage` and `backgroundImageOptions` properties (#51): the background image from a
+  property, set when the component mounts and when it changes. It takes the place of the background image
+  of `value` and `defaultValue`. From the `backgroundImage` property of @subforce-solutions.
+- The `crossOrigin` option of `addImg()`, `setBackgroundFromDataUrl()` and `setOverlayFromDataUrl()` (#33,
+  #95). `addImg()` requests the image without CORS as before, unless it is given, so a canvas with a
+  cross-origin image can be exported. The background and the overlay images are requested with
+  `"anonymous"` as before, and `null` shows an image of a server without CORS headers, at the cost of a
+  tainted canvas. From `react-sketch2` of @x5engine.
+- The showcase has an Overlay section (a sample outline, an image of your own, remove), a
+  `backgroundImage` tab that uses the property, and a CORS switch for "Load Image from URL". The fit
+  switches of the Background section also apply to the background image that is already set.
+- The laser pointer tool: `tool="laser-pointer"`, `Tools.LaserPointer` and `Types.Tool.LASER_POINTER`. A
+  line follows the pointer, gets thinner towards its start and disappears about a second after it was drawn,
+  with the color and the weight of the line (`lineColor`, `lineWidth`) and a glow. It is only drawn on the
+  top canvas of fabric, so it is not an object of the sketch: it is not in `toJSON()` or `toDataURL()`, it
+  is not an undo step, and neither `onObjectAdded` nor `onChange` is called for it. Another tool clears what
+  is left of the line.
+- The showcase has a Laser pointer button in the tool selector. The laser pointer keeps its own line color
+  and weight (red, 8px to start with), apart from the other tools.
+- The polygon tool (#96): `tool="polygon"`, `Tools.Polygon` and `Types.Tool.POLYGON`. Each click or tap
+  places a vertex, where the pointer is released, and a line follows the pointer from the last one (on
+  touch, while the finger is down). The polygon is closed by a click or tap on the first vertex (within 10
+  pixels, 20 on touch), by a double click or double tap, or by the Enter key, and the Escape key cancels
+  it. It needs three vertices. It takes `lineColor`, `lineWidth` and `fillColor` as the rectangle does. The
+  polygon in progress is only drawn on the top canvas: when it is closed it is one `fabric.Polygon` and one
+  undo step, `onObjectAdded` is called once with it, and `onChange` is called once, not for each vertex. Its
+  vertices are in `points` of the object. Switching to another tool keeps a polygon with three vertices and
+  drops one with fewer, and `zoom()` and the resize of the canvas scale the polygon in progress with the
+  objects.
+- The showcase has a Polygon button in the tool selector, with a hint of how to close the polygon.
+- The `lineStyle` property and the `Types.LineStyle` type: `"solid"` (the default), `"dashed"`, `"dotted"` or
+  `"dash-dot"`, with the dashes and the dots following `lineWidth`. The pencil, line, arrow (its shaft),
+  rectangle, rectangle label, circle and polygon draw it, and the polygon in progress is shown in it. A
+  change is for the next drawing. It is saved by `toJSON()` and loaded by `fromJSON()` with the object.
+  The highlighter, the eraser and the laser pointer do not draw it.
+- The showcase has the line styles in the Line section.
+- Pinch zoom (#84): two fingers on the canvas zoom and pan its view, about the point between the fingers. The
+  `pinchZoom` (default `true`), `minZoom` (0.5) and `maxZoom` (8) properties, the `onViewChange` callback and
+  the `resetView()` method. The view is the viewport of the canvas, the objects stay where they are: it is not
+  in `toJSON()`, not an undo step, and `onChange` is not called for it. The canvas cannot be taken out of sight.
+  When the second finger comes, what the first one started (a line, a shape, a free stroke, the eraser, a vertex
+  of a polygon) is dropped and leaves no object nor undo step, so a polygon in progress is not disturbed.
+- The showcase has a View section for the pinch zoom (the switch, the smallest and the largest zoom, and the
+  view as `onViewChange` reports it) and a reset button above the canvas, which also takes back the zoom in and zoom out buttons.
+
+### Changed
+
+- Each tool starts from the default cursor of free drawing (the crosshair), so the cursor of the pencil or
+  of the eraser is not kept by the highlighter.
+- `toDataURL()` draws the whole drawing, whatever the zoom and pan of the view of the canvas (pinch zoom, and
+  the pan tool, which moved what the image showed).
+- `clear()` also removes the overlay image.
+- The showcase starts with the pencil tool selected, it was the line.
+- When several images are asked for the overlay (or the background), only the last request is set.
+
+### Fixed
+
+- The arrow tool: an arrow which is drawn is not selectable, as the other shapes are. A press on an earlier
+  arrow selected it and a drag moved it, instead of drawing the new arrow, so an arrow could not be drawn
+  over or across another one.
+- The arrow tool: an arrow is one undo step, and `onObjectAdded` is called once with it, and
+  `onObjectRemoved` is not called. The line and the head which are shown while the arrow is drawn were
+  recorded and announced too, so an arrow took three undos, and `onObjectAdded` was called three times.
+
+### Packaging and tooling
+
+- The code of `@erase2d/fabric` 1.2.2 is in the private package `packages/eraser`
+  (`@react-sketch/eraser`), with its license, and `react-sketch` bundles it. Nothing new is installed for
+  the users of the library, and the externals of the bundle are still `react` and `fabric`. The license is
+  in `dist/index.js.LICENSE.txt`. `yarn typecheck`, `yarn build` and `yarn test` build the package first.
+- The laser pointer brush is in the private package `packages/laserpointer` (`@react-sketch/laserpointer`),
+  which `react-sketch` bundles too. `yarn build:packages` builds both private packages, and
+  `yarn typecheck`, `yarn build` and `yarn test` run it first.
+- CI also runs on Node.js 26, with 22 and 24 (`engines` already allowed it).
+
 ## 1.0.1 (unreleased)
 
 ### Fixed

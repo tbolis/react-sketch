@@ -1,4 +1,5 @@
 import type { MouseEvent, ReactElement } from "react";
+import { Types } from "react-sketch";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import Paper from "@mui/material/Paper";
@@ -8,9 +9,31 @@ import CanvasSize from "./CanvasSize";
 import ColorSelector from "./ColorSelector";
 import ImageControls from "./ImageControls";
 import LabeledSlider from "./LabeledSlider";
+import LineStyleSelector from "./LineStyleSelector";
+import Overlay from "./Overlay";
 import Section from "./Section";
 import TextControls from "./TextControls";
+import ViewControls from "./ViewControls";
 import ToolSelector from "./ToolSelector";
+
+interface LineSettings {
+  lineColor: string;
+  lineWidth: number;
+}
+
+/** The line of the laser pointer, a thin black one is hardly seen */
+let laserLine: LineSettings = { lineColor: "#ff0000", lineWidth: 8 };
+/** The line of the other tools, kept while the laser pointer is in use */
+let otherLine: LineSettings = {
+  lineColor: CONFIG.lineColor,
+  lineWidth: CONFIG.lineWidth,
+};
+
+const swapLine = (leaving: LineSettings): LineSettings => {
+  const { lineColor, lineWidth } = CONFIG;
+  Object.assign(CONFIG, leaving);
+  return { lineColor, lineWidth };
+};
 
 /**
  * Handle the selection of the Sketch tool
@@ -19,10 +42,23 @@ import ToolSelector from "./ToolSelector";
  * @param {string | null} value of the selected buttons, null when the selected one is clicked again
  */
 const handleSelectTool = (event: MouseEvent<HTMLElement>, value: string | null) => {
-  if (value !== null) {
-    CONFIG.selectedTool = value;
+  if (value === null) return;
+  const laser = Types.Tool.LASER_POINTER;
+  // The laser pointer keeps its own color and weight, apart from the other tools
+  if (value === laser && CONFIG.selectedTool !== laser) {
+    otherLine = swapLine(laserLine);
+  } else if (value !== laser && CONFIG.selectedTool === laser) {
+    laserLine = swapLine(otherLine);
   }
+  CONFIG.selectedTool = value;
 };
+
+/** The tools which draw no line style: their line is a brush, or is not kept */
+const NO_LINE_STYLE: string[] = [
+  Types.Tool.HIGHLIGHTER,
+  Types.Tool.ERASER,
+  Types.Tool.LASER_POINTER,
+];
 
 const SketchTools = (props: Config): ReactElement => {
   return (
@@ -31,7 +67,7 @@ const SketchTools = (props: Config): ReactElement => {
       <Section
         id="stroke"
         title="Line"
-        chip={`${props.lineWidth}px`}
+        chip={`${props.lineWidth}px ${props.lineStyle}`}
         defaultExpanded>
         <LabeledSlider
           label="Line Weight"
@@ -41,6 +77,10 @@ const SketchTools = (props: Config): ReactElement => {
           startIcon={<RemoveIcon />}
           endIcon={<AddIcon />}
           onChange={(value) => (CONFIG.lineWidth = value)}
+        />
+        <LineStyleSelector
+          selected={props.lineStyle}
+          disabled={NO_LINE_STYLE.includes(props.selectedTool)}
         />
       </Section>
       <ColorSelector
@@ -60,8 +100,15 @@ const SketchTools = (props: Config): ReactElement => {
         stretchedX={props.stretchedX}
         stretchedY={props.stretchedY}
       />
+      <ViewControls
+        pinchZoom={props.pinchZoom}
+        minZoom={props.minZoom}
+        maxZoom={props.maxZoom}
+        view={props.view}
+      />
+      <Overlay />
       <TextControls text={props.text} />
-      <ImageControls imageUrl={props.imageUrl} />
+      <ImageControls imageUrl={props.imageUrl} imageCors={props.imageCors} />
     </Paper>
   );
 };

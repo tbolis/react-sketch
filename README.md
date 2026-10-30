@@ -197,41 +197,59 @@ export const Editor = ({ imageUrl }: { imageUrl: string }) => {
 };
 ```
 
+### Background and overlay images
+
+- The background image is drawn under the objects. Set it with the `backgroundImage` property (and `backgroundImageOptions`), or with `setBackgroundFromDataUrl` and `removeBackgroundImage`. The property takes the place of the background image of a `value`.
+- The overlay image is drawn above the objects, for example an outline to draw within. Set it with `setOverlayFromDataUrl` and remove it with `removeOverlayImage`. It takes no mouse events, so the objects below can still be selected, and `toJSON` and `toDataURL` include it. `clear()` removes it, and so does loading a `value` that has none.
+- The background and the overlay images are requested with CORS (`crossOrigin: "anonymous"`), so the canvas can be exported. A server without CORS headers cannot be used that way: pass `crossOrigin: null` to show the image anyway, knowing that a cross-origin image taints the canvas and `toDataURL` throws a SecurityError. `addImg` requests the image without CORS, as before, unless you pass `crossOrigin`.
+
+```tsx
+sketch.current?.setOverlayFromDataUrl(outlineUrl, { stretched: true });
+sketch.current?.addImg(photoUrl, { crossOrigin: "anonymous" }); // the canvas can still be exported
+```
+
 ## Properties
 
 All properties are optional.
 
-| Property           | Type                                 | Default         | Description                                                                                                                                                                                                                                                              |
-| ------------------ | ------------------------------------ | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `tool`             | `Types.Tool` or `string`             | `"select"`      | The tool to use, see [Tools](#tools). `null` is treated as `"select"`, an unknown name selects `"pencil"`.                                                                                                                                                               |
-| `lineColor`        | `string`                             | `"black"`       | Color of the line.                                                                                                                                                                                                                                                       |
-| `lineWidth`        | `number`                             | `10`            | Width of the line.                                                                                                                                                                                                                                                       |
-| `fillColor`        | `string`                             | `"transparent"` | Fill color of the shapes, where applicable (rectangle, rectangle-label, circle).                                                                                                                                                                                         |
-| `backgroundColor`  | `string`                             | `"transparent"` | Background color of the sketch, in hex or rgba format.                                                                                                                                                                                                                   |
-| `opacity`          | `number`                             | `1.0`           | Accepted and not applied: it has no effect. It had no effect in 0.5.x either.                                                                                                                                                                                            |
-| `undoSteps`        | `number`                             | `25`            | Number of undo/redo steps to keep. Read when the component mounts, a later change has no effect.                                                                                                                                                                         |
-| `imageFormat`      | `string`                             |                 | Default format of `toDataURL`, `png` or `jpeg`, used when the options of the call have no `format`. Without it, `png`.                                                                                                                                                   |
-| `value`            | `object` or `string`                 |                 | Drawing to load, loaded again when it changes. See [Initial, loaded and saved drawings](#initial-loaded-and-saved-drawings).                                                                                                                                             |
-| `forceValue`       | `boolean`                            | `false`         | Load `value` on every update of the component, even when it did not change.                                                                                                                                                                                              |
-| `defaultValue`     | `object` or `string`                 |                 | Drawing loaded when the component mounts, unless `value` is set.                                                                                                                                                                                                         |
-| `widthCorrection`  | `number`                             | `0`             | Pixels subtracted from the width of the container when the canvas is resized. Compensates a border or padding of the container.                                                                                                                                          |
-| `heightCorrection` | `number`                             | `0`             | Pixels subtracted from the height of the container when the canvas is resized.                                                                                                                                                                                           |
-| `autoresize`       | `boolean`                            | `true`          | Resize the canvas, and scale its objects, when the window is resized. The canvas is always fitted to its container on mount and when `width` or `height` change.                                                                                                         |
-| `width`            | `number`                             | undefined       | Width of the sketch in pixels. When not set, the sketch takes the width of its parent element.                                                                                                                                                                           |
-| `height`           | `number`                             | `512`           | Height of the sketch in pixels.                                                                                                                                                                                                                                          |
-| `className`        | `string`                             |                 | Class name of the container element of the canvas.                                                                                                                                                                                                                       |
-| `style`            | `CSS.Properties`                     |                 | Style of the container element of the canvas.                                                                                                                                                                                                                            |
-| `onChange`         | `(event?: Event) => void`            |                 | Called 10 ms after every mouse up and mouse out on the canvas, whether or not the drawing changed (see [Known limitations](#known-limitations)), and after `undo`, `redo` and the load of a value. The argument is the DOM event after a mouse event, nothing otherwise. |
-| `onObjectAdded`    | `(event: Types.SketchEvent) => void` | no-op           | An object was added: drawn, pasted, or loaded with a value. Not called when `undo` or `redo` add an object back.                                                                                                                                                         |
-| `onObjectModified` | `(event: Types.SketchEvent) => void` | no-op           | An object was modified by the user (moved, scaled, rotated).                                                                                                                                                                                                             |
-| `onObjectRemoved`  | `(event: Types.SketchEvent) => void` | no-op           | An object was removed from the sketch.                                                                                                                                                                                                                                   |
-| `onObjectMoving`   | `(event: Types.SketchEvent) => void` | no-op           | An object is being moved.                                                                                                                                                                                                                                                |
-| `onObjectScaling`  | `(event: Types.SketchEvent) => void` | no-op           | An object is being scaled.                                                                                                                                                                                                                                               |
-| `onObjectRotating` | `(event: Types.SketchEvent) => void` | no-op           | An object is being rotated.                                                                                                                                                                                                                                              |
-| `onMouseDown`      | `(event: Types.SketchEvent) => void` | no-op           | Mouse down on the canvas.                                                                                                                                                                                                                                                |
-| `onMouseMove`      | `(event: Types.SketchEvent) => void` | no-op           | Mouse move on the canvas.                                                                                                                                                                                                                                                |
-| `onMouseUp`        | `(event: Types.SketchEvent) => void` | no-op           | Mouse up on the canvas.                                                                                                                                                                                                                                                  |
-| `onMouseOut`       | `(event: Types.SketchEvent) => void` | no-op           | The mouse left the canvas.                                                                                                                                                                                                                                               |
+| Property                 | Type                                 | Default         | Description                                                                                                                                                                                                                                                              |
+| ------------------------ | ------------------------------------ | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `tool`                   | `Types.Tool` or `string`             | `"select"`      | The tool to use, see [Tools](#tools). `null` is treated as `"select"`, an unknown name selects `"pencil"`.                                                                                                                                                               |
+| `lineColor`              | `string`                             | `"black"`       | Color of the line.                                                                                                                                                                                                                                                       |
+| `lineWidth`              | `number`                             | `10`            | Width of the line.                                                                                                                                                                                                                                                       |
+| `lineStyle`              | `Types.LineStyle`                    | `"solid"`       | Style of the line: `"solid"`, `"dashed"`, `"dotted"` or `"dash-dot"`. See [Line style](#line-style).                                                                                                                                                                     |
+| `fillColor`              | `string`                             | `"transparent"` | Fill color of the shapes, where applicable (rectangle, rectangle-label, circle).                                                                                                                                                                                         |
+| `backgroundColor`        | `string`                             | `"transparent"` | Background color of the sketch, in hex or rgba format.                                                                                                                                                                                                                   |
+| `backgroundImage`        | `string`                             |                 | URL or data URL of the background image. It is set when the component mounts and when it changes, and removed when it is gone. It takes the place of the background image of `value` and `defaultValue`.                                                                 |
+| `backgroundImageOptions` | `Types.BackgroundOptions`            |                 | Options of `backgroundImage`, those of `setBackgroundFromDataUrl`. Options written inline in a render do not load the image again when their content is the same.                                                                                                        |
+| `opacity`                | `number`                             | `1.0`           | Accepted and not applied: it has no effect. It had no effect in 0.5.x either.                                                                                                                                                                                            |
+| `undoSteps`              | `number`                             | `25`            | Number of undo/redo steps to keep. Read when the component mounts, a later change has no effect.                                                                                                                                                                         |
+| `imageFormat`            | `string`                             |                 | Default format of `toDataURL`, `png` or `jpeg`, used when the options of the call have no `format`. Without it, `png`.                                                                                                                                                   |
+| `value`                  | `object` or `string`                 |                 | Drawing to load, loaded again when it changes. See [Initial, loaded and saved drawings](#initial-loaded-and-saved-drawings).                                                                                                                                             |
+| `forceValue`             | `boolean`                            | `false`         | Load `value` on every update of the component, even when it did not change.                                                                                                                                                                                              |
+| `defaultValue`           | `object` or `string`                 |                 | Drawing loaded when the component mounts, unless `value` is set.                                                                                                                                                                                                         |
+| `widthCorrection`        | `number`                             | `0`             | Pixels subtracted from the width of the container when the canvas is resized. Compensates a border or padding of the container.                                                                                                                                          |
+| `heightCorrection`       | `number`                             | `0`             | Pixels subtracted from the height of the container when the canvas is resized.                                                                                                                                                                                           |
+| `autoresize`             | `boolean`                            | `true`          | Resize the canvas, and scale its objects, when the window is resized. The canvas is always fitted to its container on mount and when `width` or `height` change.                                                                                                         |
+| `pinchZoom`              | `boolean`                            | `true`          | Zoom and pan the view of the canvas with two fingers on a touch screen. See [Pinch zoom](#pinch-zoom).                                                                                                                                                                   |
+| `minZoom`                | `number`                             | `0.5`           | The smallest zoom of the view, 1 being the whole canvas.                                                                                                                                                                                                                 |
+| `maxZoom`                | `number`                             | `8`             | The largest zoom of the view.                                                                                                                                                                                                                                            |
+| `width`                  | `number`                             | undefined       | Width of the sketch in pixels. When not set, the sketch takes the width of its parent element.                                                                                                                                                                           |
+| `height`                 | `number`                             | `512`           | Height of the sketch in pixels.                                                                                                                                                                                                                                          |
+| `className`              | `string`                             |                 | Class name of the container element of the canvas.                                                                                                                                                                                                                       |
+| `style`                  | `CSS.Properties`                     |                 | Style of the container element of the canvas.                                                                                                                                                                                                                            |
+| `onChange`               | `(event?: Event) => void`            |                 | Called 10 ms after every mouse up and mouse out on the canvas, whether or not the drawing changed (see [Known limitations](#known-limitations)), and after `undo`, `redo` and the load of a value. The argument is the DOM event after a mouse event, nothing otherwise. |
+| `onObjectAdded`          | `(event: Types.SketchEvent) => void` | no-op           | An object was added: drawn, pasted, or loaded with a value. Not called when `undo` or `redo` add an object back.                                                                                                                                                         |
+| `onObjectModified`       | `(event: Types.SketchEvent) => void` | no-op           | An object was modified by the user (moved, scaled, rotated).                                                                                                                                                                                                             |
+| `onObjectRemoved`        | `(event: Types.SketchEvent) => void` | no-op           | An object was removed from the sketch.                                                                                                                                                                                                                                   |
+| `onObjectMoving`         | `(event: Types.SketchEvent) => void` | no-op           | An object is being moved.                                                                                                                                                                                                                                                |
+| `onObjectScaling`        | `(event: Types.SketchEvent) => void` | no-op           | An object is being scaled.                                                                                                                                                                                                                                               |
+| `onObjectRotating`       | `(event: Types.SketchEvent) => void` | no-op           | An object is being rotated.                                                                                                                                                                                                                                              |
+| `onMouseDown`            | `(event: Types.SketchEvent) => void` | no-op           | Mouse down on the canvas.                                                                                                                                                                                                                                                |
+| `onMouseMove`            | `(event: Types.SketchEvent) => void` | no-op           | Mouse move on the canvas.                                                                                                                                                                                                                                                |
+| `onMouseUp`              | `(event: Types.SketchEvent) => void` | no-op           | Mouse up on the canvas.                                                                                                                                                                                                                                                  |
+| `onMouseOut`             | `(event: Types.SketchEvent) => void` | no-op           | The mouse left the canvas.                                                                                                                                                                                                                                               |
+| `onViewChange`           | `(view: Types.SketchView) => void`   |                 | The view changed (two fingers, or `resetView()`): `zoom` (1 is the whole canvas) and the origin `x`, `y` of the canvas, in pixels.                                                                                                                                       |
 
 `Types.SketchEvent` is `{ e?: Event; target?: Types.SketchObject; [key: string]: unknown }`: `e` is the
 DOM event, `target` is the object the event is about (object events only). `Types.SketchObject` is
@@ -252,12 +270,15 @@ throws.
 | `toDataURL(options?)`                         | `string`           | The sketch as a data URL. Options: `format` (`"png"` or `"jpeg"`, default `imageFormat`, then `"png"`), `quality` (0 to 1, jpeg only, default 1), `multiplier` (default 1), and the crop area `left`, `top`, `width`, `height`. |
 | `toJSON(propertiesToInclude?)`                | `Types.SketchData` | The sketch as an object. `propertiesToInclude` lists additional properties of the objects to include.                                                                                                                           |
 | `fromJSON(json?)`                             | `void`             | Load a drawing (object or JSON string). Loads after 100 ms, starts the undo history again with the loaded objects, applies the tool configuration again and calls `onChange`. Does nothing for an empty argument.               |
-| `clear(propertiesToInclude?)`                 | `Types.SketchData` | Remove all objects and the background image, and reset the undo history. Returns the discarded content as JSON. The `backgroundColor` property is kept.                                                                         |
-| `addImg(dataUrl, options?)`                   | `void`             | Add an image, given as URL or data URL, as an object. It is added when it has loaded. Options: `left`, `top` (default: random position), `scale` (default `0.5`).                                                               |
+| `clear(propertiesToInclude?)`                 | `Types.SketchData` | Remove all objects, the background image and the overlay image, and reset the undo history. Returns the discarded content as JSON. The `backgroundColor` property is kept.                                                      |
+| `addImg(dataUrl, options?)`                   | `void`             | Add an image, given as URL or data URL, as an object. It is added when it has loaded. Options: `left`, `top` (default: random position), `scale` (default `0.5`), `crossOrigin` (see Background and overlay images).            |
 | `addText(text, options?)`                     | `void`             | Add an editable text. It is centered unless `left` or `top` are given. `options` are the options of a fabric text object, for example `fontSize`, `fill`.                                                                       |
-| `setBackgroundFromDataUrl(dataUrl, options?)` | `void`             | Use an image as background. Options: `stretched` (fill the canvas, the proportions change), `stretchedX` (fit the width), `stretchedY` (fit the height), both together are `stretched`; any other option is an image option.    |
-| `removeBackgroundImage()`                     | `void`             | Remove the background image, also one that is still loading. The objects and the `backgroundColor` are kept. Like `setBackgroundFromDataUrl`, it is not part of the undo history.                                               |
-| `zoom(factor)`                                | `void`             | Scale the objects and the background image by a factor: 2 doubles their size, 0.5 halves it.                                                                                                                                    |
+| `setBackgroundFromDataUrl(dataUrl, options?)` | `void`             | Use an image as background. Options: `stretched` (fill the canvas, the proportions change), `stretchedX` (fit the width), `stretchedY` (fit the height), both are `stretched`; `crossOrigin`; the others are image options.     |
+| `removeBackgroundImage()`                     | `void`             | Remove the background image, also one that is still loading. The objects, the overlay image and the `backgroundColor` are kept. Like `setBackgroundFromDataUrl`, it is not part of the undo history.                            |
+| `setOverlayFromDataUrl(dataUrl, options?)`    | `void`             | Use an image as overlay, above the objects. It takes no mouse events, `toJSON` and `toDataURL` include it, and it is not part of the undo history. The options are those of `setBackgroundFromDataUrl`.                         |
+| `removeOverlayImage()`                        | `void`             | Remove the overlay image, also one that is still loading. The objects, the background image and the `backgroundColor` are kept.                                                                                                 |
+| `zoom(factor)`                                | `void`             | Scale the objects, the background image and the overlay image by a factor: 2 doubles their size, 0.5 halves it.                                                                                                                 |
+| `resetView()`                                 | `void`             | Put the view back to the whole canvas, after it was zoomed or panned with two fingers.                                                                                                                                          |
 | `hasSelection()`                              | `boolean`          | Whether an object is selected.                                                                                                                                                                                                  |
 | `clearSelection()`                            | `void`             | Deselect the selected object or objects.                                                                                                                                                                                        |
 | `removeSelected()`                            | `void`             | Remove the selected object or objects. It can be undone.                                                                                                                                                                        |
@@ -271,27 +292,123 @@ throws.
 Use the tools by name (`"pencil"`), with `Tools` (`Tools.Pencil`) or with the enumeration
 `Types.Tool` (`Types.Tool.PENCIL`).
 
-| Tool            | `Tools`                | Value             | Description                                                                                                                                |
-| --------------- | ---------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Select          | `Tools.Select`         | `select`          | Disables drawing. Objects can be selected, moved, scaled and rotated.                                                                      |
-| Pencil          | `Tools.Pencil`         | `pencil`          | Free drawing.                                                                                                                              |
-| Line            | `Tools.Line`           | `line`            | Straight lines.                                                                                                                            |
-| Arrow           | `Tools.Arrow`          | `arrow`           | Lines with an arrow head.                                                                                                                  |
-| Rectangle       | `Tools.Rectangle`      | `rectangle`       | Rectangles, filled with `fillColor`.                                                                                                       |
-| Rectangle label | `Tools.RectangleLabel` | `rectangle-label` | Rectangles with a text box above them. The text box follows the rectangle when it is moved or scaled.                                      |
-| Circle          | `Tools.Circle`         | `circle`          | Circles, filled with `fillColor`. The drag from the first to the second point is the diameter.                                             |
-| Pan             | `Tools.Pan`            | `pan`             | Disables drawing. Dragging moves the whole canvas, useful after zooming (contributed by [wmaillard](https://github.com/wmaillard)).        |
-| Highlighter     | `Tools.Highlighter`    | `highlighter`     | Free drawing in a semi-transparent color. `lineColor` must be a hex code or a color name; any other value falls back to the default color. |
-| Default tool    | `Tools.DefaultTool`    | `default-tool`    | Disables drawing and selection. Use it to show a drawing that is not edited.                                                               |
+| Tool            | `Tools`                | Value             | Description                                                                                                                                                                              |
+| --------------- | ---------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Select          | `Tools.Select`         | `select`          | Disables drawing. Objects can be selected, moved, scaled and rotated.                                                                                                                    |
+| Pencil          | `Tools.Pencil`         | `pencil`          | Free drawing.                                                                                                                                                                            |
+| Line            | `Tools.Line`           | `line`            | Straight lines.                                                                                                                                                                          |
+| Arrow           | `Tools.Arrow`          | `arrow`           | Lines with an arrow head.                                                                                                                                                                |
+| Rectangle       | `Tools.Rectangle`      | `rectangle`       | Rectangles, filled with `fillColor`.                                                                                                                                                     |
+| Rectangle label | `Tools.RectangleLabel` | `rectangle-label` | Rectangles with a text box above them. The text box follows the rectangle when it is moved or scaled.                                                                                    |
+| Polygon         | `Tools.Polygon`        | `polygon`         | Closed shapes of straight sides, filled with `fillColor`. Each click or tap is a vertex. See [Polygon](#polygon).                                                                        |
+| Circle          | `Tools.Circle`         | `circle`          | Circles, filled with `fillColor`. The drag from the first to the second point is the diameter.                                                                                           |
+| Pan             | `Tools.Pan`            | `pan`             | Disables drawing. Dragging moves the whole canvas, useful after zooming (contributed by [wmaillard](https://github.com/wmaillard)).                                                      |
+| Highlighter     | `Tools.Highlighter`    | `highlighter`     | Free drawing in a semi-transparent color. `lineColor` must be a hex code or a color name; any other value falls back to the default color.                                               |
+| Eraser          | `Tools.Eraser`         | `eraser`          | Erases parts of the objects, with the width of `lineWidth`. The cursor shows the size of the brush. The background color and the background image are not erased. See [Eraser](#eraser). |
+| Laser pointer   | `Tools.LaserPointer`   | `laser-pointer`   | A line that follows the pointer, fades out and disappears. It is not part of the drawing. See [Laser pointer](#laser-pointer).                                                           |
+| Default tool    | `Tools.DefaultTool`    | `default-tool`    | Disables drawing and selection. Use it to show a drawing that is not edited.                                                                                                             |
+
+### Line style
+
+`lineStyle` sets how the line is drawn: `"solid"` (the default), `"dashed"`, `"dotted"` or `"dash-dot"`. The
+dashes and the dots follow `lineWidth` (a line thinner than 2 pixels has the pattern of one of 2), so a
+thick line has long dashes and wide dots.
+
+```tsx
+<Sketch tool={Sketch.Tools.Rectangle} lineWidth={3} lineStyle="dashed" />
+```
+
+The pencil, line, arrow, rectangle, rectangle label, circle and polygon draw it. The head of an arrow and the
+text box of a rectangle label are not dashed, and the highlighter, the eraser and the laser pointer do not
+draw it. A change of `lineStyle` is for the next drawing: what is drawn already keeps its style. The style is
+saved by `toJSON()` and loaded by `fromJSON()` with the object (`strokeDashArray` and `strokeLineCap`), and
+the polygon in progress is shown in it.
+
+### Polygon
+
+Each click or tap places a vertex of the polygon, where the pointer is released, and a line follows the
+pointer from the last vertex (with a finger, while it is down, so the vertex is where it is lifted). A
+polygon needs three vertices, and it is closed in one of three ways, which do nothing with fewer:
+
+- a click or tap on the first vertex, within 10 pixels (20 with a finger), which is ringed when the pointer
+  is near enough;
+- a double click or double tap (two releases within 400 ms and 4 pixels, 10 with a finger), which closes with
+  the vertices placed so far;
+- the Enter key.
+
+The Escape key cancels the polygon in progress. The keys are listened to on the document only while a
+polygon is in progress, and only when the focus is on the page or in the sketch: a button, a field or a
+dialog which has the focus keeps its keys. With more than one sketch on a page, the keys go to the one which
+was pressed last. A polygon in progress is dropped when the sketch is cleared, when a value is loaded, and
+when an undo or a redo is done.
+
+The polygon in progress is drawn on the top canvas of fabric only. It is not an object of the sketch (it is
+not in `toJSON()`, `toDataURL()` or the undo history) until it is closed. Then it is one `fabric.Polygon`
+with the color (`lineColor`), the weight (`lineWidth`) and the fill (`fillColor`, transparent by default) of
+the line, and it is one undo step: `onObjectAdded` is called once with the polygon as `target`, and
+`onChange` is called once, not for each vertex. `onMouseDown` and `onMouseUp` are called for every click.
+Switching to another tool closes a polygon which has three vertices and keeps it, and drops one with fewer.
+Unmounting drops the polygon in progress. `zoom()` and the resize of the canvas scale the polygon in progress
+with the objects. A polygon which crosses itself is drawn as it is.
+
+Once it is closed the polygon is a shape like the others: the select tool moves, scales and rotates it as a
+whole, the eraser cuts it, and `toJSON()` and `fromJSON()` save and load it. The vertices are the `points` of
+the object, in its own space, which is centered on `pathOffset`. To get them in canvas coordinates:
+
+```js
+const matrix = polygon.calcTransformMatrix();
+const vertices = polygon.points.map(({ x, y }) =>
+  fabric.util.transformPoint(
+    new fabric.Point(x - polygon.pathOffset.x, y - polygon.pathOffset.y),
+    matrix
+  )
+);
+```
+
+Moving the vertices of a polygon which is closed is not supported.
+
+### Pinch zoom
+
+On a touch screen, two fingers on the canvas zoom and pan its view: the point between the fingers stays under
+them while the distance between them sets the zoom (between `minZoom` and `maxZoom`), and moving them together
+pans. The canvas cannot be taken out of sight, a quarter of its smaller side stays in the window. Set
+`pinchZoom` to `false` to turn it off, call `resetView()` to go back to the whole canvas, and use `onViewChange`
+to show the zoom.
+
+The view is the viewport of the canvas, the objects stay where they are. So it is not saved by `toJSON()`, not
+an undo step, `onChange` is not called for it, and `toDataURL()` draws the whole drawing, not the part which
+the view shows. This is different from `zoom(factor)`, which scales the objects.
+
+The second finger makes the first one a gesture of the view: what the first finger started is dropped, a line,
+a shape or a free stroke is not drawn and leaves no undo step, and a polygon in progress keeps its vertices
+and places none. Drawing with two fingers at once is not possible. The mouse is not used for this: on a
+desktop the Pan tool moves the view.
+
+### Eraser
+
+The eraser cuts the strokes it draws out of the objects it crosses: a line, a shape, an image or a text.
+A stroke is one undo step. The erased parts are kept on the objects, so `toJSON()` saves them and `value`,
+`defaultValue` and `fromJSON()` load them. An object is only cut where the eraser crosses it, the rest of
+the sketch stays, and the background color and the background image are not erased.
+
+### Laser pointer
+
+The laser pointer points at something on the sketch: the line follows the pointer, gets thinner towards its
+start and disappears about a second after it was drawn. It has the color (`lineColor`) and the weight
+(`lineWidth`) of the line, and it glows in its color.
+
+The line is drawn on the top canvas of fabric only, it is never an object of the sketch. It is not in
+`toJSON()` or `toDataURL()`, it is not an undo step, `onObjectAdded` is not called for it, and `onChange` is
+not called when it is drawn. Switching to another tool clears what is left of the line.
 
 ## Exports
 
-| Export         | Description                                                                                                                                                                                                  |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `SketchField`  | The component (named export). Also usable as a type, for the `ref`.                                                                                                                                          |
-| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`.                                                                        |
-| `Types`        | Namespace of the types: `Tool` (enumeration), `Tools`, `SketchProperties`, `SketchEvent`, `SketchObject`, `SketchValue`, `SketchData`, `DataUrlOptions`, `ImageOptions`, `BackgroundOptions`, `TextOptions`. |
-| default export | The component, which also carries `SketchField` and `Tools` (as in 0.5.x).                                                                                                                                   |
+| Export         | Description                                                                                                                                                                                                               |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SketchField`  | The component (named export). Also usable as a type, for the `ref`.                                                                                                                                                       |
+| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Polygon`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`, `Eraser`, `LaserPointer`.                                                |
+| `Types`        | Namespace of the types: `Tool` (enumeration), `Tools`, `LineStyle`, `SketchProperties`, `SketchEvent`, `SketchObject`, `SketchValue`, `SketchData`, `DataUrlOptions`, `ImageOptions`, `BackgroundOptions`, `TextOptions`. |
+| default export | The component, which also carries `SketchField` and `Tools` (as in 0.5.x).                                                                                                                                                |
 
 ## Known limitations
 
@@ -306,7 +423,7 @@ Use the tools by name (`"pencil"`), with `Tools` (`Tools.Pencil`) or with the en
 - React: `^17.0.0 || ^18.0.0 || ^19.0.0` (peer dependency). The test suite runs on React 19.
 - Browsers: browsers with HTML5 canvas support. No polyfills are included and Internet Explorer 11 is not supported.
 - Server-side rendering has not been tested. Render the component in the browser only.
-- Node.js: the package has no runtime requirement for Node.js. Developing in this repository requires Node.js 22.22.1 or later (`.nvmrc` has 24) and Yarn 1.
+- Node.js: the package has no runtime requirement for Node.js. Developing in this repository requires Node.js 22.22.1 or later (`.nvmrc` has 24) and Yarn 1. The CI runs the checks and the tests on Node.js 22, 24 and 26.
 
 ## Repository layout
 
@@ -315,6 +432,8 @@ This is a Yarn 1 workspaces monorepo.
 | Path                    | Description                                                                                                                                                                     |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/react-sketch` | The library, published to npm as `react-sketch`. The build output is `dist/index.js` (UMD bundle, `react` and `fabric` are external) and `dist/index.d.ts` (type declarations). |
+| `packages/eraser`       | The eraser brush, from `@erase2d/fabric` (private, bundled into `react-sketch`).                                                                                                |
+| `packages/laserpointer` | The laser pointer brush (private, bundled into `react-sketch`).                                                                                                                 |
 | `packages/showcase`     | Demo application (not published): a tools panel and the `defaultValue`, `value` and `addImg` scenarios.                                                                         |
 | `.github/workflows`     | Continuous integration ([ci.yml](.github/workflows/ci.yml)).                                                                                                                    |
 

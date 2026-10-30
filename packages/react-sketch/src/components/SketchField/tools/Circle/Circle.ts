@@ -1,12 +1,13 @@
 import * as fabric from "fabric";
 import { CanvasEvent } from "../../events";
 import { FabricCanvasTool } from "../index";
-import { SketchProperties, Tool } from "../../../../types";
-import { linearDistance } from "../../../../utils";
+import { LineStyle, SketchProperties, Tool } from "../../../../types";
+import { linearDistance, lineStroke } from "../../../../utils";
 
 export class Circle extends FabricCanvasTool {
   private width?: number;
   private color?: string;
+  private style?: LineStyle;
   private fill?: string;
   private isDown: boolean;
   private startX: number;
@@ -25,6 +26,7 @@ export class Circle extends FabricCanvasTool {
     this.setInteractive(false);
     this.width = props.lineWidth ? props.lineWidth : 1;
     this.color = props.lineColor ? props.lineColor : "black";
+    this.style = props.lineStyle;
     this.fill = props.fillColor ? props.fillColor : "transparent";
   }
 
@@ -40,6 +42,7 @@ export class Circle extends FabricCanvasTool {
       originY: "center",
       strokeWidth: this.width,
       stroke: this.color,
+      ...lineStroke(this.style, this.width ?? 1),
       fill: this.fill,
       selectable: false,
       evented: false,
@@ -64,6 +67,10 @@ export class Circle extends FabricCanvasTool {
   }
 
   doMouseUp(): void {
+    this.isDown = false;
+  }
+
+  cancel(): void {
     this.isDown = false;
   }
 

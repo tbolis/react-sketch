@@ -7,7 +7,7 @@ describe("exports", () => {
     expect(typeof SketchField).toEqual("function");
   });
 
-  it("exports Tools with the names and values of 0.5.x", () => {
+  it("exports Tools with the names and values of 0.5.x, and the new tools", () => {
     expect(Tools).toEqual({
       Select: "select",
       Pencil: "pencil",
@@ -15,10 +15,13 @@ describe("exports", () => {
       Arrow: "arrow",
       Rectangle: "rectangle",
       RectangleLabel: "rectangle-label",
+      Polygon: "polygon",
       Circle: "circle",
       Pan: "pan",
       DefaultTool: "default-tool",
       Highlighter: "highlighter",
+      Eraser: "eraser",
+      LaserPointer: "laser-pointer",
     });
   });
 
