@@ -234,8 +234,10 @@ export interface SketchProperties {
   /** Style of the container div of the canvas */
   style?: CSS.Properties;
   /**
-   * Called after a drawing was finished (mouse up, mouse out) and after undo, redo and
-   * loading a value. The argument is the DOM event of the former, nothing in the latter
+   * Called when the mouse was released on the canvas, or left it, after an object was
+   * added, changed or removed since it was pressed, and after undo, redo and loading a
+   * value. Not called for a click which only selects, or for a pointer which comes and
+   * goes. The argument is the DOM event of the former, nothing in the latter
    */
   onChange?: (event?: Event) => void;
   /** Called when an object is added by the user, not when undo or redo add it back */

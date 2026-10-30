@@ -769,23 +769,117 @@ describe("SketchField", () => {
   });
 
   describe("callbacks", () => {
-    it("calls onChange with the DOM event, a moment after mouse up and mouse out", () => {
-      jest.useFakeTimers();
-      const onChange = jest.fn();
-      const { canvas } = mount({ tool: Tool.RECTANGLE, onChange });
+    describe("onChange", () => {
+      beforeEach(() => {
+        jest.useFakeTimers();
+      });
 
-      const up = mouseEvent("mouseup", END);
-      fire(canvas, "mouse:up", up);
-      expect(onChange).not.toHaveBeenCalled();
-      jest.advanceTimersByTime(10);
-      expect(onChange).toHaveBeenCalledTimes(1);
-      expect(onChange).toHaveBeenLastCalledWith(up.e);
+      afterEach(() => {
+        jest.useRealTimers();
+      });
 
-      const out = mouseEvent("mouseout", END);
-      fire(canvas, "mouse:out", out);
-      jest.advanceTimersByTime(10);
-      expect(onChange).toHaveBeenCalledTimes(2);
-      expect(onChange).toHaveBeenLastCalledWith(out.e);
+      it("is called with the DOM event, a moment after the mouse is released on a drawing", () => {
+        const onChange = jest.fn();
+        const { canvas } = mount({ tool: Tool.RECTANGLE, onChange });
+
+        fire(canvas, "mouse:down", mouseEvent("mousedown", START));
+        fire(canvas, "mouse:move", mouseEvent("mousemove", END));
+        const up = mouseEvent("mouseup", END);
+        fire(canvas, "mouse:up", up);
+        expect(onChange).not.toHaveBeenCalled();
+        jest.advanceTimersByTime(10);
+
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(onChange).toHaveBeenLastCalledWith(up.e);
+      });
+
+      it("is called with the DOM event when the mouse leaves the canvas in the middle of a drawing, and once", () => {
+        const onChange = jest.fn();
+        const { canvas } = mount({ tool: Tool.RECTANGLE, onChange });
+
+        fire(canvas, "mouse:down", mouseEvent("mousedown", START));
+        fire(canvas, "mouse:move", mouseEvent("mousemove", END));
+        const out = mouseEvent("mouseout", END);
+        fire(canvas, "mouse:out", out);
+        jest.advanceTimersByTime(10);
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(onChange).toHaveBeenLastCalledWith(out.e);
+
+        // The release outside of the canvas has nothing more to tell
+        fire(canvas, "mouse:up", mouseEvent("mouseup", END));
+        jest.advanceTimersByTime(10);
+        expect(onChange).toHaveBeenCalledTimes(1);
+      });
+
+      it("is called once for each drawing", () => {
+        const onChange = jest.fn();
+        const { canvas } = mount({ tool: Tool.RECTANGLE, onChange });
+
+        objectFromDrag(canvas, START, END);
+        jest.advanceTimersByTime(10);
+        objectFromDrag(canvas, START, END);
+        jest.advanceTimersByTime(10);
+
+        expect(onChange).toHaveBeenCalledTimes(2);
+      });
+
+      it("is not called when the mouse is released or leaves the canvas without a change", () => {
+        const onChange = jest.fn();
+        const { canvas } = mount({ tool: Tool.SELECT, onChange });
+        canvas.add(new fabric.Rect({ left: 0, top: 0, width: 50, height: 50 }));
+
+        // A click which only selects, and a pointer which comes and goes
+        fire(canvas, "mouse:down", mouseEvent("mousedown", START));
+        fire(canvas, "mouse:up", mouseEvent("mouseup", START));
+        fire(canvas, "mouse:out", mouseEvent("mouseout", END));
+        jest.advanceTimersByTime(1000);
+
+        expect(onChange).not.toHaveBeenCalled();
+      });
+
+      it("is not called for the mouse of the pan tool", () => {
+        const onChange = jest.fn();
+        const { canvas } = mount({ tool: Tool.PAN, onChange });
+
+        fire(canvas, "mouse:down", mouseEvent("mousedown", START));
+        fire(canvas, "mouse:move", mouseEvent("mousemove", END));
+        fire(canvas, "mouse:up", mouseEvent("mouseup", END));
+        jest.advanceTimersByTime(1000);
+
+        expect(onChange).not.toHaveBeenCalled();
+      });
+
+      it("is called when an object is moved, and when it is removed", () => {
+        const onChange = jest.fn();
+        const { canvas } = mount({ tool: Tool.SELECT, onChange });
+        const rect = new fabric.Rect({ left: 0, top: 0, width: 50, height: 50 });
+        canvas.add(rect);
+
+        fire(canvas, "mouse:down", mouseEvent("mousedown", START));
+        rect.set({ left: 20 });
+        fire(canvas, "object:modified", { target: rect });
+        fire(canvas, "mouse:up", mouseEvent("mouseup", END));
+        jest.advanceTimersByTime(10);
+        expect(onChange).toHaveBeenCalledTimes(1);
+
+        fire(canvas, "mouse:down", mouseEvent("mousedown", START));
+        canvas.remove(rect);
+        fire(canvas, "mouse:up", mouseEvent("mouseup", END));
+        jest.advanceTimersByTime(10);
+        expect(onChange).toHaveBeenCalledTimes(2);
+      });
+
+      it("is not called for a change made before the press, like an object added by code", () => {
+        const onChange = jest.fn();
+        const { canvas } = mount({ tool: Tool.SELECT, onChange });
+        canvas.add(new fabric.Rect({ left: 0, top: 0, width: 50, height: 50 }));
+
+        fire(canvas, "mouse:down", mouseEvent("mousedown", START));
+        fire(canvas, "mouse:up", mouseEvent("mouseup", START));
+        jest.advanceTimersByTime(1000);
+
+        expect(onChange).not.toHaveBeenCalled();
+      });
     });
 
     it("does not call onChange after the component is unmounted", () => {
