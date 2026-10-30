@@ -46,18 +46,22 @@ export class FabricCanvasEventsManager
 {
   private readonly history: SketchHistory;
   private readonly schedule: (callback: () => void, delay: number) => void;
+  private readonly gesturing: () => boolean;
 
   /**
    * @param history the history of the sketch
    * @param schedule runs the callback after the delay (in milliseconds)
+   * @param gesturing whether the fingers on the screen are a gesture of the view, which draws nothing
    */
   constructor(
     history: SketchHistory,
-    schedule: (callback: () => void, delay: number) => void
+    schedule: (callback: () => void, delay: number) => void,
+    gesturing: () => boolean = () => false
   ) {
     super();
     this.history = history;
     this.schedule = schedule;
+    this.gesturing = gesturing;
   }
 
   /**
@@ -129,7 +133,7 @@ export class FabricCanvasEventsManager
    * the mouse was released or left the canvas.
    */
   private notifyChange({ event, tool, props }: EventInput): void {
-    if (!tool.notifiesChange()) return;
+    if (!tool.notifiesChange() || this.gesturing()) return;
     const { onChange } = props;
     if (onChange) this.schedule(() => onChange(event.e), 10);
   }

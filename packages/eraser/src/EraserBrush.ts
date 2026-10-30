@@ -371,6 +371,8 @@ export class EraserBrush extends fabric.PencilBrush {
     pointer: fabric.Point,
     context: fabric.TEvent<fabric.TPointerEvent>
   ): void {
+    // A second finger does not start a stroke of its own
+    if (!this.canvas._isMainEvent(context.e)) return;
     if (
       !this.eventEmitter.dispatchEvent(
         new CustomEvent("start", { detail: context, cancelable: true })
@@ -550,6 +552,19 @@ export class EraserBrush extends fabric.PencilBrush {
     this.canvas.clearContext(this.canvas.contextTop);
     this.canvas.requestRenderAll();
 
+    this._resetShadow();
+  }
+
+  /**
+   * Drop the stroke in progress, nothing is erased. The canvas stops
+   * drawing it, and the brush is ready for the next one.
+   */
+  cancel(): void {
+    this.active = false;
+    this._disposer?.();
+    delete this._disposer;
+    this.canvas.clearContext(this.canvas.contextTop);
+    this.canvas.requestRenderAll();
     this._resetShadow();
   }
 

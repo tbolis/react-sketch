@@ -90,6 +90,13 @@ export class Polygon extends FabricCanvasTool {
     this.paint();
   }
 
+  /** The press which was going on places nothing, and the pointer is not there any more */
+  cancel(): void {
+    this.isDown = false;
+    this.pointerAt = null;
+    this.paint();
+  }
+
   /** A press which leaves the canvas places nothing */
   doMouseOut(): void {
     this.isDown = false;

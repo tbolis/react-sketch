@@ -1262,8 +1262,9 @@ describe("Polygon", () => {
   });
 
   describe("a second finger", () => {
-    // The canvas does not pass its events on, so it is not a vertex nor a pointer
-    it("is not a pointer of the polygon", () => {
+    // The two fingers are a gesture of the view (pinch zoom), so the first one
+    // places no vertex, and the polygon goes on from the vertices it had
+    it("makes a gesture of the view, which places no vertex", () => {
       const { canvas } = mount();
       tap(canvas, [100, 100]);
       tap(canvas, [200, 100]);
@@ -1279,7 +1280,10 @@ describe("Polygon", () => {
       );
       document.dispatchEvent(touchEvent("touchend", [150, 180]));
       keydown("Enter");
+      expect(polygons(canvas)).toHaveLength(0);
 
+      tap(canvas, [150, 180]);
+      keydown("Enter");
       expect(vertices(polygons(canvas)[0])).toEqual([
         [100, 100],
         [200, 100],

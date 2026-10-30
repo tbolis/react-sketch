@@ -58,6 +58,11 @@ export class LaserBrush extends fabric.BaseBrush {
     return false;
   }
 
+  /** The line which is drawn stays on its own, as when the pointer is released */
+  cancel(): void {
+    this.trails.forEach((trail) => (trail.held = false));
+  }
+
   /**
    * Draw the lines on the top canvas. The canvas calls it when it renders the
    * top canvas while a line is drawn, the animation calls it on every frame.
