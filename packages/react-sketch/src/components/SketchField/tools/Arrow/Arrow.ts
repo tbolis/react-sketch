@@ -1,11 +1,13 @@
 import * as fabric from "fabric";
 import { CanvasEvent } from "../../events";
 import { FabricCanvasTool } from "../index";
-import { SketchProperties, Tool } from "../../../../types";
+import { LineStyle, SketchProperties, Tool } from "../../../../types";
+import { lineStroke } from "../../../../utils";
 
 export class Arrow extends FabricCanvasTool {
   private width: number;
   private color?: string;
+  private style?: LineStyle;
   private isDown: boolean;
   private startX: number;
   private startY: number;
@@ -26,6 +28,7 @@ export class Arrow extends FabricCanvasTool {
     this.setInteractive(false);
     this.width = props.lineWidth ? props.lineWidth : 1;
     this.color = props.lineColor ? props.lineColor : "black";
+    this.style = props.lineStyle;
   }
 
   doMouseDown(event: CanvasEvent): void {
@@ -37,6 +40,7 @@ export class Arrow extends FabricCanvasTool {
       strokeWidth: this.width,
       fill: this.color,
       stroke: this.color,
+      ...lineStroke(this.style, this.width),
       originX: "center",
       originY: "center",
       selectable: false,

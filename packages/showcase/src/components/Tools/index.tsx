@@ -9,6 +9,7 @@ import CanvasSize from "./CanvasSize";
 import ColorSelector from "./ColorSelector";
 import ImageControls from "./ImageControls";
 import LabeledSlider from "./LabeledSlider";
+import LineStyleSelector from "./LineStyleSelector";
 import Overlay from "./Overlay";
 import Section from "./Section";
 import TextControls from "./TextControls";
@@ -51,6 +52,13 @@ const handleSelectTool = (event: MouseEvent<HTMLElement>, value: string | null) 
   CONFIG.selectedTool = value;
 };
 
+/** The tools which draw no line style: their line is a brush, or is not kept */
+const NO_LINE_STYLE: string[] = [
+  Types.Tool.HIGHLIGHTER,
+  Types.Tool.ERASER,
+  Types.Tool.LASER_POINTER,
+];
+
 const SketchTools = (props: Config): ReactElement => {
   return (
     <Paper sx={{ p: 1, color: "text.secondary" }}>
@@ -58,7 +66,7 @@ const SketchTools = (props: Config): ReactElement => {
       <Section
         id="stroke"
         title="Line"
-        chip={`${props.lineWidth}px`}
+        chip={`${props.lineWidth}px ${props.lineStyle}`}
         defaultExpanded>
         <LabeledSlider
           label="Line Weight"
@@ -68,6 +76,10 @@ const SketchTools = (props: Config): ReactElement => {
           startIcon={<RemoveIcon />}
           endIcon={<AddIcon />}
           onChange={(value) => (CONFIG.lineWidth = value)}
+        />
+        <LineStyleSelector
+          selected={props.lineStyle}
+          disabled={NO_LINE_STYLE.includes(props.selectedTool)}
         />
       </Section>
       <ColorSelector

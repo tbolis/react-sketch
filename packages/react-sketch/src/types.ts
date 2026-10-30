@@ -141,6 +141,12 @@ export interface BackgroundOptions {
 export type TextOptions = Record<string, unknown>;
 
 /**
+ * How a line is drawn: unbroken, in dashes, in dots, or in dashes and dots.
+ * The lengths follow `lineWidth`.
+ */
+export type LineStyle = "solid" | "dashed" | "dotted" | "dash-dot";
+
+/**
  * Properties of the SketchField component
  */
 export interface SketchProperties {
@@ -154,6 +160,12 @@ export interface SketchProperties {
   lineColor?: string;
   /** The width of the line. Defaults to 10 */
   lineWidth?: number;
+  /**
+   * The style of the line, see {@link LineStyle}. Defaults to "solid". The
+   * pencil, line, arrow (its shaft), rectangle, rectangle label, circle and
+   * polygon draw it, the highlighter, eraser and laser pointer do not.
+   */
+  lineStyle?: LineStyle;
   /** The fill color of the shape when applicable. Defaults to "transparent" */
   fillColor?: string;
   /** The background color of the sketch, in rgba or hex format. Defaults to "transparent" */

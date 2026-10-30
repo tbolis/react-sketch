@@ -1,7 +1,8 @@
 /*eslint @typescript-eslint/no-unused-vars: 0,@typescript-eslint/no-empty-function: 0*/
 
 import * as fabric from "fabric";
-import { SketchProperties, Tool } from "../../../types";
+import { LineStyle, SketchProperties, Tool } from "../../../types";
+import { lineStroke } from "../../../utils";
 import { EraserBrush } from "@react-sketch/eraser";
 import { CanvasEvent, EventInput } from "../events";
 
@@ -150,6 +151,18 @@ export abstract class FabricCanvasTool {
     if (current && !(current instanceof EraserBrush)) return current;
     current?.dispose();
     return (this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas));
+  }
+
+  /**
+   * Set the line style of the brush. The brush is kept from a tool to the
+   * next, so a tool which does not draw a style (the highlighter) calls this
+   * with none, and the style of the pencil is not left on it.
+   */
+  protected setBrushStroke(style: LineStyle | undefined, width: number): void {
+    const brush = this.brush;
+    brush.strokeDashArray = null;
+    brush.strokeLineCap = "round";
+    Object.assign(brush, lineStroke(style, width));
   }
 
   /**

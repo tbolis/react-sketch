@@ -42,6 +42,7 @@ const SketchCanvas = (props: Config): ReactElement => {
         tool={props.selectedTool}
         lineColor={props.lineColor}
         lineWidth={props.lineWidth}
+        lineStyle={props.lineStyle}
         fillColor={props.fillWithColor ? props.fillColor : "transparent"}
         backgroundColor={
           props.fillWithBackgroundColor ? props.backgroundColor : "transparent"

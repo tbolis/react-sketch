@@ -254,6 +254,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     } else if (
       props.lineColor !== prevProps.lineColor ||
       props.lineWidth !== prevProps.lineWidth ||
+      props.lineStyle !== prevProps.lineStyle ||
       props.fillColor !== prevProps.fillColor
     ) {
       this.configureTool();
