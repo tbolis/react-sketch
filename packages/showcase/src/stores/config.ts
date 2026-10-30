@@ -73,7 +73,7 @@ export const createDrawing = (src: string): Drawing => ({
 
 export class ConfigStore implements Config {
   public scenario: Scenario = "playground";
-  public selectedTool = "line";
+  public selectedTool = Types.Tool.PENCIL;
   public lineColor = "#000000";
   public lineWidth = 1;
   public lineStyle: Types.LineStyle = "solid";
