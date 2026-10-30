@@ -2,7 +2,7 @@
 
 ## 1.1.0 (unreleased)
 
-The eraser and laser pointer tools, and features that forks of react-sketch had, written again for the TypeScript code and fabric 7.
+The eraser, laser pointer and polygon tools, and features that forks of react-sketch had, written again for the TypeScript code and fabric 7.
 
 ### Added
 
@@ -36,6 +36,17 @@ The eraser and laser pointer tools, and features that forks of react-sketch had,
   is left of the line.
 - The showcase has a Laser pointer button in the tool selector. The laser pointer keeps its own line color
   and weight (red, 8px to start with), apart from the other tools.
+- The polygon tool (#96): `tool="polygon"`, `Tools.Polygon` and `Types.Tool.POLYGON`. Each click or tap
+  places a vertex, where the pointer is released, and a line follows the pointer from the last one (on
+  touch, while the finger is down). The polygon is closed by a click or tap on the first vertex (within 10
+  pixels, 20 on touch), by a double click or double tap, or by the Enter key, and the Escape key cancels
+  it. It needs three vertices. It takes `lineColor`, `lineWidth` and `fillColor` as the rectangle does. The
+  polygon in progress is only drawn on the top canvas: when it is closed it is one `fabric.Polygon` and one
+  undo step, `onObjectAdded` is called once with it, and `onChange` is called once, not for each vertex. Its
+  vertices are in `points` of the object. Switching to another tool keeps a polygon with three vertices and
+  drops one with fewer, and `zoom()` and the resize of the canvas scale the polygon in progress with the
+  objects.
+- The showcase has a Polygon button in the tool selector, with a hint of how to close the polygon.
 
 ### Changed
 

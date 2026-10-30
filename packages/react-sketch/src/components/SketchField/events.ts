@@ -1,5 +1,5 @@
 import type { FabricObject, TPointerEvent } from "fabric";
-import { SketchEvent, SketchProperties, Tool } from "../../types";
+import { SketchEvent, SketchProperties } from "../../types";
 import { SketchHistory } from "./history/SketchHistory";
 import { AbstractEventAware, CanvasEventAware, FabricCanvasTool } from "./tools";
 
@@ -122,8 +122,7 @@ export class FabricCanvasEventsManager
    * the mouse was released or left the canvas.
    */
   private notifyChange({ event, tool, props }: EventInput): void {
-    // The line of the laser pointer is not part of the sketch
-    if (tool.type() === Tool.LASER_POINTER) return;
+    if (!tool.notifiesChange()) return;
     const { onChange } = props;
     if (onChange) this.schedule(() => onChange(event.e), 10);
   }

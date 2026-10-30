@@ -17,6 +17,7 @@ import { autoresize, scaleContent } from "./resize";
 import { FabricCanvasTool } from "./tools";
 import { create_tool } from "./tools/factory";
 import { Eraser } from "./tools/Eraser";
+import { Polygon } from "./tools/Polygon";
 
 /**
  * The properties which always have a value, because SketchField provides
@@ -223,7 +224,10 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     this.history = new SketchHistory(this.canvas, undoSteps);
     // Loading a value clears the canvas first: the history starts again with the
     // loaded objects, and only when the load works
-    this.canvas.onClear = () => this.history.clear();
+    this.canvas.onClear = () => {
+      this.history.clear();
+      this.tool.reset();
+    };
 
     // Bind Events to Actions
     this._bind_canvas_events(
@@ -305,9 +309,15 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * Use the tool of the properties, from now on
    */
   private selectTool(): void {
+    this.tool?.finish();
     this.tool?.dispose();
     this.withToolProps((props) => {
       this.tool = create_tool(this.canvas, props);
+      if (this.tool instanceof Polygon) {
+        this.tool.onComplete = () => {
+          if (this.mounted) this.props.onChange?.();
+        };
+      }
       if (this.tool instanceof Eraser) {
         this.tool.onErase = (erasures) => {
           if (!this.mounted) return;
@@ -332,7 +342,13 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     const container = this.containerEl.current;
     if (!container) return;
     const { widthCorrection, heightCorrection } = this.props;
-    autoresize(this.canvas, container, widthCorrection, heightCorrection);
+    const factors = autoresize(
+      this.canvas,
+      container,
+      widthCorrection,
+      heightCorrection
+    );
+    if (factors) this.tool.scale(factors.x, factors.y);
   }
 
   /**
@@ -419,6 +435,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    */
   zoom = (factor: number): void => {
     scaleContent(this.canvas, factor, factor);
+    this.tool.scale(factor, factor);
     this.canvas.renderAll();
     this.canvas.calcOffset();
   };
@@ -427,14 +444,20 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * Perform an undo operation on canvas, if it cannot undo it will leave the canvas intact
    */
   undo = (): void => {
-    if (this.history.undo()) this.props.onChange?.();
+    if (this.history.undo()) {
+      this.tool.reset();
+      this.props.onChange?.();
+    }
   };
 
   /**
    * Perform a redo operation on canvas, if it cannot redo it will leave the canvas intact
    */
   redo = (): void => {
-    if (this.history.redo()) this.props.onChange?.();
+    if (this.history.redo()) {
+      this.tool.reset();
+      this.props.onChange?.();
+    }
   };
 
   /**

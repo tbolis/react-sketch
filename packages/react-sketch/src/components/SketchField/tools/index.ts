@@ -78,10 +78,39 @@ export abstract class FabricCanvasTool {
   abstract configureCanvas(props: SketchProperties): void;
 
   /**
+   * Called when another tool takes over, before `dispose()`, for the tools
+   * which have something unfinished to complete (it is not called when the
+   * canvas goes away)
+   */
+  finish(): void {}
+
+  /**
    * Called when another tool takes over, and when the canvas goes away, for
    * the tools which keep something running on the canvas
    */
   dispose(): void {}
+
+  /**
+   * Called when the content of the canvas is replaced (it is cleared, a value
+   * is loaded, an undo or a redo is done), for the tools which hold something
+   * drawn on it
+   */
+  reset(): void {}
+
+  /**
+   * Called when the sketch scales its objects (`zoom()`, and the resize of the
+   * canvas), for the tools which hold coordinates of their own
+   */
+  scale(xFactor: number, yFactor: number): void {}
+
+  /**
+   * Whether the application is told about a change (`onChange`) when the
+   * mouse is released or leaves the canvas. The tools which do not change the
+   * sketch on every release say no, and tell the application themselves.
+   */
+  notifiesChange(): boolean {
+    return true;
+  }
 
   doMouseUp(event: CanvasEvent): void {}
 

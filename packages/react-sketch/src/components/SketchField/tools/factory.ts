@@ -10,6 +10,7 @@ import { LaserPointer } from "./LaserPointer";
 import { Line } from "./Line";
 import { Pan } from "./Pan";
 import { Pencil } from "./Pencil";
+import { Polygon } from "./Polygon";
 import { Rectangle } from "./Rectangle";
 import { RectangleLabel } from "./RectangleLabel";
 import { Select } from "./Select";
@@ -42,6 +43,9 @@ export const create_tool = (
       break;
     case Tool.RECTANGLE_LABEL:
       toolInstance = new RectangleLabel(canvas);
+      break;
+    case Tool.POLYGON:
+      toolInstance = new Polygon(canvas);
       break;
     case Tool.SELECT:
       toolInstance = new Select(canvas);

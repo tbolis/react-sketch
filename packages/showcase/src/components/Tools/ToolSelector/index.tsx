@@ -6,6 +6,7 @@ import LineIcon from "@mui/icons-material/Straighten";
 import ArrowIcon from "@mui/icons-material/NorthEast";
 import RectangleIcon from "@mui/icons-material/CropSquare";
 import RectangleLabelIcon from "@mui/icons-material/Label";
+import PolygonIcon from "@mui/icons-material/Pentagon";
 import CircleIcon from "@mui/icons-material/RadioButtonUnchecked";
 import PanIcon from "@mui/icons-material/PanTool";
 import HighlighterIcon from "@mui/icons-material/Highlight";
@@ -32,6 +33,13 @@ const TOOLS = [
     label: "Rectangle label",
     icon: <RectangleLabelIcon />,
   },
+  {
+    value: Types.Tool.POLYGON,
+    label: "Polygon",
+    title:
+      "Polygon: click to add points, close it with the first point, a double click or Enter, Esc cancels",
+    icon: <PolygonIcon />,
+  },
   { value: Types.Tool.CIRCLE, label: "Circle", icon: <CircleIcon /> },
   { value: Types.Tool.PAN, label: "Pan", icon: <PanIcon /> },
   { value: Types.Tool.HIGHLIGHTER, label: "Highlighter", icon: <HighlighterIcon /> },
@@ -57,11 +65,16 @@ const ToolSelector = (props: ToolSelectorProps): ReactElement => {
             key={tool.value}
             value={tool.value}
             aria-label={tool.label}
-            title={tool.label}>
+            title={tool.title ?? tool.label}>
             {tool.icon}
           </ToggleButton>
         ))}
       </ToggleButtonGroup>
+      {props.selected === Types.Tool.POLYGON && (
+        <Typography variant="caption" component="p" sx={{ mt: 1 }}>
+          Click points. First point closes.
+        </Typography>
+      )}
       {props.selected === Types.Tool.LASER_POINTER && (
         <Typography variant="caption" component="p" sx={{ mt: 1 }}>
           Drag over the canvas to point at something. The line fades out and is not

@@ -29,6 +29,11 @@ export class LaserPointer extends FabricCanvasTool {
     return Tool.LASER_POINTER;
   }
 
+  /** The line is not part of the sketch, so there is nothing to tell */
+  notifiesChange(): boolean {
+    return false;
+  }
+
   /** The line is gone with the tool, it does not fade on while another tool is in use */
   dispose(): void {
     const current = this.canvas.freeDrawingBrush;
