@@ -69,6 +69,7 @@ The eraser, laser pointer and polygon tools, pinch zoom, and features that forks
 - `toDataURL()` draws the whole drawing, whatever the zoom and pan of the view of the canvas (pinch zoom, and
   the pan tool, which moved what the image showed).
 - `clear()` also removes the overlay image.
+- The showcase starts with the pencil tool selected, it was the line.
 - When several images are asked for the overlay (or the background), only the last request is set.
 
 ### Fixed
