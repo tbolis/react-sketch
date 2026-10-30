@@ -56,9 +56,26 @@ const clear = () => {
   withSketch((sketch) => sketch.clear());
   CONFIG.controlledValue = undefined;
   CONFIG.fillWithBackgroundColor = false;
+  // What was scaled is gone
+  CONFIG.zoomFactor = 1;
   // The canvas does not announce it
   syncState();
 };
+
+/** The buttons scale the drawing (`zoom()`), which is not the view of the fingers */
+const zoomBy = (factor: number) =>
+  withSketch((sketch) => {
+    sketch.zoom(factor);
+    CONFIG.zoomFactor *= factor;
+  });
+
+/** Back to the whole canvas: what the buttons scaled, and what the fingers zoomed and panned */
+const resetView = () =>
+  withSketch((sketch) => {
+    if (CONFIG.zoomFactor !== 1) sketch.zoom(1 / CONFIG.zoomFactor);
+    CONFIG.zoomFactor = 1;
+    sketch.resetView();
+  });
 
 const copy = () =>
   withSketch((sketch) => {
@@ -131,19 +148,13 @@ const CanvasActions = ({
       </Action>
     </Stack>
     <Stack direction="row">
-      <Action
-        label="Zoom in"
-        onClick={() => withSketch((sketch) => sketch.zoom(1.25))}>
+      <Action label="Zoom in" onClick={() => zoomBy(1.25)}>
         <ZoomInIcon />
       </Action>
-      <Action
-        label="Zoom out"
-        onClick={() => withSketch((sketch) => sketch.zoom(0.8))}>
+      <Action label="Zoom out" onClick={() => zoomBy(0.8)}>
         <ZoomOutIcon />
       </Action>
-      <Action
-        label="Reset view (the zoom and the pan of the fingers)"
-        onClick={() => withSketch((sketch) => sketch.resetView())}>
+      <Action label="Reset zoom and view" onClick={resetView}>
         <ResetViewIcon />
       </Action>
     </Stack>

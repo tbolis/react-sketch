@@ -20,7 +20,7 @@ const ViewControls = (props: ViewControlsProps): ReactElement => {
       <Typography variant="body2" sx={{ mb: 1 }}>
         Two fingers on the canvas zoom and pan its view. The drawing is not changed:
         the view is not saved, not an undo step, and not in the download. The reset
-        view button is above the canvas.
+        button above the canvas also takes back the zoom in and zoom out buttons.
       </Typography>
       <FormControlLabel
         label="Pinch zoom"

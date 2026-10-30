@@ -35,6 +35,7 @@ const selectScenario = (scenario: Scenario) => {
   CONFIG.hasSelection = false;
   CONFIG.canPaste = false;
   CONFIG.view = INITIAL_VIEW;
+  CONFIG.zoomFactor = 1;
 };
 
 const ScenarioTabs = ({ scenario }: Pick<Config, "scenario">): ReactElement => (
@@ -78,7 +79,11 @@ const ScenarioControls = ({
             <Button
               variant="outlined"
               // A new object, so that the canvas reloads the value on every click
-              onClick={() => (CONFIG.controlledValue = { ...controlledValue })}>
+              onClick={() => {
+                CONFIG.controlledValue = { ...controlledValue };
+                // The value is loaded as it is, not scaled by the buttons
+                CONFIG.zoomFactor = 1;
+              }}>
               Load controlled Value
             </Button>
             <FormControlLabel
