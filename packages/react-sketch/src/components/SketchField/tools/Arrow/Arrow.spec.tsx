@@ -86,4 +86,62 @@ describe("Arrow", () => {
     expect(arrow.selectable).toBe(true);
     expect(arrow.evented).toBe(true);
   });
+
+  describe("in the history", () => {
+    it("is one undo step, which undo and redo take off and put back", () => {
+      const { sketch, canvas } = mount();
+      drag(canvas, [100, 100], [300, 100]);
+      const [arrow] = arrows(canvas);
+
+      sketch.undo();
+      expect(canvas.getObjects()).toHaveLength(0);
+      expect(sketch.canUndo()).toBe(false);
+
+      sketch.redo();
+      expect(canvas.getObjects()).toEqual([arrow]);
+      expect(sketch.canRedo()).toBe(false);
+    });
+
+    it("takes one undo for each arrow, and brings none of the line and head loose", () => {
+      const { sketch, canvas } = mount();
+      drag(canvas, [100, 100], [300, 100]);
+      drag(canvas, [100, 200], [300, 200]);
+      const [first, second] = arrows(canvas);
+
+      sketch.undo();
+      expect(canvas.getObjects()).toEqual([first]);
+      sketch.undo();
+      expect(canvas.getObjects()).toHaveLength(0);
+      expect(sketch.canUndo()).toBe(false);
+
+      sketch.redo();
+      sketch.redo();
+      expect(canvas.getObjects()).toEqual([first, second]);
+      expect(sketch.canRedo()).toBe(false);
+    });
+
+    it("calls onObjectAdded once with the arrow, and onObjectRemoved not at all", () => {
+      const onObjectAdded = jest.fn();
+      const onObjectRemoved = jest.fn();
+      const { canvas } = mount({ onObjectAdded, onObjectRemoved });
+      drag(canvas, [100, 100], [300, 100]);
+
+      expect(onObjectAdded).toHaveBeenCalledTimes(1);
+      expect(onObjectAdded.mock.calls[0][0].target).toBe(arrows(canvas)[0]);
+      expect(onObjectRemoved).not.toHaveBeenCalled();
+    });
+
+    it("still tells the application of the objects it removes", () => {
+      const onObjectRemoved = jest.fn();
+      const { sketch, canvas } = mount({ onObjectRemoved });
+      drag(canvas, [100, 100], [300, 100]);
+      const [arrow] = arrows(canvas);
+
+      canvas.setActiveObject(arrow);
+      sketch.removeSelected();
+
+      expect(onObjectRemoved).toHaveBeenCalledTimes(1);
+      expect(onObjectRemoved.mock.calls[0][0].target).toBe(arrow);
+    });
+  });
 });

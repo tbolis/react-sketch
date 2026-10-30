@@ -60,6 +60,9 @@ The eraser, laser pointer and polygon tools, and features that forks of react-sk
 - The arrow tool: an arrow which is drawn is not selectable, as the other shapes are. A press on an earlier
   arrow selected it and a drag moved it, instead of drawing the new arrow, so an arrow could not be drawn
   over or across another one.
+- The arrow tool: an arrow is one undo step, and `onObjectAdded` is called once with it, and
+  `onObjectRemoved` is not called. The line and the head which are shown while the arrow is drawn were
+  recorded and announced too, so an arrow took three undos, and `onObjectAdded` was called three times.
 
 ### Packaging and tooling
 

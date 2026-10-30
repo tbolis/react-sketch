@@ -98,6 +98,15 @@ export abstract class FabricCanvasTool {
   reset(): void {}
 
   /**
+   * Whether the object is one which the tool shows while it draws, and takes
+   * off for the final one. It is not an action of the user, so it is not in
+   * the history, and `onObjectAdded` and `onObjectRemoved` are not called for it.
+   */
+  isPreview(object: fabric.FabricObject): boolean {
+    return false;
+  }
+
+  /**
    * Called when the sketch scales its objects (`zoom()`, and the resize of the
    * canvas), for the tools which hold coordinates of their own
    */
