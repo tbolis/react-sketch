@@ -7,7 +7,7 @@ import { CONFIG, type Config } from "../../stores/config";
 import CanvasActions from "./CanvasActions";
 import Drawings from "./Drawings";
 import { ScenarioControls, ScenarioTabs } from "./Scenarios";
-import { sketchRef, syncState } from "./sketchRef";
+import { sketchRef, syncChange, syncState } from "./sketchRef";
 
 const style = { backgroundColor: teal[50] };
 
@@ -73,11 +73,11 @@ const SketchCanvas = (props: Config): ReactElement => {
         value={controlled ? props.controlledValue : undefined}
         forceValue={controlled && props.forceValue}
         // The canvas announces a change after drawing, undo, redo and loading a value
-        onChange={syncState}
+        onChange={syncChange}
         // The selection changes with the mouse, and the objects with the actions
         onMouseUp={syncState}
-        onObjectAdded={syncState}
-        onObjectRemoved={syncState}
+        onObjectAdded={syncChange}
+        onObjectRemoved={syncChange}
       />
       <Drawings drawings={props.drawings} />
     </Paper>

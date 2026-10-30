@@ -11,6 +11,7 @@ import ImageControls from "./ImageControls";
 import LabeledSlider from "./LabeledSlider";
 import LineStyleSelector from "./LineStyleSelector";
 import Overlay from "./Overlay";
+import Preview from "./Preview";
 import Section from "./Section";
 import TextControls from "./TextControls";
 import ViewControls from "./ViewControls";
@@ -100,6 +101,7 @@ const SketchTools = (props: Config): ReactElement => {
         stretchedX={props.stretchedX}
         stretchedY={props.stretchedY}
       />
+      <Preview preview={props.preview} view={props.view} />
       <ViewControls
         pinchZoom={props.pinchZoom}
         minZoom={props.minZoom}
