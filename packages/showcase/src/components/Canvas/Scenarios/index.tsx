@@ -36,6 +36,7 @@ const selectScenario = (scenario: Scenario) => {
   CONFIG.canPaste = false;
   CONFIG.view = INITIAL_VIEW;
   CONFIG.zoomFactor = 1;
+  CONFIG.preview = "";
 };
 
 const ScenarioTabs = ({ scenario }: Pick<Config, "scenario">): ReactElement => (
