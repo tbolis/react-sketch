@@ -64,7 +64,8 @@ export class FabricCanvasEventsManager
    * Action when an object is added to the canvas. The objects which undo and
    * redo add back are not new, so they are not recorded nor announced.
    */
-  public onObjectAdded({ event, props }: EventInput): void {
+  public onObjectAdded({ event, tool, props }: EventInput): void {
+    if (this.isPreview(event, tool)) return;
     // Only erasable objects are affected by the eraser
     if (event.target) (event.target as { erasable?: boolean }).erasable = true;
     if (this.history.replaying) return;
@@ -77,7 +78,8 @@ export class FabricCanvasEventsManager
     props.onObjectModified?.(sketchEvent(event));
   }
 
-  public onObjectRemoved({ event, props }: EventInput): void {
+  public onObjectRemoved({ event, tool, props }: EventInput): void {
+    if (this.isPreview(event, tool)) return;
     props.onObjectRemoved?.(sketchEvent(event));
   }
 
@@ -115,6 +117,11 @@ export class FabricCanvasEventsManager
     this.history.onMouseUp();
     this.notifyChange({ event, tool, props });
     props.onMouseUp?.(sketchEvent(event));
+  }
+
+  /** Whether the object of the event is one the tool only shows while it draws */
+  private isPreview({ target }: CanvasEvent, tool: FabricCanvasTool): boolean {
+    return !!target && tool.isPreview(target);
   }
 
   /**

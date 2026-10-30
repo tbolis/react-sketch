@@ -100,6 +100,11 @@ export class Arrow extends FabricCanvasTool {
     this.isDown = false;
   }
 
+  /** The line and the head are the arrow until it is released: then the group is */
+  isPreview(object: fabric.FabricObject): boolean {
+    return object === this.line || object === this.head;
+  }
+
   type(): Tool {
     return Tool.ARROW;
   }
