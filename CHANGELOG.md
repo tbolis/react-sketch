@@ -84,6 +84,11 @@ The eraser, laser pointer and polygon tools, pinch zoom, and features that forks
 - The arrow tool: an arrow is one undo step, and `onObjectAdded` is called once with it, and
   `onObjectRemoved` is not called. The line and the head which are shown while the arrow is drawn were
   recorded and announced too, so an arrow took three undos, and `onObjectAdded` was called three times.
+- The tools which draw a shape or pan (line, arrow, rectangle, rectangle label, circle, polygon, pan and
+  the default tool) freeze the objects which are added while they are in use too: an image from `addImg()`,
+  a text from `addText()`, a pasted object, and one which undo brings back. They were selectable, so a press
+  on an image drew nothing and moved the image instead, with the arrow or any other of these tools. They are
+  selectable again when the select tool takes over.
 
 ### Packaging and tooling
 

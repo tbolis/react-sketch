@@ -76,6 +76,12 @@ export class FabricCanvasEventsManager
    */
   public onObjectAdded({ event, tool, props }: EventInput): void {
     if (this.isPreview(event, tool)) return;
+    // What is added while a tool draws (an image, a text, a pasted object, one which
+    // undo brings back) is frozen like the rest: a press on it would select it and
+    // a drag would move it, instead of drawing
+    if (event.target && !tool.isInteractive()) {
+      event.target.set({ selectable: false, evented: false });
+    }
     // Only erasable objects are affected by the eraser
     if (event.target) (event.target as { erasable?: boolean }).erasable = true;
     if (this.history.replaying) return;
