@@ -26,6 +26,8 @@ export interface Config {
   maxZoom: number;
   /** The view of the canvas, as it reports it */
   view: Types.SketchView;
+  /** A small copy of the whole drawing, as a data URL. Empty when there is none yet */
+  preview: string;
   /** What the zoom in and zoom out buttons scaled the drawing by, 1 when they did not */
   zoomFactor: number;
   fillWithColor: boolean;
@@ -81,6 +83,7 @@ export class ConfigStore implements Config {
   public minZoom = 0.5;
   public maxZoom = 8;
   public view: Types.SketchView = INITIAL_VIEW;
+  public preview = "";
   public zoomFactor = 1;
   public fillWithColor = false;
   public fillColor = "#68ccca";

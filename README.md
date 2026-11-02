@@ -197,6 +197,43 @@ export const Editor = ({ imageUrl }: { imageUrl: string }) => {
 };
 ```
 
+### A preview of the drawing
+
+`toDataURL()` draws the whole drawing, whatever the zoom and the pan of the view, so a small copy of it,
+drawn again after each change, is a preview (or a minimap) of the sketch:
+
+```tsx
+import { useRef, useState } from "react";
+import { SketchField } from "react-sketch";
+
+export const WithPreview = () => {
+  const sketch = useRef<SketchField>(null);
+  const [preview, setPreview] = useState("");
+  const refresh = () =>
+    setPreview(sketch.current?.toDataURL({ multiplier: 0.25 }) ?? "");
+
+  return (
+    <>
+      <SketchField
+        ref={sketch}
+        onChange={refresh}
+        onObjectAdded={refresh}
+        onObjectRemoved={refresh}
+      />
+      {preview && <img src={preview} alt="Preview of the drawing" />}
+    </>
+  );
+};
+```
+
+`onChange` is called for a drawing, `undo`, `redo` and the load of a value. `onObjectAdded` and
+`onObjectRemoved` also tell of the objects which code adds or removes (`addText()`, `addImg()`, `paste()`,
+`removeSelected()`). `zoom()` and `clear()` tell nothing, so draw the preview again after them. With
+`onViewChange`, a frame on the preview can show what the canvas shows: the visible part starts at
+`-x / zoom`, `-y / zoom` in canvas pixels, and is the size of the canvas divided by `zoom`. The showcase has
+this in its Preview section. `toDataURL()` throws for a canvas with an image of another site which does not
+allow it (CORS), so catch it where that can happen.
+
 ### Background and overlay images
 
 - The background image is drawn under the objects. Set it with the `backgroundImage` property (and `backgroundImageOptions`), or with `setBackgroundFromDataUrl` and `removeBackgroundImage`. The property takes the place of the background image of a `value`.
