@@ -92,6 +92,10 @@ The eraser, laser pointer and polygon tools, pinch zoom, and features that forks
   a text from `addText()`, a pasted object, and one which undo brings back. They were selectable, so a press
   on an image drew nothing and moved the image instead, with the arrow or any other of these tools. They are
   selectable again when the select tool takes over.
+- The rectangle label tool: the canvas has two listeners for all the labels, not two more for each label
+  that is drawn. They were never removed, so they stayed after a label was deleted or the canvas was
+  cleared, and a canvas that is drawn on for long kept more of them. A label still follows its rectangle
+  when undo and redo take it off the canvas and put it back.
 
 ### Packaging and tooling
 
