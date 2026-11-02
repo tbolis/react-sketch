@@ -69,6 +69,7 @@ export abstract class AbstractEventAware implements CanvasEventAware {
  */
 export abstract class FabricCanvasTool {
   private readonly _canvas: fabric.Canvas;
+  private interactive = true;
 
   protected constructor(canvas: fabric.Canvas) {
     this._canvas = canvas;
@@ -97,6 +98,17 @@ export abstract class FabricCanvasTool {
    * the tools which keep something running on the canvas
    */
   dispose(): void {}
+
+  /**
+   * Whether the objects can be selected and moved with the tool. It is not for
+   * the tools which freeze them, so a press on an object draws instead of
+   * moving it: the objects which are added while the tool is in use are frozen
+   * too. The tools which draw free hand leave them as they are, as fabric
+   * does not select an object in drawing mode.
+   */
+  isInteractive(): boolean {
+    return this.interactive;
+  }
 
   /**
    * Called when the content of the canvas is replaced (it is cleared, a value
@@ -178,6 +190,7 @@ export abstract class FabricCanvasTool {
    * Free drawing is turned off in both.
    */
   protected setInteractive(interactive: boolean): void {
+    this.interactive = interactive;
     this.canvas.isDrawingMode = false;
     this.canvas.selection = interactive;
     this.canvas.forEachObject((o) => (o.selectable = o.evented = interactive));
