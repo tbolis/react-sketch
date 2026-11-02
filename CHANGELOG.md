@@ -71,6 +71,10 @@ The eraser, laser pointer and polygon tools, pinch zoom, and features that forks
 - `clear()` also removes the overlay image.
 - The showcase starts with the pencil tool selected, it was the line.
 - When several images are asked for the overlay (or the background), only the last request is set.
+- `onChange` is called when the sketch changed, and not after every mouse up and mouse out (#80): an object
+  was added, changed or removed since the mouse was pressed. A click which only selects, a drag of the pan
+  tool and a pointer which comes and goes do not call it, and a drawing which the mouse leaves the canvas
+  in the middle of calls it once. `undo`, `redo` and the load of a value call it as before.
 
 ### Fixed
 
