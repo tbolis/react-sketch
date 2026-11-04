@@ -1,7 +1,41 @@
+const fs = require("fs");
 const path = require("path");
+const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const port = 23000;
+
+/**
+ * Where the showcase is deployed (GitHub Pages). The link preview of the page (Open Graph
+ * and Twitter card) needs absolute URLs, a relative one shows no image.
+ */
+const siteUrl = "https://tbolis.github.io/react-sketch/";
+
+/** The files of public/ which the build copies as they are, the page links them by name */
+const staticFiles = ["og-image.png", "apple-touch-icon.png", "favicon-32.png"];
+
+class CopyStaticFiles {
+  apply(compiler) {
+    compiler.hooks.thisCompilation.tap("CopyStaticFiles", (compilation) => {
+      compilation.hooks.processAssets.tap(
+        {
+          name: "CopyStaticFiles",
+          stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
+        },
+        () => {
+          for (const name of staticFiles) {
+            const file = path.join(__dirname, "public", name);
+            compilation.fileDependencies.add(file);
+            compilation.emitAsset(
+              name,
+              new webpack.sources.RawSource(fs.readFileSync(file))
+            );
+          }
+        }
+      );
+    });
+  }
+}
 
 module.exports = {
   target: "web",
@@ -59,6 +93,8 @@ module.exports = {
       filename: "index.html",
       template: "./public/base.html",
       favicon: "./public/favicon.ico",
+      siteUrl,
     }),
+    new CopyStaticFiles(),
   ],
 };

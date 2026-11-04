@@ -67,6 +67,9 @@ The eraser, laser pointer and polygon tools, pinch zoom, and features that forks
 - The showcase has keyboard shortcuts for the tools, undo, redo, copy, paste, delete, save and zoom, listed by `?`.
 - The showcase is deployed to <https://tbolis.github.io/react-sketch/> by `.github/workflows/pages.yml`, when the
   library, the showcase or their dependencies change on `master`, and on demand from the Actions tab.
+- The page of the showcase has a link preview (Open Graph and Twitter card tags, with a 1200 x 630 image), so a
+  link to it shows a title, a description and an image in chats and on social networks. It also has PNG icons
+  (32 pixel and Apple touch) next to the icon file.
 
 ### Changed
 
