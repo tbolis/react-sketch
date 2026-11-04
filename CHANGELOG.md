@@ -13,6 +13,8 @@
 - The showcase runs on Material UI 9.5 with CSS variables and color schemes, and the keyboard focus ring of
   `theme.focusVisible`.
 - The sample drawings of the `defaultValue` and `value` scenarios are put in the middle of the canvas.
+- The favicon of the showcase is the brush of the react-sketch logo, as an icon file with 16, 32, 48 and 64 pixel
+  images (the old file held one 512 pixel image, which Chrome could not decode).
 
 ### Added
 
