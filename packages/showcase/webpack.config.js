@@ -16,6 +16,8 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, "build"),
     filename: "bundle.js",
+    // Relative URLs, so the build works from any path, such as /react-sketch/ on GitHub Pages
+    publicPath: "auto",
     clean: true,
   },
   devServer: {
@@ -50,7 +52,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      title: "React-Sketch Showcase",
+      title: "react-sketch showcase",
       description: "Sketch Component for React applications, backed-up by fabricjs",
       keywords: ["react", "canvas", "sketch", "fabricjs", "fabric.js"],
       inject: "body",

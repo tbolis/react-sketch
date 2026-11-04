@@ -9,6 +9,8 @@ Draw with a pencil, lines, arrows, rectangles and circles, select and move objec
 text, undo and redo, and export the drawing as JSON or as an image. The package includes TypeScript
 declarations.
 
+The showcase is live at <https://tbolis.github.io/react-sketch/>.
+
 ## Installation
 
 ```sh
@@ -231,7 +233,7 @@ export const WithPreview = () => {
 `removeSelected()`). `zoom()` and `clear()` tell nothing, so draw the preview again after them. With
 `onViewChange`, a frame on the preview can show what the canvas shows: the visible part starts at
 `-x / zoom`, `-y / zoom` in canvas pixels, and is the size of the canvas divided by `zoom`. The showcase has
-this in its Preview section. `toDataURL()` throws for a canvas with an image of another site which does not
+this in its Preview panel. `toDataURL()` throws for a canvas with an image of another site which does not
 allow it (CORS), so catch it where that can happen.
 
 ### Background and overlay images
@@ -464,13 +466,13 @@ not called when it is drawn. Switching to another tool clears what is left of th
 
 This is a Yarn 1 workspaces monorepo.
 
-| Path                    | Description                                                                                                                                                                     |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/react-sketch` | The library, published to npm as `react-sketch`. The build output is `dist/index.js` (UMD bundle, `react` and `fabric` are external) and `dist/index.d.ts` (type declarations). |
-| `packages/eraser`       | The eraser brush, from `@erase2d/fabric` (private, bundled into `react-sketch`).                                                                                                |
-| `packages/laserpointer` | The laser pointer brush (private, bundled into `react-sketch`).                                                                                                                 |
-| `packages/showcase`     | Demo application (not published): a tools panel and the `defaultValue`, `value` and `addImg` scenarios.                                                                         |
-| `.github/workflows`     | Continuous integration ([ci.yml](.github/workflows/ci.yml)).                                                                                                                    |
+| Path                    | Description                                                                                                                                                                               |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/react-sketch` | The library, published to npm as `react-sketch`. The build output is `dist/index.js` (UMD bundle, `react` and `fabric` are external) and `dist/index.d.ts` (type declarations).           |
+| `packages/eraser`       | The eraser brush, from `@erase2d/fabric` (private, bundled into `react-sketch`).                                                                                                          |
+| `packages/laserpointer` | The laser pointer brush (private, bundled into `react-sketch`).                                                                                                                           |
+| `packages/showcase`     | Demo application (not published), live on GitHub Pages: a canvas with floating tools, properties and settings, and the `defaultValue`, `value`, `addImg` and `backgroundImage` scenarios. |
+| `.github/workflows`     | Continuous integration ([ci.yml](.github/workflows/ci.yml)) and the deployment of the showcase ([pages.yml](.github/workflows/pages.yml)).                                                |
 
 ## Development
 
@@ -497,6 +499,15 @@ library does not have to be built first.
 | `yarn clean`     | Remove the build output.                                                                            |
 
 The tests run on React 19. `REACT=18 yarn test` runs them on React 18, and CI does both.
+
+### Showcase on GitHub Pages
+
+[pages.yml](.github/workflows/pages.yml) builds the showcase and publishes `packages/showcase/build` to
+<https://tbolis.github.io/react-sketch/>. It runs on every push to `master` that changes the library, the
+`@react-sketch/*` packages, the showcase, the lockfile, `.nvmrc` or the workflow itself (not markdown), and
+on demand from the Actions tab (Run workflow). The showcase imports the sources of the library, so a
+change of the library is in the next deployment. The repository needs Settings > Pages > Build and
+deployment > Source set to GitHub Actions, once.
 
 ## Upgrading from 0.5.x
 
