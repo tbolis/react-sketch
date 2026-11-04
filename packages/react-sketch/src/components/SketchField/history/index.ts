@@ -49,6 +49,17 @@ export class UndoHistory<T = unknown> {
   }
 
   /**
+   * Forget the last object kept, as if it was never kept
+   *
+   * @returns the object forgotten, or null when the history is empty
+   */
+  pop(): T | null {
+    const last = this.current;
+    this.current = this.undoList.pop() ?? null;
+    return last;
+  }
+
+  /**
    * Undo the last object, this operation will set the current object to one step back in time
    *
    * @returns the new current value after the undo operation, else null if no undo operation was possible

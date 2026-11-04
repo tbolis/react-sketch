@@ -45,7 +45,7 @@ export const Drawing = () => {
 ```
 
 Exports: `SketchField` (the component), `Tools` (`Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`,
-`RectangleLabel`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`), `Types` (namespace with the types and
+`RectangleLabel`, `Polygon`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`, `Eraser`, `LaserPointer`), `Types` (namespace with the types and
 the `Tool` enumeration) and a default export, which is the component with `SketchField` and `Tools`
 attached (as in 0.5.x).
 

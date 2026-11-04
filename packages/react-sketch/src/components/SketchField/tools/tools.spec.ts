@@ -215,6 +215,68 @@ describe("Tools", () => {
       expect(text.left).toEqual(200);
       expect(text.top).toEqual(150 - text.getScaledHeight());
     });
+
+    it("listens to the canvas once, whatever the number of labels", () => {
+      const on = jest.spyOn(canvas, "on");
+      const tool = create_tool(canvas, { tool: Tool.RECTANGLE_LABEL });
+      [100, 200, 300].forEach((y) => drag(tool, [100, y], [180, y + 60]));
+
+      const listened = (name: string) =>
+        on.mock.calls.filter(([event]) => event === name);
+      expect(canvas.getObjects()).toHaveLength(6);
+      expect(listened("object:moving")).toHaveLength(1);
+      expect(listened("object:scaling")).toHaveLength(1);
+    });
+
+    it("moves each label along with its own rectangle", () => {
+      const tool = create_tool(canvas, { tool: Tool.RECTANGLE_LABEL });
+      drag(tool, [100, 100], [180, 160]);
+      drag(tool, [100, 300], [180, 360]);
+
+      const [, first, second, other] = canvas.getObjects() as fabric.FabricObject[];
+      const firstTop = first.top;
+      second.set({ left: 250, top: 320 });
+      fire(canvas, "object:moving", { target: second });
+
+      expect(other.left).toEqual(250);
+      expect(other.top).toEqual(320 - other.getScaledHeight());
+      expect(first.top).toEqual(firstTop);
+    });
+
+    it("moves the label of a canvas which is not the first one", () => {
+      const another = new fabric.Canvas(document.createElement("canvas"));
+      try {
+        drag(
+          create_tool(canvas, { tool: Tool.RECTANGLE_LABEL }),
+          [10, 10],
+          [50, 50]
+        );
+        const tool = create_tool(another, { tool: Tool.RECTANGLE_LABEL });
+        drag(tool, [100, 100], [180, 160]);
+
+        const [rect, text] = another.getObjects() as fabric.FabricObject[];
+        rect.set({ left: 200, top: 150 });
+        fire(another, "object:moving", { target: rect });
+
+        expect(text.left).toEqual(200);
+        expect(text.top).toEqual(150 - text.getScaledHeight());
+      } finally {
+        another.dispose();
+      }
+    });
+
+    it("moves the label of a rectangle which undo and redo took off and put back", () => {
+      const tool = create_tool(canvas, { tool: Tool.RECTANGLE_LABEL });
+      drag(tool, [100, 100], [180, 160]);
+
+      const [rect, text] = canvas.getObjects() as fabric.FabricObject[];
+      canvas.remove(rect);
+      canvas.add(rect);
+      rect.set({ left: 200, top: 150 });
+      fire(canvas, "object:moving", { target: rect });
+
+      expect(text.left).toEqual(200);
+    });
   });
 
   describe("Pan", () => {

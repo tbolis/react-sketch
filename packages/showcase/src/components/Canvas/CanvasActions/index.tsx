@@ -7,6 +7,7 @@ import PasteIcon from "@mui/icons-material/ContentPaste";
 import RemoveSelectedIcon from "@mui/icons-material/Delete";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
 import ZoomOutIcon from "@mui/icons-material/ZoomOut";
+import ResetViewIcon from "@mui/icons-material/CenterFocusStrong";
 import SaveIcon from "@mui/icons-material/Save";
 import DownloadIcon from "@mui/icons-material/Download";
 import ClearIcon from "@mui/icons-material/DeleteSweep";
@@ -15,7 +16,7 @@ import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import { CONFIG, createDrawing, type Config } from "../../../stores/config";
 import { downloadText, downloadUrl } from "../../../utils/files";
-import { syncState, withSketch } from "../sketchRef";
+import { syncPreview, syncState, withSketch } from "../sketchRef";
 
 type CanvasActionsProps = Pick<
   Config,
@@ -55,9 +56,29 @@ const clear = () => {
   withSketch((sketch) => sketch.clear());
   CONFIG.controlledValue = undefined;
   CONFIG.fillWithBackgroundColor = false;
+  // What was scaled is gone
+  CONFIG.zoomFactor = 1;
   // The canvas does not announce it
   syncState();
+  syncPreview();
 };
+
+/** The buttons scale the drawing (`zoom()`), which is not the view of the fingers */
+const zoomBy = (factor: number) =>
+  withSketch((sketch) => {
+    sketch.zoom(factor);
+    CONFIG.zoomFactor *= factor;
+    syncPreview();
+  });
+
+/** Back to the whole canvas: what the buttons scaled, and what the fingers zoomed and panned */
+const resetView = () =>
+  withSketch((sketch) => {
+    if (CONFIG.zoomFactor !== 1) sketch.zoom(1 / CONFIG.zoomFactor);
+    CONFIG.zoomFactor = 1;
+    sketch.resetView();
+    syncPreview();
+  });
 
 const copy = () =>
   withSketch((sketch) => {
@@ -130,15 +151,14 @@ const CanvasActions = ({
       </Action>
     </Stack>
     <Stack direction="row">
-      <Action
-        label="Zoom in"
-        onClick={() => withSketch((sketch) => sketch.zoom(1.25))}>
+      <Action label="Zoom in" onClick={() => zoomBy(1.25)}>
         <ZoomInIcon />
       </Action>
-      <Action
-        label="Zoom out"
-        onClick={() => withSketch((sketch) => sketch.zoom(0.8))}>
+      <Action label="Zoom out" onClick={() => zoomBy(0.8)}>
         <ZoomOutIcon />
+      </Action>
+      <Action label="Reset zoom and view" onClick={resetView}>
+        <ResetViewIcon />
       </Action>
     </Stack>
     <Stack direction="row">

@@ -13,9 +13,12 @@ import {
 } from "../../types";
 import { CanvasEvent, FabricCanvasEventsManager, SketchEventAware } from "./events";
 import { SketchHistory } from "./history/SketchHistory";
+import { IDENTITY_VIEW, PinchZoom } from "./pinch";
 import { autoresize, scaleContent } from "./resize";
 import { FabricCanvasTool } from "./tools";
 import { create_tool } from "./tools/factory";
+import { Eraser } from "./tools/Eraser";
+import { Polygon } from "./tools/Polygon";
 
 /**
  * The properties which always have a value, because SketchField provides
@@ -35,6 +38,9 @@ type DefaultedProps = Required<
     | "heightCorrection"
     | "forceValue"
     | "autoresize"
+    | "pinchZoom"
+    | "minZoom"
+    | "maxZoom"
     | "onObjectAdded"
     | "onObjectModified"
     | "onObjectRemoved"
@@ -60,6 +66,9 @@ const defaultProps: DefaultedProps = {
   heightCorrection: 0,
   forceValue: false,
   autoresize: true,
+  pinchZoom: true,
+  minZoom: 0.5,
+  maxZoom: 8,
   onObjectAdded: () => undefined,
   onObjectModified: () => undefined,
   onObjectRemoved: () => undefined,
@@ -82,6 +91,14 @@ class SketchCanvas extends fabric.Canvas {
   /** Called after the canvas is cleared, also when a value is loaded, before its objects are added */
   onClear?: () => void;
 
+  /** Stop the free drawing stroke in progress, nothing is drawn of it */
+  abortDrawing(): void {
+    if (!this._isCurrentlyDrawing) return;
+    (this.freeDrawingBrush as { cancel?: () => void } | undefined)?.cancel?.();
+    this._isCurrentlyDrawing = false;
+    this.clearContext(this.contextTop);
+  }
+
   clear(): void {
     this.clearing = true;
     try {
@@ -92,6 +109,26 @@ class SketchCanvas extends fabric.Canvas {
     this.onClear?.();
   }
 }
+
+/**
+ * The two layers of the canvas which hold an image: the background image is
+ * drawn under the objects, the overlay image above them
+ */
+type ImageLayer = "backgroundImage" | "overlayImage";
+
+/**
+ * Whether two option objects have the same content, so that options written
+ * inline in a render do not count as a change
+ */
+const sameOptions = (
+  a: BackgroundOptions = {},
+  b: BackgroundOptions = {}
+): boolean => {
+  const keys = Object.keys(a);
+  return (
+    keys.length === Object.keys(b).length && keys.every((key) => a[key] === b[key])
+  );
+};
 
 /**
  * Sketch Tool based on FabricJS for React Applications
@@ -105,9 +142,15 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   private canvas!: SketchCanvas;
   private tool!: FabricCanvasTool;
   private history!: SketchHistory;
+  private pinch?: PinchZoom;
+  /** The objects of the canvas when the last touch began, to know the ones it added */
+  private objectsBeforeTouch: fabric.FabricObject[] = [];
   private mounted = false;
-  /** Counts the background images asked for, so that only the last one is set */
-  private backgroundLoads = 0;
+  /** Counts the images asked for by layer, so that only the last one of a layer is set */
+  private readonly imageLoads: Record<ImageLayer, number> = {
+    backgroundImage: 0,
+    overlayImage: 0,
+  };
   private clipboard: Promise<fabric.FabricObject> | null = null;
   /** The pastes, which run one after the other as cloning is asynchronous */
   private pasting: Promise<unknown> = Promise.resolve();
@@ -179,7 +222,8 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   }
 
   componentDidMount(): void {
-    const { backgroundColor, undoSteps, value, defaultValue } = this.props;
+    const { backgroundColor, backgroundImage, undoSteps, value, defaultValue } =
+      this.props;
 
     this.mounted = true;
     // The defaults of fabric 7 that differ from the ones of fabric 4 are set back:
@@ -198,11 +242,32 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     this.history = new SketchHistory(this.canvas, undoSteps);
     // Loading a value clears the canvas first: the history starts again with the
     // loaded objects, and only when the load works
-    this.canvas.onClear = () => this.history.clear();
+    this.canvas.onClear = () => {
+      this.history.clear();
+      this.tool.reset();
+    };
 
     // Bind Events to Actions
     this._bind_canvas_events(
-      new FabricCanvasEventsManager(this.history, this.schedule)
+      new FabricCanvasEventsManager(
+        this.history,
+        this.schedule,
+        () => this.pinch?.gesturing ?? false
+      )
+    );
+
+    this.pinch = new PinchZoom(
+      this.canvas,
+      {
+        enabled: () => this.props.pinchZoom,
+        minZoom: () => this.props.minZoom,
+        maxZoom: () => this.props.maxZoom,
+      },
+      {
+        onTouch: () => (this.objectsBeforeTouch = this.canvas.getObjects().slice()),
+        onGesture: () => this.cancelInteraction(),
+        onChange: (view) => this.props.onViewChange?.(view),
+      }
     );
 
     window.addEventListener("resize", this._resize_listener);
@@ -210,6 +275,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
 
     // initialize canvas with controlled value if exists
     this.fromJSON(value || defaultValue);
+    if (backgroundImage) this.applyBackgroundImage();
   }
 
   componentDidUpdate(prevProps: Readonly<SketchProperties>): void {
@@ -224,6 +290,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     } else if (
       props.lineColor !== prevProps.lineColor ||
       props.lineWidth !== prevProps.lineWidth ||
+      props.lineStyle !== prevProps.lineStyle ||
       props.fillColor !== prevProps.fillColor
     ) {
       this.configureTool();
@@ -231,6 +298,14 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
 
     if (props.backgroundColor !== prevProps.backgroundColor) {
       this.setBackground(props.backgroundColor);
+    }
+
+    if (
+      props.backgroundImage !== prevProps.backgroundImage ||
+      (props.backgroundImage &&
+        !sameOptions(props.backgroundImageOptions, prevProps.backgroundImageOptions))
+    ) {
+      this.applyBackgroundImage();
     }
 
     if (props.value !== prevProps.value || (props.value && props.forceValue)) {
@@ -244,6 +319,8 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     window.removeEventListener("resize", this._resize_listener);
     this.timers.forEach((id) => window.clearTimeout(id));
     this.timers.clear();
+    this.pinch?.dispose();
+    this.tool.dispose();
     // The canvas element is released at once, so it can be used again (React
     // strict mode mounts twice). The rest is freed once the pending render is done.
     void this.canvas.dispose();
@@ -270,8 +347,22 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * Use the tool of the properties, from now on
    */
   private selectTool(): void {
+    this.tool?.finish();
+    this.tool?.dispose();
     this.withToolProps((props) => {
       this.tool = create_tool(this.canvas, props);
+      if (this.tool instanceof Polygon) {
+        this.tool.onComplete = () => {
+          if (this.mounted) this.props.onChange?.();
+        };
+      }
+      if (this.tool instanceof Eraser) {
+        this.tool.onErase = (erasures) => {
+          if (!this.mounted) return;
+          this.history.onErased(erasures);
+          this.props.onChange?.();
+        };
+      }
     });
   }
 
@@ -289,7 +380,13 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     const container = this.containerEl.current;
     if (!container) return;
     const { widthCorrection, heightCorrection } = this.props;
-    autoresize(this.canvas, container, widthCorrection, heightCorrection);
+    const factors = autoresize(
+      this.canvas,
+      container,
+      widthCorrection,
+      heightCorrection
+    );
+    if (factors) this.tool.scale(factors.x, factors.y);
   }
 
   /**
@@ -340,18 +437,23 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    *   left: <Number: distance from left of canvas>,
    *   top: <Number: distance from top of canvas>,
    *   scale: <Number: initial scale of image>
+   *   crossOrigin: <"anonymous" | "use-credentials": request the image with CORS, so the canvas can be exported>
    * }
    */
   addImg = (dataUrl: string, options: ImageOptions = {}): void => {
     const canvas = this.canvas;
-    fabric.FabricImage.fromURL(dataUrl, {}, { originX: "left", originY: "top" })
+    const { crossOrigin, ...placement } = options;
+    fabric.FabricImage.fromURL(dataUrl, crossOrigin ? { crossOrigin } : {}, {
+      originX: "left",
+      originY: "top",
+    })
       .then((image) => {
         if (!this.isCurrent(canvas)) return;
         const { left, top, scale } = {
           left: Math.random() * (canvas.getWidth() - (image.width ?? 0) * 0.5),
           top: Math.random() * (canvas.getHeight() - (image.height ?? 0) * 0.5),
           scale: 0.5,
-          ...options,
+          ...placement,
         };
         image.scale(scale);
         image.set({ left, top });
@@ -360,6 +462,34 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
       // An image which cannot be loaded is not added
       .catch(() => undefined);
   };
+
+  /**
+   * Put the view of the canvas back to the whole canvas, as it is before it
+   * is zoomed or panned with two fingers
+   */
+  resetView = (): void => {
+    this.canvas.setViewportTransform([...IDENTITY_VIEW]);
+    this.props.onViewChange?.({ zoom: 1, x: 0, y: 0 });
+  };
+
+  /**
+   * What the first finger started is dropped, as the second one makes them a
+   * gesture of the view: the objects it added are taken off the canvas (they
+   * are not an undo step), the stroke it was drawing stops, and the tool forgets
+   * the press
+   */
+  private cancelInteraction(): void {
+    const { canvas } = this;
+    const added = canvas
+      .getObjects()
+      .filter((object) => !this.objectsBeforeTouch.includes(object));
+    if (added.length) {
+      this.history.discard(added);
+      canvas.remove(...added);
+    }
+    canvas.abortDrawing();
+    this.tool.cancel();
+  }
 
   /**
    * Zoom the drawing by the factor specified
@@ -371,6 +501,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    */
   zoom = (factor: number): void => {
     scaleContent(this.canvas, factor, factor);
+    this.tool.scale(factor, factor);
     this.canvas.renderAll();
     this.canvas.calcOffset();
   };
@@ -379,14 +510,20 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    * Perform an undo operation on canvas, if it cannot undo it will leave the canvas intact
    */
   undo = (): void => {
-    if (this.history.undo()) this.props.onChange?.();
+    if (this.history.undo()) {
+      this.tool.reset();
+      this.props.onChange?.();
+    }
   };
 
   /**
    * Perform a redo operation on canvas, if it cannot redo it will leave the canvas intact
    */
   redo = (): void => {
-    if (this.history.redo()) this.props.onChange?.();
+    if (this.history.redo()) {
+      this.tool.reset();
+      this.props.onChange?.();
+    }
   };
 
   /**
@@ -422,11 +559,19 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
    *
    * @returns URL containing a representation of the object in the format specified by options.format
    */
-  toDataURL = (options?: DataUrlOptions): string =>
-    this.canvas.toDataURL({
-      format: this.props.imageFormat,
-      ...options,
-    } as fabric.TDataUrlOptions);
+  toDataURL = (options?: DataUrlOptions): string => {
+    // The image is of the drawing, not of the part which the view shows
+    const view = this.canvas.viewportTransform;
+    this.canvas.viewportTransform = [...IDENTITY_VIEW];
+    try {
+      return this.canvas.toDataURL({
+        format: this.props.imageFormat,
+        ...options,
+      } as fabric.TDataUrlOptions);
+    } finally {
+      this.canvas.viewportTransform = view;
+    }
+  };
 
   /**
    * Returns JSON representation of canvas
@@ -468,6 +613,8 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
           // The loaded objects follow the tool in use, for example they can't be
           // selected when drawing
           this.configureTool();
+          // The property takes the place of the background image of the value
+          if (this.props.backgroundImage) this.applyBackgroundImage();
           canvas.renderAll();
           this.props.onChange?.();
         })
@@ -571,23 +718,28 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   };
 
   /**
-   * Sets the background from the dataUrl given
-   *
-   * @param dataUrl the dataUrl to be used as a background
-   * @param options stretched, stretchedX and stretchedY scale the image to the canvas, the other
-   * options are options of the image
+   * Sets an image on a layer of the canvas, in place of the one it has, and
+   * fits it as the options say. Only the last image asked for a layer is set,
+   * also when an earlier one loads later.
    */
-  setBackgroundFromDataUrl = (
+  private setImageLayer(
+    layer: ImageLayer,
     dataUrl: string,
-    options: BackgroundOptions = {}
-  ): void => {
+    options: BackgroundOptions
+  ): void {
     const canvas = this.canvas;
-    const load = ++this.backgroundLoads;
+    const load = ++this.imageLoads[layer];
+    const {
+      stretched,
+      stretchedX,
+      stretchedY,
+      crossOrigin = "anonymous",
+      ...imageOptions
+    } = options;
     const img = new Image();
-    img.setAttribute("crossOrigin", "anonymous");
-    const { stretched, stretchedX, stretchedY, ...imageOptions } = options;
+    if (crossOrigin) img.setAttribute("crossOrigin", crossOrigin);
     img.onload = () => {
-      if (!this.isCurrent(canvas) || load !== this.backgroundLoads) return;
+      if (!this.isCurrent(canvas) || load !== this.imageLoads[layer]) return;
       const imgObj = new fabric.FabricImage(img, {
         originX: "left",
         originY: "top",
@@ -605,22 +757,69 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
         imgObj.scaleToHeight(canvas.getHeight());
       }
       imgObj.set(imageOptions);
-      canvas.backgroundImage = imgObj;
+      canvas[layer] = imgObj;
       canvas.requestRenderAll();
     };
     img.src = dataUrl;
-  };
+  }
 
   /**
-   * Removes the background image, also one that is still loading. The objects
-   * and the background color are kept, and the undo history is not changed
-   * (setting the background image is not part of it either).
+   * Removes the image of a layer, also one that is still loading. The objects
+   * and the other layers are kept.
    */
-  removeBackgroundImage = (): void => {
-    this.backgroundLoads++;
-    this.canvas.backgroundImage = undefined;
+  private removeImageLayer(layer: ImageLayer): void {
+    this.imageLoads[layer]++;
+    this.canvas[layer] = undefined;
     this.canvas.requestRenderAll();
-  };
+  }
+
+  /**
+   * Sets the background from the dataUrl given
+   *
+   * @param dataUrl the dataUrl to be used as a background
+   * @param options stretched, stretchedX and stretchedY scale the image to the canvas, crossOrigin
+   * says how the image is requested (anonymous by default), the other options are options of the image
+   */
+  setBackgroundFromDataUrl = (
+    dataUrl: string,
+    options: BackgroundOptions = {}
+  ): void => this.setImageLayer("backgroundImage", dataUrl, options);
+
+  /**
+   * Sets the overlay image from the dataUrl given. The overlay image is drawn above the
+   * objects and does not take mouse events, so it can be an outline to draw within. It is
+   * saved by `toJSON` and in the image of `toDataURL`, and it is not part of the undo history.
+   *
+   * @param dataUrl the dataUrl to be used as an overlay
+   * @param options the options of `setBackgroundFromDataUrl`
+   */
+  setOverlayFromDataUrl = (dataUrl: string, options: BackgroundOptions = {}): void =>
+    this.setImageLayer("overlayImage", dataUrl, options);
+
+  /**
+   * Removes the background image, also one that is still loading. The objects,
+   * the overlay image and the background color are kept, and the undo history is
+   * not changed (setting the background image is not part of it either).
+   */
+  removeBackgroundImage = (): void => this.removeImageLayer("backgroundImage");
+
+  /**
+   * Removes the overlay image, also one that is still loading. The objects, the
+   * background image and the background color are kept.
+   */
+  removeOverlayImage = (): void => this.removeImageLayer("overlayImage");
+
+  /**
+   * Set the image of the `backgroundImage` property, or remove the image when it is gone
+   */
+  private applyBackgroundImage(): void {
+    const { backgroundImage, backgroundImageOptions } = this.props;
+    if (backgroundImage) {
+      this.setBackgroundFromDataUrl(backgroundImage, backgroundImageOptions);
+    } else {
+      this.removeBackgroundImage();
+    }
+  }
 
   /**
    * Add a text to the center of the canvas

@@ -1,5 +1,6 @@
 import * as fabric from "fabric";
 import { UndoHistory } from "./index";
+import type { Erasure } from "../tools/Eraser";
 
 /**
  * One undoable action of the sketch
@@ -7,7 +8,8 @@ import { UndoHistory } from "./index";
 type HistoryEntry =
   | { action: "add"; object: fabric.FabricObject }
   | { action: "remove"; object: fabric.FabricObject }
-  | { action: "modify"; object: fabric.FabricObject; before: string; after: string };
+  | { action: "modify"; object: fabric.FabricObject; before: string; after: string }
+  | { action: "erase"; erasures: Erasure[] };
 
 /**
  * Properties of the serialized state which are not restored: the type cannot
@@ -59,6 +61,21 @@ export class SketchHistory {
   }
 
   /**
+   * Forget the objects which were added, and which are taken off the canvas
+   * before the drawing of them was finished. They were the last actions.
+   */
+  discard(objects: fabric.FabricObject[]): void {
+    for (
+      let last = this.entries.getCurrent();
+      last?.action === "add" && objects.includes(last.object);
+      last = this.entries.getCurrent()
+    ) {
+      this.entries.pop();
+    }
+    if (this.pending && objects.includes(this.pending)) this.pending = null;
+  }
+
+  /**
    * Record an object modified on the canvas. Objects which were not added
    * through {@link onObjectAdded} (for example a multiple selection) are ignored.
    */
@@ -68,6 +85,14 @@ export class SketchHistory {
     const after = stateOf(object);
     this.snapshots.set(object, after);
     this.entries.keep({ action: "modify", object, before, after });
+  }
+
+  /**
+   * Record one stroke of the eraser, which is one action whatever the number
+   * of objects it erased
+   */
+  onErased(erasures: Erasure[]): void {
+    this.entries.keep({ action: "erase", erasures });
   }
 
   /**
@@ -132,10 +157,35 @@ export class SketchHistory {
     this.pending = null;
   }
 
+  /**
+   * Take the stroke off the erasing group of the object, or put it back. A group
+   * which the stroke created goes away with it, the object is as it was.
+   */
+  private applyErasure(
+    { object, group, source, created }: Erasure,
+    forward: boolean
+  ): void {
+    if (forward) {
+      if (created) object.clipPath = group;
+      else group.add(source);
+    } else if (created) {
+      object.clipPath = undefined;
+    } else {
+      group.remove(source);
+    }
+    group.set("dirty", true);
+    object.set("dirty", true);
+  }
+
   private apply(entry: HistoryEntry, forward: boolean): void {
-    const { object } = entry;
     this.applying = true;
     try {
+      if (entry.action === "erase") {
+        entry.erasures.forEach((erasure) => this.applyErasure(erasure, forward));
+        this.canvas.renderAll();
+        return;
+      }
+      const { object } = entry;
       switch (entry.action) {
         case "add":
         case "remove":

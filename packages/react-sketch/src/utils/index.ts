@@ -1,3 +1,5 @@
+import type { LineStyle } from "../types";
+
 interface Point {
   x: number;
   y: number;
@@ -15,6 +17,44 @@ export const linearDistance = (point1: Point, point2: Point): number => {
   const xs = point2.x - point1.x;
   const ys = point2.y - point1.y;
   return Math.sqrt(xs * xs + ys * ys);
+};
+
+/**
+ * The pattern of each line style, in units of the line width: the length of a
+ * dash and of the gap after it, and so on. A dash of length 0 is a dot, which
+ * is round because the ends of the line are.
+ */
+const LINE_STYLES: Record<
+  Exclude<LineStyle, "solid">,
+  { pattern: number[]; cap: "butt" | "round" }
+> = {
+  dashed: { pattern: [3, 2], cap: "butt" },
+  dotted: { pattern: [0, 2], cap: "round" },
+  "dash-dot": { pattern: [2, 3, 0, 3], cap: "round" },
+};
+
+/** A line thinner than this has the pattern of this one, so that it is seen */
+const MIN_PATTERN_UNIT = 2;
+
+/**
+ * The options of a canvas object (or brush) which draw a line in a style.
+ * They are none for a solid line, and for a style which is not known, so the
+ * object keeps what it has.
+ *
+ * @param style the style of the line
+ * @param width the width of the line
+ */
+export const lineStroke = (
+  style: LineStyle | undefined,
+  width: number
+): { strokeDashArray?: number[]; strokeLineCap?: "butt" | "round" } => {
+  const found = style && style !== "solid" ? LINE_STYLES[style] : undefined;
+  if (!found) return {};
+  const unit = Math.max(width, MIN_PATTERN_UNIT);
+  return {
+    strokeDashArray: found.pattern.map((length) => length * unit),
+    strokeLineCap: found.cap,
+  };
 };
 
 /**

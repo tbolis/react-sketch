@@ -46,36 +46,59 @@ export class FabricCanvasEventsManager
 {
   private readonly history: SketchHistory;
   private readonly schedule: (callback: () => void, delay: number) => void;
+  private readonly gesturing: () => boolean;
+  /**
+   * Whether an object was added, modified or removed since the mouse was
+   * pressed. Only then the application is told of a change, so a click which
+   * selects an object, or a pointer which leaves the canvas, is not one.
+   */
+  private changed = false;
 
   /**
    * @param history the history of the sketch
    * @param schedule runs the callback after the delay (in milliseconds)
+   * @param gesturing whether the fingers on the screen are a gesture of the view, which draws nothing
    */
   constructor(
     history: SketchHistory,
-    schedule: (callback: () => void, delay: number) => void
+    schedule: (callback: () => void, delay: number) => void,
+    gesturing: () => boolean = () => false
   ) {
     super();
     this.history = history;
     this.schedule = schedule;
+    this.gesturing = gesturing;
   }
 
   /**
    * Action when an object is added to the canvas. The objects which undo and
    * redo add back are not new, so they are not recorded nor announced.
    */
-  public onObjectAdded({ event, props }: EventInput): void {
+  public onObjectAdded({ event, tool, props }: EventInput): void {
+    if (this.isPreview(event, tool)) return;
+    // What is added while a tool draws (an image, a text, a pasted object, one which
+    // undo brings back) is frozen like the rest: a press on it would select it and
+    // a drag would move it, instead of drawing
+    if (event.target && !tool.isInteractive()) {
+      event.target.set({ selectable: false, evented: false });
+    }
+    // Only erasable objects are affected by the eraser
+    if (event.target) (event.target as { erasable?: boolean }).erasable = true;
     if (this.history.replaying) return;
+    this.changed = true;
     if (event.target) this.history.onObjectAdded(event.target);
     props.onObjectAdded?.(sketchEvent(event));
   }
 
   public onObjectModified({ event, props }: EventInput): void {
+    this.changed = true;
     if (event.target) this.history.onObjectModified(event.target);
     props.onObjectModified?.(sketchEvent(event));
   }
 
-  public onObjectRemoved({ event, props }: EventInput): void {
+  public onObjectRemoved({ event, tool, props }: EventInput): void {
+    if (this.isPreview(event, tool)) return;
+    this.changed = true;
     props.onObjectRemoved?.(sketchEvent(event));
   }
 
@@ -92,6 +115,7 @@ export class FabricCanvasEventsManager
   }
 
   public onMouseDown({ event, tool, props }: EventInput): void {
+    this.changed = false;
     tool.doMouseDown(event);
     props.onMouseDown?.(sketchEvent(event));
   }
@@ -115,11 +139,19 @@ export class FabricCanvasEventsManager
     props.onMouseUp?.(sketchEvent(event));
   }
 
+  /** Whether the object of the event is one the tool only shows while it draws */
+  private isPreview({ target }: CanvasEvent, tool: FabricCanvasTool): boolean {
+    return !!target && tool.isPreview(target);
+  }
+
   /**
-   * Tell the application that the sketch may have changed, shortly after
-   * the mouse was released or left the canvas.
+   * Tell the application that the sketch changed, shortly after the mouse was
+   * released or left the canvas. Nothing is told when it did not change, and
+   * a change is told once: the release which follows a mouse out has none.
    */
-  private notifyChange({ event, props }: EventInput): void {
+  private notifyChange({ event, tool, props }: EventInput): void {
+    if (!tool.notifiesChange() || this.gesturing() || !this.changed) return;
+    this.changed = false;
     const { onChange } = props;
     if (onChange) this.schedule(() => onChange(event.e), 10);
   }

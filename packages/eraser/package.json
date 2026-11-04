@@ -1,0 +1,19 @@
+{
+  "name": "@react-sketch/eraser",
+  "version": "1.2.2",
+  "private": true,
+  "description": "The eraser brush for fabric, from @erase2d/fabric 1.2.2, used by react-sketch",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "fabric": "^7.4.0"
+  },
+  "devDependencies": {
+    "fabric": "^7.4.0"
+  }
+}

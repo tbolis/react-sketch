@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { colorNameToHex, hexToRgbA, linearDistance } from "./index";
+import { colorNameToHex, hexToRgbA, lineStroke, linearDistance } from "./index";
 
 describe("Utils", () => {
   describe("linearDistance", () => {
@@ -35,6 +35,34 @@ describe("Utils", () => {
     it("Returns undefined for unknown names", () => {
       expect(colorNameToHex("not-a-color")).toBeUndefined();
       expect(colorNameToHex("constructor")).toBeUndefined();
+    });
+  });
+
+  describe("lineStroke", () => {
+    it("has nothing for a solid line, or no style, or one which is not known", () => {
+      expect(lineStroke("solid", 4)).toEqual({});
+      expect(lineStroke(undefined, 4)).toEqual({});
+      expect(lineStroke("wavy" as never, 4)).toEqual({});
+    });
+
+    it("makes the pattern of each style from the width", () => {
+      expect(lineStroke("dashed", 4)).toEqual({
+        strokeDashArray: [12, 8],
+        strokeLineCap: "butt",
+      });
+      expect(lineStroke("dotted", 4)).toEqual({
+        strokeDashArray: [0, 8],
+        strokeLineCap: "round",
+      });
+      expect(lineStroke("dash-dot", 4)).toEqual({
+        strokeDashArray: [8, 12, 0, 12],
+        strokeLineCap: "round",
+      });
+    });
+
+    it("gives a thin line the pattern of a line of 2, so that it is seen", () => {
+      expect(lineStroke("dashed", 1)).toEqual(lineStroke("dashed", 2));
+      expect(lineStroke("dotted", 0.5)).toEqual(lineStroke("dotted", 2));
     });
   });
 });

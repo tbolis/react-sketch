@@ -20,7 +20,7 @@ type BackgroundProps = Pick<
   | "stretchedY"
 >;
 
-const visuallyHidden = {
+export const visuallyHidden = {
   position: "absolute",
   width: 1,
   height: 1,
