@@ -1,6 +1,6 @@
 {
   "name": "react-sketch",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "React component for drawing on an HTML canvas with pencil, line, arrow, rectangle and circle tools, built on fabric.js, with undo/redo, JSON import/export and TypeScript types",
   "keywords": [
     "react",

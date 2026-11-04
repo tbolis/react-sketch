@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.1.0 (unreleased)
+## 1.1.0 (2026-11-04)
 
 The eraser, laser pointer and polygon tools, pinch zoom, and features that forks of react-sketch had, written again for the TypeScript code and fabric 7.
 
@@ -96,22 +96,6 @@ The eraser, laser pointer and polygon tools, pinch zoom, and features that forks
   that is drawn. They were never removed, so they stayed after a label was deleted or the canvas was
   cleared, and a canvas that is drawn on for long kept more of them. A label still follows its rectangle
   when undo and redo take it off the canvas and put it back.
-
-### Packaging and tooling
-
-- The code of `@erase2d/fabric` 1.2.2 is in the private package `packages/eraser`
-  (`@react-sketch/eraser`), with its license, and `react-sketch` bundles it. Nothing new is installed for
-  the users of the library, and the externals of the bundle are still `react` and `fabric`. The license is
-  in `dist/index.js.LICENSE.txt`. `yarn typecheck`, `yarn build` and `yarn test` build the package first.
-- The laser pointer brush is in the private package `packages/laserpointer` (`@react-sketch/laserpointer`),
-  which `react-sketch` bundles too. `yarn build:packages` builds both private packages, and
-  `yarn typecheck`, `yarn build` and `yarn test` run it first.
-- CI also runs on Node.js 26, with 22 and 24 (`engines` already allowed it).
-
-## 1.0.1 (unreleased)
-
-### Fixed
-
 - A value which cannot be loaded (`value`, `defaultValue`, `fromJSON()`) no longer breaks the canvas. Its
   undo history is kept, and the canvas draws the objects added afterwards again: fabric turned that off
   while it loaded and on again only when the load worked. The error is not hidden: it is thrown as an
@@ -131,6 +115,14 @@ The eraser, laser pointer and polygon tools, pinch zoom, and features that forks
 
 ### Packaging and tooling
 
+- The code of `@erase2d/fabric` 1.2.2 is in the private package `packages/eraser`
+  (`@react-sketch/eraser`), with its license, and `react-sketch` bundles it. Nothing new is installed for
+  the users of the library, and the externals of the bundle are still `react` and `fabric`. The license is
+  in `dist/index.js.LICENSE.txt`. `yarn typecheck`, `yarn build` and `yarn test` build the package first.
+- The laser pointer brush is in the private package `packages/laserpointer` (`@react-sketch/laserpointer`),
+  which `react-sketch` bundles too. `yarn build:packages` builds both private packages, and
+  `yarn typecheck`, `yarn build` and `yarn test` run it first.
+- CI also runs on Node.js 26, with 22 and 24 (`engines` already allowed it).
 - CI also runs the tests on React 18 (`REACT=18 yarn test`; React 18 is installed as `react-18` and
   `react-dom-18` for it), as the peer range says React 17 to 19. React 17 is not tested, Testing Library 16
   does not support it.
