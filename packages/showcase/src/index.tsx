@@ -1,19 +1,12 @@
-import { App } from "./App";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { configure } from "mobx";
-import { observer } from "mobx-react-lite";
-import { createContext, use } from "react";
-import { Config, CONFIG } from "./stores/config";
+import { App } from "./App";
+import ErrorBoundary from "./components/ErrorBoundary";
+import ShowcaseTheme from "./theme";
 
 configure({
   enforceActions: "never",
-});
-
-const ShowcaseContext = createContext<Config>(CONFIG);
-
-const AppView = observer(() => {
-  const options = use(ShowcaseContext);
-  return <App {...options} />;
 });
 
 const container = document.getElementById("container");
@@ -22,7 +15,11 @@ if (!container) {
 }
 
 createRoot(container).render(
-  <ShowcaseContext value={CONFIG}>
-    <AppView />
-  </ShowcaseContext>
+  <StrictMode>
+    <ErrorBoundary>
+      <ShowcaseTheme>
+        <App />
+      </ShowcaseTheme>
+    </ErrorBoundary>
+  </StrictMode>
 );
