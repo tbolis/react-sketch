@@ -3,7 +3,7 @@
 Demo application for [react-sketch](../react-sketch), live at <https://tbolis.github.io/react-sketch/>. It is private
 and is not published to npm.
 
-The canvas fills the window, and the panels float over it, as in [Excalidraw](https://excalidraw.com/):
+The canvas fills the window, and the panels float over it:
 
 - **Toolbar** (top): select, pan, rectangle, rectangle label, circle, polygon, line, arrow, pencil, highlighter,
   eraser and laser pointer. The keys of the tools are on the buttons and in the shortcuts dialog.

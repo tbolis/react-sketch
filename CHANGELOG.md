@@ -1,28 +1,5 @@
 # Changelog
 
-## Unreleased
-
-### Changed
-
-- The showcase is a new application, with the same scenarios and settings: the canvas fills the window and the
-  panels float over it, as in Excalidraw. A toolbar (with the number and letter keys of the tools), a
-  properties panel (line color, fill, weight and style, and the actions on the selected objects), a
-  settings panel with the Scenario, Canvas and Insert tabs, undo and redo next to the menu, zoom at the bottom, a preview
-  with the frame of the view, a hint for the tool in use, and a menu with the saved drawings, the download, the
-  keyboard shortcuts and the light, dark and system color schemes. It has a layout for small screens.
-- The showcase runs on Material UI 9.5 with CSS variables and color schemes, and the keyboard focus ring of
-  `theme.focusVisible`.
-- The sample drawings of the `defaultValue` and `value` scenarios are put in the middle of the canvas.
-- The favicon of the showcase is the brush of the react-sketch logo, as an icon file with 16, 32, 48 and 64 pixel
-  images (the old file held one 512 pixel image, which Chrome could not decode).
-
-### Added
-
-- The keyboard shortcuts of the showcase: the tools, undo, redo, copy, paste, delete, save and zoom, listed
-  by `?`.
-- The showcase is deployed to <https://tbolis.github.io/react-sketch/> by `.github/workflows/pages.yml`
-  when the library, the showcase or their dependencies change on `master`, and on demand.
-
 ## 1.1.0 (2026-11-04)
 
 The eraser, laser pointer and polygon tools, pinch zoom, and features that forks of react-sketch had, written again for the TypeScript code and fabric 7.
@@ -87,6 +64,9 @@ The eraser, laser pointer and polygon tools, pinch zoom, and features that forks
   view is zoomed or panned. The README has the same in "A preview of the drawing".
 - The showcase has a View section for the pinch zoom (the switch, the smallest and the largest zoom, and the
   view as `onViewChange` reports it) and a reset button above the canvas, which also takes back the zoom in and zoom out buttons.
+- The showcase has keyboard shortcuts for the tools, undo, redo, copy, paste, delete, save and zoom, listed by `?`.
+- The showcase is deployed to <https://tbolis.github.io/react-sketch/> by `.github/workflows/pages.yml`, when the
+  library, the showcase or their dependencies change on `master`, and on demand from the Actions tab.
 
 ### Changed
 
@@ -101,6 +81,17 @@ The eraser, laser pointer and polygon tools, pinch zoom, and features that forks
   was added, changed or removed since the mouse was pressed. A click which only selects, a drag of the pan
   tool and a pointer which comes and goes do not call it, and a drawing which the mouse leaves the canvas
   in the middle of calls it once. `undo`, `redo` and the load of a value call it as before.
+- The showcase is a new application, with the same scenarios and settings. The canvas fills the window and the
+  panels float over it: a toolbar with the tools (and the letter and number keys of the tools), a properties panel
+  (line color, fill, weight and style, and the actions on the selected objects), a settings panel with the
+  Scenario, Canvas and Insert tabs, undo and redo next to the menu, zoom at the bottom, a preview with the frame
+  of the view, a hint for the tool in use, and a menu with the saved drawings, the download, the keyboard
+  shortcuts and the light, dark and system color schemes. It has a layout for small screens.
+- The showcase runs on Material UI 9.5, with CSS variables, color schemes and the keyboard focus ring of
+  `theme.focusVisible`.
+- The sample drawings of the showcase scenarios `defaultValue` and `value` are put in the middle of the canvas.
+- The favicon of the showcase is the brush of the react-sketch logo, as an icon file with 16, 32, 48 and 64 pixel
+  images. The old file held one 512 pixel image, which Chrome could not decode.
 
 ### Fixed
 
