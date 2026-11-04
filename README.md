@@ -233,7 +233,7 @@ export const WithPreview = () => {
 `removeSelected()`). `zoom()` and `clear()` tell nothing, so draw the preview again after them. With
 `onViewChange`, a frame on the preview can show what the canvas shows: the visible part starts at
 `-x / zoom`, `-y / zoom` in canvas pixels, and is the size of the canvas divided by `zoom`. The showcase has
-this in its Preview section. `toDataURL()` throws for a canvas with an image of another site which does not
+this in its Preview panel. `toDataURL()` throws for a canvas with an image of another site which does not
 allow it (CORS), so catch it where that can happen.
 
 ### Background and overlay images

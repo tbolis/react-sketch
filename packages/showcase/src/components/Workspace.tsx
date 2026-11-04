@@ -110,10 +110,9 @@ const Workspace = observer((): ReactElement => {
       sx={{
         position: "absolute",
         inset: 0,
-        overflow: "hidden",
+        // A sheet which is larger than the window scrolls
+        overflow: controlledSize ? "auto" : "hidden",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
         bgcolor: "background.default",
         // The grid of the workspace, around a sheet
         backgroundImage:
@@ -127,6 +126,8 @@ const Workspace = observer((): ReactElement => {
           sx={{
             position: "relative",
             flexShrink: 0,
+            // In the middle, and not cut off at the start when it is larger than the window
+            m: "auto",
             width,
             height,
             bgcolor: SURFACE,
