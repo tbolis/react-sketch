@@ -12,7 +12,7 @@ The canvas fills the window, and the panels float over it, as in [Excalidraw](ht
 - **Settings** (right, the gear): the **Scenario** tab (what the scenario shows and its actions), the **Canvas** tab
   (size, background color and image, pinch zoom, view, grid) and the **Insert** tab (text, image from a URL,
   overlay).
-- **Top left**: the menu, and undo and redo, which are always in sight.
+- **Top left**: the menu, and undo and redo, which fade out until the first change.
 - **Bottom**: zoom (the percentage resets the view), and a hint for the tool in use. The **preview** is at the
   right, with the frame of the view when it is zoomed or panned.
 - **Menu** (top left): save the drawing, download the PNG and the JSON, clear the canvas, the color scheme

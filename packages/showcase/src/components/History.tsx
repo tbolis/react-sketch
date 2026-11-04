@@ -30,17 +30,25 @@ const Action = ({ label, disabled, onClick, children }: ActionProps) => (
 );
 
 /**
- * Undo and redo, next to the menu where they are always in sight. They are in the
- * color of the page while there is a step to go to, and fade when there is none.
+ * Undo and redo, next to the menu where they are always in sight. They fade out
+ * until the first change, and come in with it.
  */
 const History = observer((): ReactElement => {
   const { canUndo, canRedo } = CONFIG;
+  const active = canUndo || canRedo;
 
   return (
     <Island
       role="group"
       aria-label="History"
-      sx={{ display: "flex", alignItems: "center", p: 0.5 }}>
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        p: 0.5,
+        opacity: active ? 1 : 0.5,
+        transition: "opacity 250ms",
+        "@media (prefers-reduced-motion: reduce)": { transition: "none" },
+      }}>
       <Action label="Undo (Ctrl Z)" disabled={!canUndo} onClick={undo}>
         <UndoIcon />
       </Action>
