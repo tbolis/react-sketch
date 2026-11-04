@@ -4,8 +4,8 @@ import Drawer from "@mui/material/Drawer";
 import Snackbar from "@mui/material/Snackbar";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { observer } from "mobx-react-lite";
-import BottomBar from "./components/BottomBar";
 import Drawings from "./components/Drawings";
+import History from "./components/History";
 import { ToolHint, Welcome } from "./components/Hints";
 import MainMenu from "./components/MainMenu";
 import Preview from "./components/Preview";
@@ -15,6 +15,7 @@ import ShortcutsDialog from "./components/ShortcutsDialog";
 import Toolbar from "./components/Toolbar";
 import TopRight from "./components/TopRight";
 import Workspace from "./components/Workspace";
+import ZoomBar from "./components/ZoomBar";
 import { useShortcuts } from "./shortcuts";
 import { CONFIG, DESKTOP_QUERY } from "./stores/config";
 
@@ -56,8 +57,10 @@ export const App = observer((): ReactElement => {
             },
             gridTemplateColumns: { xs: "1fr auto", lg: "1fr auto 1fr" },
           }}>
-          <Box sx={{ gridArea: "menu", justifySelf: "start" }}>
+          <Box
+            sx={{ gridArea: "menu", justifySelf: "start", display: "flex", gap: 1 }}>
             <MainMenu />
+            <History />
           </Box>
           <Box sx={{ gridArea: "tools", justifySelf: "center", maxWidth: 1 }}>
             <Toolbar />
@@ -95,14 +98,12 @@ export const App = observer((): ReactElement => {
         </Box>
         <Box
           sx={{ display: "flex", flexWrap: "wrap", alignItems: "flex-end", gap: 1 }}>
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <BottomBar />
-          </Box>
+          <ZoomBar />
           <Box sx={{ display: "flex", flex: "1 1 240px", justifyContent: "center" }}>
             <ToolHint />
           </Box>
           {/* Keeps the hint in the middle of the window */}
-          {desktop && <Box sx={{ width: 190 }} />}
+          {desktop && <Box sx={{ width: 145 }} />}
         </Box>
       </Box>
       {!desktop && (

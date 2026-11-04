@@ -32,7 +32,12 @@ const TopRight = observer((): ReactElement => {
         aria-expanded={anchor !== null}
         endIcon={<ExpandMoreIcon />}
         onClick={(event) => setAnchor(event.currentTarget)}
-        sx={{ textTransform: "none", whiteSpace: "nowrap", maxWidth: 190 }}>
+        sx={{
+          textTransform: "none",
+          whiteSpace: "nowrap",
+          maxWidth: 190,
+          px: { xs: 1, sm: 2 },
+        }}>
         {scenarioInfo(scenario).label}
       </Button>
       <Menu

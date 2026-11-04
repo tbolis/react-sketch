@@ -7,7 +7,7 @@
 - The showcase is a new application, with the same scenarios and settings: the canvas fills the window and the
   panels float over it, as in Excalidraw. A toolbar (with the number and letter keys of the tools), a
   properties panel (line color, fill, weight and style, and the actions on the selected objects), a
-  settings panel with the Scenario, Canvas and Insert tabs, zoom, undo and redo at the bottom, a preview
+  settings panel with the Scenario, Canvas and Insert tabs, undo and redo next to the menu, zoom at the bottom, a preview
   with the frame of the view, a hint for the tool in use, and a menu with the saved drawings, the download, the
   keyboard shortcuts and the light, dark and system color schemes. It has a layout for small screens.
 - The showcase runs on Material UI 9.5 with CSS variables and color schemes, and the keyboard focus ring of
