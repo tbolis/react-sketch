@@ -23,6 +23,17 @@ const follow = (canvas: fabric.Canvas): void => {
 };
 
 /**
+ * The objects which the pointer moves along with the object: the text box of the
+ * rectangle of a label, which follows it. None for any other object.
+ */
+export const linkedObjects = (
+  object: fabric.FabricObject
+): fabric.FabricObject[] => {
+  const label = labels.get(object);
+  return label ? [label.textbox] : [];
+};
+
+/**
  * A rectangle with a text box on top of it. The text box follows the
  * rectangle when it is moved or scaled.
  */
