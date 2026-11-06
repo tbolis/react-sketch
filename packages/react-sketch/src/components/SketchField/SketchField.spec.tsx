@@ -1508,8 +1508,9 @@ describe("SketchField", () => {
         expect(ids(canvas)).toEqual(["rect2"]);
         expect(sketch.hasSelection()).toBe(false);
 
+        // It is back where it was, under the object which is above it
         sketch.undo();
-        expect(ids(canvas)).toEqual(["rect2", "rect1"]);
+        expect(ids(canvas)).toEqual(["rect1", "rect2"]);
       });
 
       it("removes the object again on redo", () => {

@@ -21,6 +21,7 @@ describe("exports", () => {
       DefaultTool: "default-tool",
       Highlighter: "highlighter",
       Eraser: "eraser",
+      BucketFill: "bucket-fill",
       LaserPointer: "laser-pointer",
     });
   });

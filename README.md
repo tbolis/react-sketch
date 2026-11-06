@@ -257,7 +257,7 @@ All properties are optional.
 | `lineColor`              | `string`                             | `"black"`       | Color of the line.                                                                                                                                                                                                                                                                                                                                                           |
 | `lineWidth`              | `number`                             | `10`            | Width of the line.                                                                                                                                                                                                                                                                                                                                                           |
 | `lineStyle`              | `Types.LineStyle`                    | `"solid"`       | Style of the line: `"solid"`, `"dashed"`, `"dotted"` or `"dash-dot"`. See [Line style](#line-style).                                                                                                                                                                                                                                                                         |
-| `fillColor`              | `string`                             | `"transparent"` | Fill color of the shapes, where applicable (rectangle, rectangle-label, circle).                                                                                                                                                                                                                                                                                             |
+| `fillColor`              | `string`                             | `"transparent"` | Fill color of the shapes, where applicable (rectangle, rectangle-label, circle), and the color of the bucket fill, which uses `lineColor` while it is transparent.                                                                                                                                                                                                           |
 | `backgroundColor`        | `string`                             | `"transparent"` | Background color of the sketch, in hex or rgba format.                                                                                                                                                                                                                                                                                                                       |
 | `backgroundImage`        | `string`                             |                 | URL or data URL of the background image. It is set when the component mounts and when it changes, and removed when it is gone. It takes the place of the background image of `value` and `defaultValue`.                                                                                                                                                                     |
 | `backgroundImageOptions` | `Types.BackgroundOptions`            |                 | Options of `backgroundImage`, those of `setBackgroundFromDataUrl`. Options written inline in a render do not load the image again when their content is the same.                                                                                                                                                                                                            |
@@ -344,6 +344,7 @@ Use the tools by name (`"pencil"`), with `Tools` (`Tools.Pencil`) or with the en
 | Pan             | `Tools.Pan`            | `pan`             | Disables drawing. Dragging moves the whole canvas, useful after zooming (contributed by [wmaillard](https://github.com/wmaillard)).                                                                            |
 | Highlighter     | `Tools.Highlighter`    | `highlighter`     | Free drawing in a semi-transparent color. `lineColor` must be a hex code or a color name; any other value falls back to the default color.                                                                     |
 | Eraser          | `Tools.Eraser`         | `eraser`          | Erases parts of the objects, with the width of `lineWidth`. The cursor shows the size of the brush. The background color and the background image are not erased. See [Eraser](#eraser).                       |
+| Bucket fill     | `Tools.BucketFill`     | `bucket-fill`     | Fills the area which is closed around a click with `fillColor` (`lineColor` while it is transparent). See [Bucket fill](#bucket-fill).                                                                         |
 | Laser pointer   | `Tools.LaserPointer`   | `laser-pointer`   | A line that follows the pointer, fades out and disappears. It is not part of the drawing. See [Laser pointer](#laser-pointer).                                                                                 |
 | Default tool    | `Tools.DefaultTool`    | `default-tool`    | Disables drawing and selection. Use it to show a drawing that is not edited.                                                                                                                                   |
 
@@ -358,8 +359,8 @@ thick line has long dashes and wide dots.
 ```
 
 The pencil, line, arrow, rectangle, rectangle label, circle and polygon draw it. The head of an arrow and the
-text box of a rectangle label are not dashed, and the highlighter, the eraser and the laser pointer do not
-draw it. A change of `lineStyle` is for the next drawing: what is drawn already keeps its style. The style is
+text box of a rectangle label are not dashed, and the highlighter, the eraser, the bucket fill and the laser
+pointer do not draw it. A change of `lineStyle` is for the next drawing: what is drawn already keeps its style. The style is
 saved by `toJSON()` and loaded by `fromJSON()` with the object (`strokeDashArray` and `strokeLineCap`), and
 the polygon in progress is shown in it.
 
@@ -430,6 +431,26 @@ A stroke is one undo step. The erased parts are kept on the objects, so `toJSON(
 `defaultValue` and `fromJSON()` load them. An object is only cut where the eraser crosses it, the rest of
 the sketch stays, and the background color and the background image are not erased.
 
+### Bucket fill
+
+The bucket fill fills the area around the point of a click with `fillColor`, or with `lineColor` while
+`fillColor` is transparent (its default). What closes the area is what is drawn: lines, rectangles, circles,
+polygons, strokes of the pencil, texts, the overlay image, and any other object, whatever its color. The
+background color and the background image do not close an area.
+
+The area has to be closed within the canvas, as it is shown with the zoom and the position of the view. Where
+the lines do not meet, or the area reaches the edge of the canvas, the color would get out: a click there fills
+nothing, and `onChange` is not called. A dashed or dotted line has gaps, so it does not close an area.
+
+The fill is an object of the sketch, a path of the shape of the area. It is one undo step, `onObjectAdded` and
+`onChange` are called for it, `toJSON()` saves it (as a `BucketFill` object), `value`, `defaultValue` and
+`fromJSON()` load it, and it scales with the canvas. It is over the object the area is in and under the objects
+around it, and goes a pixel under their lines, so a line is never covered and there is no seam at its edge. A
+click in an area which has a fill fills it again, over the first one. The select tool moves and removes the fills,
+and the eraser cuts them, as it does the other objects.
+
+The fill is made by the private package [`@react-sketch/bucket`](packages/bucket).
+
 ### Laser pointer
 
 The laser pointer points at something on the sketch: the line follows the pointer, gets thinner towards its
@@ -445,7 +466,7 @@ not called when it is drawn. Switching to another tool clears what is left of th
 | Export         | Description                                                                                                                                                                                                               |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `SketchField`  | The component (named export). Also usable as a type, for the `ref`.                                                                                                                                                       |
-| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Polygon`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`, `Eraser`, `LaserPointer`.                                                |
+| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Polygon`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`, `Eraser`, `BucketFill`, `LaserPointer`.                                  |
 | `Types`        | Namespace of the types: `Tool` (enumeration), `Tools`, `LineStyle`, `SketchProperties`, `SketchEvent`, `SketchObject`, `SketchValue`, `SketchData`, `DataUrlOptions`, `ImageOptions`, `BackgroundOptions`, `TextOptions`. |
 | default export | The component, which also carries `SketchField` and `Tools` (as in 0.5.x).                                                                                                                                                |
 
@@ -469,6 +490,7 @@ This is a Yarn 1 workspaces monorepo.
 | Path                    | Description                                                                                                                                                                               |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/react-sketch` | The library, published to npm as `react-sketch`. The build output is `dist/index.js` (UMD bundle, `react` and `fabric` are external) and `dist/index.d.ts` (type declarations).           |
+| `packages/bucket`       | The bucket fill, which finds the area closed around a point and makes its fill (private, bundled into `react-sketch`).                                                                    |
 | `packages/eraser`       | The eraser brush, from `@erase2d/fabric` (private, bundled into `react-sketch`).                                                                                                          |
 | `packages/laserpointer` | The laser pointer brush (private, bundled into `react-sketch`).                                                                                                                           |
 | `packages/showcase`     | Demo application (not published), live on GitHub Pages: a canvas with floating tools, properties and settings, and the `defaultValue`, `value`, `addImg` and `backgroundImage` scenarios. |

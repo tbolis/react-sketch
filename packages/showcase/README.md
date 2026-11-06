@@ -6,9 +6,9 @@ and is not published to npm.
 The canvas fills the window, and the panels float over it:
 
 - **Toolbar** (top): select, pan, rectangle, rectangle label, circle, polygon, line, arrow, pencil, highlighter,
-  eraser and laser pointer. The keys of the tools are on the buttons and in the shortcuts dialog.
-- **Properties** (left): line color, fill color, line weight and line style of the tool, and copy, paste and delete
-  of the selected objects.
+  eraser, bucket fill and laser pointer. The keys of the tools are on the buttons and in the shortcuts dialog.
+- **Properties** (left): line color, fill color, line weight and line style of the tool (the bucket fill has the fill
+  color only), and copy, paste and delete of the selected objects.
 - **Settings** (right, the gear): the **Scenario** tab (what the scenario shows and its actions), the **Canvas** tab
   (size, background color and image, pinch zoom, view, grid) and the **Insert** tab (text, image from a URL,
   overlay).
