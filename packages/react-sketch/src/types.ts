@@ -16,6 +16,7 @@ export enum Tool {
   PAN = "pan",
   HIGHLIGHTER = "highlighter",
   ERASER = "eraser",
+  BUCKET_FILL = "bucket-fill",
   LASER_POINTER = "laser-pointer",
   DEFAULT_TOOL = "default-tool",
 }
@@ -37,6 +38,7 @@ export const Tools = {
   DefaultTool: Tool.DEFAULT_TOOL,
   Highlighter: Tool.HIGHLIGHTER,
   Eraser: Tool.ERASER,
+  BucketFill: Tool.BUCKET_FILL,
   LaserPointer: Tool.LASER_POINTER,
 } as const;
 
@@ -197,7 +199,10 @@ export interface SketchProperties {
    * outline of the stroke) and not a line, so `lineStyle` does not apply to it. Defaults to false
    */
   pressureSensitive?: boolean;
-  /** The fill color of the shape when applicable. Defaults to "transparent" */
+  /**
+   * The fill color of the shape when applicable. Defaults to "transparent". The
+   * bucket fill fills with it, and with `lineColor` while it is transparent
+   */
   fillColor?: string;
   /** The background color of the sketch, in rgba or hex format. Defaults to "transparent" */
   backgroundColor?: string;
