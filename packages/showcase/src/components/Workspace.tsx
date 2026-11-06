@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ReactElement, RefObject } from "react";
-import { SketchField, type Types } from "react-sketch";
+import { SketchField, Types } from "react-sketch";
 import Box from "@mui/material/Box";
 import { observer } from "mobx-react-lite";
 import defaultValue from "../data/defaultValue";
@@ -30,6 +30,12 @@ const gridStyle = {
 const showView = (view: Types.SketchView) => {
   CONFIG.view = view;
 };
+
+/** The fill color of the tool: the bucket fills with it, whether the shapes are filled or not */
+const fillColorOfTool = (): string =>
+  CONFIG.fillWithColor || CONFIG.selectedTool === Types.Tool.BUCKET_FILL
+    ? CONFIG.fillColor
+    : "transparent";
 
 /**
  * The size of the element, as it changes. Nothing is reported before the first
@@ -157,7 +163,7 @@ const Workspace = observer((): ReactElement => {
             minZoom={CONFIG.minZoom}
             maxZoom={CONFIG.maxZoom}
             onViewChange={showView}
-            fillColor={CONFIG.fillWithColor ? CONFIG.fillColor : "transparent"}
+            fillColor={fillColorOfTool()}
             backgroundColor={
               CONFIG.fillWithBackgroundColor ? CONFIG.backgroundColor : "transparent"
             }

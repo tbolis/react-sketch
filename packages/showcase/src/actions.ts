@@ -56,6 +56,9 @@ export const NO_LINE_STYLE: string[] = [
   Types.Tool.LASER_POINTER,
 ];
 
+/** The tools which fill an area with the fill color, and draw no line: only that color matters to them */
+export const FILL_ONLY: string[] = [Types.Tool.BUCKET_FILL];
+
 /** The tools which draw nothing, so their line, color and style do not matter */
 export const NO_PROPERTIES: string[] = [Types.Tool.SELECT, Types.Tool.PAN];
 
