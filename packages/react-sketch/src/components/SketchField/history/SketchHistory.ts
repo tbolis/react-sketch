@@ -3,11 +3,14 @@ import { UndoHistory } from "./index";
 import type { Erasure } from "../tools/Eraser";
 
 /**
- * One undoable action of the sketch
+ * One undoable action of the sketch. `index` is where the object is among the
+ * others, for the actions which put it back (a fill goes under the objects which
+ * close it, and it is not put back on top of them). It is not there for an object
+ * which is on top.
  */
 type HistoryEntry =
-  | { action: "add"; object: fabric.FabricObject }
-  | { action: "remove"; object: fabric.FabricObject }
+  | { action: "add"; object: fabric.FabricObject; index?: number }
+  | { action: "remove"; object: fabric.FabricObject; index?: number }
   | { action: "modify"; object: fabric.FabricObject; before: string; after: string }
   | { action: "erase"; erasures: Erasure[] };
 
@@ -57,7 +60,7 @@ export class SketchHistory {
   onObjectAdded(object: fabric.FabricObject): void {
     this.snapshots.set(object, stateOf(object));
     this.pending = object;
-    this.entries.keep({ action: "add", object });
+    this.entries.keep({ action: "add", object, index: this.placeOf(object) });
   }
 
   /**
@@ -111,9 +114,19 @@ export class SketchHistory {
    */
   remove(objects: fabric.FabricObject[]): void {
     objects.forEach((object) => {
-      this.entries.keep({ action: "remove", object });
+      this.entries.keep({ action: "remove", object, index: this.placeOf(object) });
       this.canvas.remove(object);
     });
+  }
+
+  /**
+   * Where the object is among the objects of the canvas, unless it is on top
+   * (the place of an object which is put back on top is the end of the canvas)
+   */
+  private placeOf(object: fabric.FabricObject): number | undefined {
+    const objects = this.canvas.getObjects();
+    const index = objects.indexOf(object);
+    return index === -1 || index === objects.length - 1 ? undefined : index;
   }
 
   /**
@@ -191,7 +204,8 @@ export class SketchHistory {
         case "remove":
           // redo of an add, and undo of a remove, put the object back
           if ((entry.action === "add") === forward) {
-            this.canvas.add(object);
+            if (entry.index === undefined) this.canvas.add(object);
+            else this.canvas.insertAt(entry.index, object);
           } else {
             this.canvas.remove(object);
           }

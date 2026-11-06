@@ -2,6 +2,7 @@ import * as fabric from "fabric";
 import { SketchProperties, Tool } from "../../../types";
 import { FabricCanvasTool } from "./index";
 import { Arrow } from "./Arrow";
+import { BucketFill } from "./BucketFill";
 import { Circle } from "./Circle";
 import { DefaultTool } from "./DefaultTool";
 import { Eraser } from "./Eraser";
@@ -58,6 +59,9 @@ export const create_tool = (
       break;
     case Tool.ERASER:
       toolInstance = new Eraser(canvas);
+      break;
+    case Tool.BUCKET_FILL:
+      toolInstance = new BucketFill(canvas);
       break;
     case Tool.LASER_POINTER:
       toolInstance = new LaserPointer(canvas);
