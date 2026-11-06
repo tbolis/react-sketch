@@ -1,0 +1,19 @@
+{
+  "name": "@react-sketch/bucket",
+  "version": "1.2.0",
+  "private": true,
+  "description": "The bucket fill for fabric, which fills the area closed by the objects around a point with a color, used by react-sketch",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "fabric": "^7.4.0"
+  },
+  "devDependencies": {
+    "fabric": "^7.4.0"
+  }
+}
