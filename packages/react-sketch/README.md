@@ -53,7 +53,7 @@ attached (as in 0.5.x).
 
 The properties, the methods, the tools and the usage with a saved or controlled drawing are documented
 in the [README of the repository](https://github.com/tbolis/react-sketch#readme). Release notes are in
-the [changelog](https://github.com/tbolis/react-sketch/blob/master/CHANGELOG.md). Report problems at
+the [changelog](https://github.com/tbolis/react-sketch/blob/main/CHANGELOG.md). Report problems at
 <https://github.com/tbolis/react-sketch/issues>.
 
 ## License

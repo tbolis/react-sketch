@@ -503,7 +503,7 @@ The tests run on React 19. `REACT=18 yarn test` runs them on React 18, and CI do
 ### Showcase on GitHub Pages
 
 [pages.yml](.github/workflows/pages.yml) builds the showcase and publishes `packages/showcase/build` to
-<https://tbolis.github.io/react-sketch/>. It runs on every push to `master` that changes the library, the
+<https://tbolis.github.io/react-sketch/>. It runs on every push to `main` that changes the library, the
 `@react-sketch/*` packages, the showcase, the lockfile, `.nvmrc` or the workflow itself (not markdown), and
 on demand from the Actions tab (Run workflow). The showcase imports the sources of the library, so a
 change of the library is in the next deployment. The repository needs Settings > Pages > Build and

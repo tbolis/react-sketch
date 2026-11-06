@@ -2,13 +2,13 @@ name: Deploy showcase to GitHub Pages
 
 # Builds the showcase from the sources of this repository (the react-sketch library, the
 # @react-sketch/* packages and the showcase itself) and publishes it with GitHub Pages.
-# It runs when one of them changes on master, and on demand from the Actions tab.
+# It runs when one of them changes on main, and on demand from the Actions tab.
 #
 # One-time setup: Settings > Pages > Build and deployment > Source: GitHub Actions.
 
 on:
   push:
-    branches: [master]
+    branches: [main]
     paths:
       - "packages/**"
       - "!packages/**/*.md"

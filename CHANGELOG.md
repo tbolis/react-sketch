@@ -66,7 +66,7 @@ The eraser, laser pointer and polygon tools, pinch zoom, and features that forks
   view as `onViewChange` reports it) and a reset button above the canvas, which also takes back the zoom in and zoom out buttons.
 - The showcase has keyboard shortcuts for the tools, undo, redo, copy, paste, delete, save and zoom, listed by `?`.
 - The showcase is deployed to <https://tbolis.github.io/react-sketch/> by `.github/workflows/pages.yml`, when the
-  library, the showcase or their dependencies change on `master`, and on demand from the Actions tab.
+  library, the showcase or their dependencies change on `main`, and on demand from the Actions tab.
 - The page of the showcase has a link preview (Open Graph and Twitter card tags, with a 1200 x 630 image), so a
   link to it shows a title, a description and an image in chats and on social networks. It also has PNG icons
   (32 pixel and Apple touch) next to the icon file.
@@ -286,7 +286,7 @@ These behaviors of 0.5.x are kept.
 
 ## 0.5.x
 
-The `0.5.2` to `0.5.6` versions were set in `package.json` on the master branch and have no git tags.
+The `0.5.2` to `0.5.6` versions were set in `package.json` on the main branch and have no git tags.
 They are not on npm under the name `react-sketch`, whose latest version is 0.5.1. From December 2019 to
 November 2020 the package name in `package.json` was `@tarik.djurdjevic/react-sketch`, it is
 `react-sketch` again since 2020-11-14.

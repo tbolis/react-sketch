@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [master, "release/*.*.*", "hotfix/*.*.*"]
+    branches: [main, "release/*.*.*", "hotfix/*.*.*"]
   pull_request:
-    branches: [master, "release/*.*.*", "hotfix/*.*.*"]
+    branches: [main, "release/*.*.*", "hotfix/*.*.*"]
 
 permissions:
   contents: read

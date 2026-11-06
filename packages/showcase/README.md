@@ -46,7 +46,7 @@ Run them from the root of the repository, or with `yarn workspace showcase <scri
 
 [`.github/workflows/pages.yml`](../../.github/workflows/pages.yml) builds the showcase and publishes
 `packages/showcase/build` with GitHub Pages. It runs when the library, the `@react-sketch/*` packages or the showcase
-change on `master`, and on demand (Actions > Deploy showcase to GitHub Pages > Run workflow). The build uses
+change on `main`, and on demand (Actions > Deploy showcase to GitHub Pages > Run workflow). The build uses
 relative URLs, so it works under `https://tbolis.github.io/react-sketch/`.
 
 ## Stack
