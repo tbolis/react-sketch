@@ -2,6 +2,8 @@
 
 ## 1.2.0
 
+The bucket fill tool, the export at the resolution of the background image, and fixes to undo and redo of a move.
+
 ### Added
 
 - The panels of the showcase (the tools, the properties, the settings and the preview) can be moved, for the
@@ -21,6 +23,19 @@
   object, so the modifications of it can still be undone. The text box of a rectangle label goes into the
   group with its rectangle. The showcase has Group and Ungroup buttons in the selection panel, with Ctrl G
   and Ctrl Shift G.
+- The bucket fill tool: `tool="bucket-fill"`, `Tools.BucketFill` and `Types.Tool.BUCKET_FILL`. A click fills
+  the area which is closed around it with `fillColor` (with `lineColor` while `fillColor` is transparent, its
+  default). Lines, rectangles, circles, polygons, strokes of the pencil, texts, the overlay image and any other
+  object close an area, whatever their color. The background color and the background image do not, and nor
+  does a dashed line, which has gaps. The area has to be closed within the canvas as it is shown (with the zoom
+  and the position of the view): when the color would get out, a click fills nothing. The fill is an object of
+  the sketch (a path, saved by `toJSON()` as a `BucketFill` and loaded by `value`, `defaultValue` and
+  `fromJSON()`), one undo step, and it scales with the canvas. It is under the lines which close the area, a
+  pixel under their edge, and over the object the area is in, so a click in a filled rectangle fills what its
+  lines leave of it, and an area which has a fill is filled again over it. The cursor is a bucket with a drop
+  of the color.
+- The showcase has a Bucket fill button in the tool selector (key F), with the fill color only in its
+  properties, as the other properties do not matter to it.
 - `toDataURL({ multiplier: "original" })` (#75): the drawing at the resolution of the background image, one
   pixel of the picture for each pixel of the image, at any size of the canvas. Without a background image the
   multiplier is 1. An image which is scaled differently in the two directions is exported at the larger
@@ -29,6 +44,12 @@
   `Types.SketchSize`. A canvas of that size shows the image pixel for pixel.
 - The showcase has an Original size button in the Canvas tab, which gives the canvas the size of the
   background image, and its download has the resolution of the image.
+
+### Changed
+
+- Undo of a removal puts the object back where it was among the objects, and not on top of them. Redo of an
+  addition does the same for an object which was added under the others, as the fill of the bucket is, so a fill
+  never covers the lines which close it after an undo and a redo.
 
 ### Fixed
 
@@ -48,6 +69,13 @@
 - The drawing is scaled by exact factors when the canvas is resized. The factors were rounded to two
   decimals, which left the drawing and the background image a little off their size, and the error added up
   with every resize, so a canvas could not go back to the size it had.
+
+### Packaging and tooling
+
+- The bucket fill is in the private package `packages/bucket` (`@react-sketch/bucket`), which `react-sketch`
+  bundles too, so nothing new is installed for the users of the library. `yarn build:packages` builds the three
+  private packages, and `yarn typecheck`, `yarn build` and `yarn test` run it first. Its tests are in
+  `react-sketch`: the ones with real pixels run in the node environment of Jest, with the node build of fabric.
 
 ## 1.1.0 (2026-11-04)
 
