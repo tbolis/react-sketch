@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { Types } from "react-sketch";
 import ArrowIcon from "@mui/icons-material/NorthEast";
+import BucketFillIcon from "@mui/icons-material/FormatColorFill";
 import CircleIcon from "@mui/icons-material/RadioButtonUnchecked";
 import EraserIcon from "@mui/icons-material/AutoFixNormal";
 import HighlighterIcon from "@mui/icons-material/Highlight";
@@ -106,6 +107,13 @@ export const TOOL_GROUPS: ToolInfo[][] = [
       key: "e",
       hint: "Drag over the drawing to erase it.",
       icon: <EraserIcon />,
+    },
+    {
+      value: Types.Tool.BUCKET_FILL,
+      label: "Bucket fill",
+      key: "f",
+      hint: "Click inside a closed shape to fill it with the fill color. The lines around it must meet: a gap lets the color out, and nothing is filled.",
+      icon: <BucketFillIcon />,
     },
     {
       value: Types.Tool.LASER_POINTER,

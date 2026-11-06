@@ -21,6 +21,7 @@ import Typography from "@mui/material/Typography";
 import { Types } from "react-sketch";
 import { observer } from "mobx-react-lite";
 import {
+  FILL_ONLY,
   NO_LINE_STYLE,
   NO_PROPERTIES,
   copy,
@@ -64,6 +65,110 @@ const Action = ({ label, disabled, onClick, children }: ActionProps) => (
     </span>
   </Tooltip>
 );
+
+/**
+ * The colors, the weight and the style of the line of what the tool draws. The tools which
+ * fill an area have the fill color only, which is never none for them.
+ */
+const DrawingProperties = observer(({ tool }: { tool: string }): ReactElement => {
+  const fillOnly = FILL_ONLY.includes(tool);
+  return (
+    <Stack spacing={1.5} sx={{ mb: 1.5 }}>
+      {!fillOnly && (
+        <ColorPicker
+          label="Line color"
+          value={CONFIG.lineColor}
+          onChange={(color) => color && (CONFIG.lineColor = color)}
+        />
+      )}
+      <ColorPicker
+        label="Fill color"
+        allowNone={!fillOnly}
+        value={fillOnly || CONFIG.fillWithColor ? CONFIG.fillColor : null}
+        fallback={CONFIG.fillColor}
+        onChange={(color) => {
+          if (color) CONFIG.fillColor = color;
+          if (!fillOnly) CONFIG.fillWithColor = color !== null;
+        }}
+      />
+      {!fillOnly && (
+        <>
+          <Box>
+            <ToggleButtonGroup
+              exclusive
+              size="small"
+              color="primary"
+              fullWidth
+              aria-label="Line weight presets"
+              value={CONFIG.lineWidth}
+              onChange={(_event, value: number | null) => {
+                if (value !== null) CONFIG.lineWidth = value;
+              }}>
+              {QUICK_WIDTHS.map(({ value, label }) => (
+                <ToggleButton
+                  key={value}
+                  value={value}
+                  aria-label={label}
+                  title={label}>
+                  <Box
+                    sx={{
+                      width: 24,
+                      height: `${Math.min(value, 10)}px`,
+                      bgcolor: "currentColor",
+                      borderRadius: 1,
+                    }}
+                  />
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
+            <LabeledSlider
+              label="Line weight"
+              action={
+                tool === Types.Tool.PENCIL && (
+                  <Tooltip
+                    title="A pen (a stylus) draws a wider line the harder it presses. The mouse and the fingers draw as before."
+                    placement="right">
+                    <FormControlLabel
+                      label="Pen pressure"
+                      labelPlacement="start"
+                      slotProps={{ typography: { variant: "caption" } }}
+                      control={
+                        <Switch
+                          size="small"
+                          checked={CONFIG.pressureSensitive}
+                          onChange={(event) =>
+                            (CONFIG.pressureSensitive = event.target.checked)
+                          }
+                        />
+                      }
+                      sx={{ mx: 0 }}
+                    />
+                  </Tooltip>
+                )
+              }
+              value={CONFIG.lineWidth}
+              min={1}
+              max={100}
+              startIcon={<RemoveIcon fontSize="small" />}
+              endIcon={<AddIcon fontSize="small" />}
+              onChange={(value) => (CONFIG.lineWidth = value)}
+            />
+          </Box>
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              Line style
+            </Typography>
+            <LineStyleSelector
+              selected={CONFIG.lineStyle}
+              disabled={NO_LINE_STYLE.includes(tool)}
+            />
+          </Box>
+        </>
+      )}
+      <Divider />
+    </Stack>
+  );
+});
 
 /**
  * The line, the colors and the style of what the tool draws, and the actions on the
@@ -140,96 +245,7 @@ const Properties = observer((): ReactElement => {
             </IconButton>
           </Tooltip>
         </Stack>
-        {drawing && (
-          <Stack spacing={1.5} sx={{ mb: 1.5 }}>
-            <ColorPicker
-              label="Line color"
-              value={CONFIG.lineColor}
-              onChange={(color) => color && (CONFIG.lineColor = color)}
-            />
-            <ColorPicker
-              label="Fill color"
-              allowNone
-              value={CONFIG.fillWithColor ? CONFIG.fillColor : null}
-              fallback={CONFIG.fillColor}
-              onChange={(color) => {
-                CONFIG.fillWithColor = color !== null;
-                if (color) CONFIG.fillColor = color;
-              }}
-            />
-            <Box>
-              <ToggleButtonGroup
-                exclusive
-                size="small"
-                color="primary"
-                fullWidth
-                aria-label="Line weight presets"
-                value={CONFIG.lineWidth}
-                onChange={(_event, value: number | null) => {
-                  if (value !== null) CONFIG.lineWidth = value;
-                }}>
-                {QUICK_WIDTHS.map(({ value, label }) => (
-                  <ToggleButton
-                    key={value}
-                    value={value}
-                    aria-label={label}
-                    title={label}>
-                    <Box
-                      sx={{
-                        width: 24,
-                        height: `${Math.min(value, 10)}px`,
-                        bgcolor: "currentColor",
-                        borderRadius: 1,
-                      }}
-                    />
-                  </ToggleButton>
-                ))}
-              </ToggleButtonGroup>
-              <LabeledSlider
-                label="Line weight"
-                action={
-                  selectedTool === Types.Tool.PENCIL && (
-                    <Tooltip
-                      title="A pen (a stylus) draws a wider line the harder it presses. The mouse and the fingers draw as before."
-                      placement="right">
-                      <FormControlLabel
-                        label="Pen pressure"
-                        labelPlacement="start"
-                        slotProps={{ typography: { variant: "caption" } }}
-                        control={
-                          <Switch
-                            size="small"
-                            checked={CONFIG.pressureSensitive}
-                            onChange={(event) =>
-                              (CONFIG.pressureSensitive = event.target.checked)
-                            }
-                          />
-                        }
-                        sx={{ mx: 0 }}
-                      />
-                    </Tooltip>
-                  )
-                }
-                value={CONFIG.lineWidth}
-                min={1}
-                max={100}
-                startIcon={<RemoveIcon fontSize="small" />}
-                endIcon={<AddIcon fontSize="small" />}
-                onChange={(value) => (CONFIG.lineWidth = value)}
-              />
-            </Box>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Line style
-              </Typography>
-              <LineStyleSelector
-                selected={CONFIG.lineStyle}
-                disabled={NO_LINE_STYLE.includes(selectedTool)}
-              />
-            </Box>
-            <Divider />
-          </Stack>
-        )}
+        {drawing && <DrawingProperties tool={selectedTool} />}
         <Typography variant="caption" color="text.secondary" component="p">
           Selected objects
         </Typography>
