@@ -16,6 +16,7 @@ import { CanvasEvent, FabricCanvasEventsManager, SketchEventAware } from "./even
 import { SketchHistory } from "./history/SketchHistory";
 import { IDENTITY_VIEW, PinchZoom } from "./pinch";
 import { autoresize, scaleContent } from "./resize";
+import { SketchGroup } from "./SketchGroup";
 import { FabricCanvasTool } from "./tools";
 import { create_tool } from "./tools/factory";
 import { Eraser } from "./tools/Eraser";
@@ -733,6 +734,59 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
       })
       // A paste which fails must not stop the next ones
       .catch(() => undefined);
+  };
+
+  /**
+   * Whether the selection can be made a group: two or more objects are selected
+   */
+  canGroup = (): boolean => {
+    const selected = this.canvas.getActiveObject();
+    return (
+      selected instanceof fabric.ActiveSelection && selected.getObjects().length > 1
+    );
+  };
+
+  /**
+   * Whether the selected object is a group which `group()` made. The group of an arrow is not.
+   */
+  canUngroup = (): boolean => this.canvas.getActiveObject() instanceof SketchGroup;
+
+  /**
+   * Make a group of the selected objects, which is selected then. The group is one object:
+   * it is moved, scaled, rotated, copied and removed as one, and it is saved by `toJSON()`.
+   * It takes the place of the topmost of the objects, and the text box of a rectangle label
+   * goes into the group with its rectangle. It is one undo step. Like undo and redo, it
+   * calls `onChange` and not `onObjectAdded`. Nothing happens when `canGroup()` is false.
+   */
+  group = (): void => {
+    const canvas = this.canvas;
+    const selected = canvas.getActiveObject();
+    if (!this.canGroup() || !(selected instanceof fabric.ActiveSelection)) return;
+    const objects = selected.getObjects();
+    // Leaving the selection first gives the objects back their own position
+    canvas.discardActiveObject();
+    const group = this.history.group(objects);
+    if (group) canvas.setActiveObject(group);
+    canvas.requestRenderAll();
+    this.props.onChange?.();
+  };
+
+  /**
+   * Take the selected group apart: its objects are selected then, where they were in the
+   * drawing, with the position, the scale and the turn which the group gave them. It is one
+   * undo step. Nothing happens when `canUngroup()` is false.
+   */
+  ungroup = (): void => {
+    const canvas = this.canvas;
+    const group = canvas.getActiveObject();
+    if (!(group instanceof SketchGroup)) return;
+    canvas.discardActiveObject();
+    const objects = this.history.ungroup(group);
+    if (objects.length) {
+      canvas.setActiveObject(new fabric.ActiveSelection(objects, { canvas }));
+    }
+    canvas.requestRenderAll();
+    this.props.onChange?.();
   };
 
   /**
