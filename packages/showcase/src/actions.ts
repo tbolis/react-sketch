@@ -69,6 +69,8 @@ export const selectScenario = (scenario: Scenario): void => {
   CONFIG.canUndo = false;
   CONFIG.canRedo = false;
   CONFIG.hasSelection = false;
+  CONFIG.canGroup = false;
+  CONFIG.canUngroup = false;
   CONFIG.canPaste = false;
   CONFIG.empty = true;
   CONFIG.view = INITIAL_VIEW;
@@ -136,6 +138,11 @@ export const restoreOriginalSize = (): void =>
     CONFIG.sketchHeight = size.height;
     CONFIG.controlledSize = true;
   });
+
+/** The canvas announces the change, which updates the state of the actions */
+export const groupSelected = (): void => withSketch((sketch) => sketch.group());
+
+export const ungroupSelected = (): void => withSketch((sketch) => sketch.ungroup());
 
 export const copy = (): void =>
   withSketch((sketch) => {

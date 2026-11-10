@@ -248,8 +248,8 @@ export interface SketchProperties {
   style?: CSS.Properties;
   /**
    * Called when the mouse was released on the canvas, or left it, after an object was
-   * added, changed or removed since it was pressed, and after undo, redo and loading a
-   * value. Not called for a click which only selects, or for a pointer which comes and
+   * added, changed or removed since it was pressed, and after undo, redo, group, ungroup
+   * and loading a value. Not called for a click which only selects, or for a pointer which comes and
    * goes. The argument is the DOM event of the former, nothing in the latter
    */
   onChange?: (event?: Event) => void;

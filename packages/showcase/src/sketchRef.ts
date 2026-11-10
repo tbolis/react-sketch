@@ -54,6 +54,8 @@ export const syncState = (): void =>
       CONFIG.canUndo = sketch.canUndo();
       CONFIG.canRedo = sketch.canRedo();
       CONFIG.hasSelection = sketch.hasSelection();
+      CONFIG.canGroup = sketch.canGroup();
+      CONFIG.canUngroup = sketch.canUngroup();
     })
   );
 

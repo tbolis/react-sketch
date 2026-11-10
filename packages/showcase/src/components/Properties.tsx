@@ -6,6 +6,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PasteIcon from "@mui/icons-material/ContentPaste";
 import RemoveIcon from "@mui/icons-material/Remove";
 import StyleIcon from "@mui/icons-material/Palette";
+import GroupIcon from "@mui/icons-material/Workspaces";
+import UngroupIcon from "@mui/icons-material/WorkspacesOutlined";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
@@ -19,8 +21,10 @@ import {
   NO_LINE_STYLE,
   NO_PROPERTIES,
   copy,
+  groupSelected,
   paste,
   removeSelected,
+  ungroupSelected,
 } from "../actions";
 import { CONFIG } from "../stores/config";
 import { toolByValue } from "../tools";
@@ -46,7 +50,11 @@ interface ActionProps {
 const Action = ({ label, disabled, onClick, children }: ActionProps) => (
   <Tooltip title={label}>
     <span>
-      <IconButton aria-label={label} disabled={disabled} onClick={onClick}>
+      <IconButton
+        size="small"
+        aria-label={label}
+        disabled={disabled}
+        onClick={onClick}>
         {children}
       </IconButton>
     </span>
@@ -59,7 +67,14 @@ const Action = ({ label, disabled, onClick, children }: ActionProps) => (
  * nothing leave it with the actions only.
  */
 const Properties = observer((): ReactElement => {
-  const { selectedTool, propertiesOpen, hasSelection, canPaste } = CONFIG;
+  const {
+    selectedTool,
+    propertiesOpen,
+    hasSelection,
+    canGroup,
+    canUngroup,
+    canPaste,
+  } = CONFIG;
   const drawing = !NO_PROPERTIES.includes(selectedTool);
   const tool = toolByValue(selectedTool);
 
@@ -183,6 +198,15 @@ const Properties = observer((): ReactElement => {
         </Action>
         <Action label="Paste (Ctrl V)" disabled={!canPaste} onClick={paste}>
           <PasteIcon />
+        </Action>
+        <Action label="Group (Ctrl G)" disabled={!canGroup} onClick={groupSelected}>
+          <GroupIcon />
+        </Action>
+        <Action
+          label="Ungroup (Ctrl Shift G)"
+          disabled={!canUngroup}
+          onClick={ungroupSelected}>
+          <UngroupIcon />
         </Action>
         <Action
           label="Delete selected (Delete)"
