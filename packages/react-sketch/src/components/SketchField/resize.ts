@@ -49,8 +49,8 @@ export const autoresize = (
   const prevHeight = canvas.getHeight();
   if (width <= 0 || height <= 0 || !prevWidth || !prevHeight) return undefined;
 
-  const wfactor = parseFloat((width / prevWidth).toFixed(2));
-  const hfactor = parseFloat((height / prevHeight).toFixed(2));
+  const wfactor = width / prevWidth;
+  const hfactor = height / prevHeight;
   canvas.setDimensions({ width, height });
 
   scaleContent(canvas, wfactor, hfactor);

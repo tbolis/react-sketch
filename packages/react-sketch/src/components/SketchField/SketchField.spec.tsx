@@ -514,6 +514,70 @@ describe("SketchField", () => {
       expect([overlay.scaleX, overlay.scaleY]).toEqual([4, 6]);
     });
 
+    it("takes the drawing back to its size, as many times as the canvas is resized", () => {
+      stubImageLoads();
+      layout(400, 300);
+      const { sketch, canvas } = mount({ tool: Tool.RECTANGLE });
+      sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
+        stretched: true,
+      });
+      const image = canvas.backgroundImage as fabric.FabricImage;
+
+      // Sizes which are not a multiple of the one before: a factor rounded to two decimals is off by a pixel or more
+      for (const [width, height] of [
+        [333, 211],
+        [1013, 777],
+        [271, 189],
+        [400, 300],
+      ]) {
+        layout(width, height);
+        window.dispatchEvent(new Event("resize"));
+      }
+
+      // 200 by 100 pixels, stretched to 400 by 300
+      expect(image.scaleX).toBeCloseTo(2, 10);
+      expect(image.scaleY).toBeCloseTo(3, 10);
+    });
+
+    it("shows the background image pixel for pixel when the canvas has the size of the image", () => {
+      stubImageLoads();
+      layout(997, 613);
+      const { sketch, canvas } = mount();
+      sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
+        stretched: true,
+      });
+
+      const size = sketch.getOriginalSize() as { width: number; height: number };
+      layout(size.width, size.height);
+      window.dispatchEvent(new Event("resize"));
+
+      const image = canvas.backgroundImage as fabric.FabricImage;
+      expect(image.scaleX).toBeCloseTo(1, 10);
+      expect(image.scaleY).toBeCloseTo(1, 10);
+    });
+
+    it("goes to the size of the image through the width and height properties", () => {
+      stubImageLoads();
+      layout(400, 300);
+      const { sketch, canvas, update } = mount({
+        width: 400,
+        height: 300,
+        autoresize: false,
+      });
+      sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
+        stretched: true,
+      });
+      const image = canvas.backgroundImage as fabric.FabricImage;
+      const size = sketch.getOriginalSize() as { width: number; height: number };
+
+      layout(size.width, size.height);
+      update({ width: size.width, height: size.height, autoresize: false });
+
+      expect([canvas.getWidth(), canvas.getHeight()]).toEqual([200, 100]);
+      expect(image.scaleX).toBeCloseTo(1, 10);
+      expect(image.scaleY).toBeCloseTo(1, 10);
+    });
+
     it("does not follow the window when autoresize is off", () => {
       layout(400, 300);
       const { canvas } = mount({ autoresize: false });
@@ -1362,6 +1426,129 @@ describe("SketchField", () => {
             height: 4,
           })
         );
+      });
+    });
+
+    describe("toDataURL with the original resolution", () => {
+      const exportedAt = (sketch: SketchField, canvas: fabric.Canvas): unknown => {
+        const toDataURL = jest.spyOn(canvas, "toDataURL");
+        sketch.toDataURL({ multiplier: "original" });
+        return (toDataURL.mock.calls[0][0] as { multiplier?: number }).multiplier;
+      };
+
+      it("scales by what gives the background image a pixel for each of its own", () => {
+        stubImageLoads();
+        layout(400, 300);
+        const { sketch, canvas } = mount();
+        // 200 by 100 pixels, shown at 400 by 200
+        sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
+          scaleX: 2,
+          scaleY: 2,
+        });
+
+        expect(exportedAt(sketch, canvas)).toEqual(0.5);
+      });
+
+      it("follows the scale of the image, when the drawing is zoomed", () => {
+        stubImageLoads();
+        layout(400, 300);
+        const { sketch, canvas } = mount();
+        sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
+          scaleX: 2,
+          scaleY: 2,
+        });
+
+        sketch.zoom(2);
+
+        expect(exportedAt(sketch, canvas)).toEqual(0.25);
+      });
+
+      it("is larger than 1 for an image which is shown smaller than it is", () => {
+        stubImageLoads();
+        layout(100, 50);
+        const { sketch, canvas } = mount();
+        // 200 by 100 pixels, stretched to 100 by 50
+        sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
+          stretched: true,
+        });
+
+        expect(exportedAt(sketch, canvas)).toEqual(2);
+      });
+
+      it("keeps every pixel of an image which is scaled differently in the two directions", () => {
+        stubImageLoads();
+        layout(400, 300);
+        const { sketch, canvas } = mount();
+        // 200 by 100 pixels, stretched to 400 by 300: the scales are 2 and 3
+        sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
+          stretched: true,
+        });
+
+        expect(exportedAt(sketch, canvas)).toEqual(0.5);
+      });
+
+      it("is not thrown off by a flipped image", () => {
+        stubImageLoads();
+        layout(400, 300);
+        const { sketch, canvas } = mount();
+        sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
+          scaleX: -2,
+          scaleY: 2,
+        });
+
+        expect(exportedAt(sketch, canvas)).toEqual(0.5);
+      });
+
+      it("is 1 without a background image", () => {
+        const { sketch, canvas } = mount();
+
+        expect(exportedAt(sketch, canvas)).toEqual(1);
+      });
+
+      it("leaves the other options as they are", () => {
+        const { sketch, canvas } = mount();
+        const toDataURL = jest.spyOn(canvas, "toDataURL");
+
+        sketch.toDataURL({ multiplier: "original", format: "jpeg", left: 1 });
+
+        expect(toDataURL).toHaveBeenCalledWith(
+          expect.objectContaining({ multiplier: 1, format: "jpeg", left: 1 })
+        );
+      });
+    });
+
+    describe("getOriginalSize", () => {
+      it("is the size of the image in pixels, not the one it is shown at", () => {
+        stubImageLoads();
+        layout(400, 300);
+        const { sketch } = mount();
+        sketch.setBackgroundFromDataUrl("data:image/png;base64,00", {
+          stretched: true,
+        });
+
+        expect(sketch.getOriginalSize()).toEqual({ width: 200, height: 100 });
+
+        sketch.zoom(3);
+        expect(sketch.getOriginalSize()).toEqual({ width: 200, height: 100 });
+      });
+
+      it("is undefined without a background image", () => {
+        const { sketch } = mount();
+
+        expect(sketch.getOriginalSize()).toBeUndefined();
+      });
+
+      it("is undefined while the image loads, and after it is removed", () => {
+        const loads = deferImageLoads();
+        const { sketch } = mount();
+        sketch.setBackgroundFromDataUrl("data:image/png;base64,00");
+        expect(sketch.getOriginalSize()).toBeUndefined();
+
+        loads[0]();
+        expect(sketch.getOriginalSize()).toEqual({ width: 200, height: 100 });
+
+        sketch.removeBackgroundImage();
+        expect(sketch.getOriginalSize()).toBeUndefined();
       });
     });
 

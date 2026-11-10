@@ -119,6 +119,24 @@ export const resetView = (): void =>
     syncPreview();
   });
 
+/**
+ * Give the canvas the size of the background image, so the drawing is on the image pixel
+ * for pixel. The canvas is a sheet of that size, which scrolls when the window is smaller.
+ * The zoom is taken back first: the size is the one of the drawing, not of the view.
+ */
+export const restoreOriginalSize = (): void =>
+  withSketch((sketch) => {
+    const size = sketch.getOriginalSize();
+    if (!size) {
+      CONFIG.notice = "The canvas has no background image.";
+      return;
+    }
+    resetView();
+    CONFIG.sketchWidth = size.width;
+    CONFIG.sketchHeight = size.height;
+    CONFIG.controlledSize = true;
+  });
+
 export const copy = (): void =>
   withSketch((sketch) => {
     if (!sketch.hasSelection()) return;
@@ -138,9 +156,12 @@ export const removeSelected = (): void =>
  * The canvas as a data URL. A canvas with an image of another site that does not allow
  * it (CORS) cannot be exported: the user is told, and there is no URL.
  */
-const exportPng = (sketch: SketchField): string | undefined => {
+const exportPng = (
+  sketch: SketchField,
+  options?: Types.DataUrlOptions
+): string | undefined => {
   try {
-    return sketch.toDataURL();
+    return sketch.toDataURL(options);
   } catch {
     CONFIG.notice =
       "The canvas cannot be exported: an image on it comes from another site that does not allow it (CORS).";
@@ -158,7 +179,8 @@ export const save = (): void =>
 
 export const download = (): void =>
   withSketch((sketch) => {
-    const src = exportPng(sketch);
+    // The file has the resolution of the background image, whatever the size of the canvas
+    const src = exportPng(sketch, { multiplier: "original" });
     if (!src) return;
     downloadUrl(src, "toPNG.png");
     downloadText(JSON.stringify(sketch.toJSON()), "toDataJSON.json");

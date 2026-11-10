@@ -75,6 +75,14 @@ export interface SketchEvent {
 }
 
 /**
+ * A size in pixels, for example the one of the image of the background
+ */
+export interface SketchSize {
+  width: number;
+  height: number;
+}
+
+/**
  * Content of a sketch, as returned by `toJSON` and accepted by `value`,
  * `defaultValue` and `fromJSON`: an object, or the same object as JSON string.
  */
@@ -93,8 +101,13 @@ export interface DataUrlOptions {
   format?: string;
   /** Quality level (0..1). Only used for jpeg. Defaults to 1 */
   quality?: number;
-  /** Multiplier to scale by. Defaults to 1 */
-  multiplier?: number;
+  /**
+   * Multiplier to scale by. Defaults to 1. "original" scales by what gives the
+   * background image one pixel of the picture for each pixel of the image it was
+   * loaded from, so a drawing on a photo is exported at the resolution of the photo.
+   * Without a background image it is 1
+   */
+  multiplier?: number | "original";
   /** Cropping left offset */
   left?: number;
   /** Cropping top offset */
