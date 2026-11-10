@@ -8,12 +8,15 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import StyleIcon from "@mui/icons-material/Palette";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
+import Switch from "@mui/material/Switch";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import { Types } from "react-sketch";
 import { observer } from "mobx-react-lite";
 import {
   NO_LINE_STYLE,
@@ -159,6 +162,25 @@ const Properties = observer((): ReactElement => {
               onChange={(value) => (CONFIG.lineWidth = value)}
             />
           </Box>
+          {selectedTool === Types.Tool.PENCIL && (
+            <Tooltip
+              title="A pen (a stylus) draws a wider line the harder it presses. The mouse and the fingers draw as before."
+              placement="right">
+              <FormControlLabel
+                label="Pen pressure"
+                control={
+                  <Switch
+                    size="small"
+                    checked={CONFIG.pressureSensitive}
+                    onChange={(event) =>
+                      (CONFIG.pressureSensitive = event.target.checked)
+                    }
+                  />
+                }
+                sx={{ ml: 0 }}
+              />
+            </Tooltip>
+          )}
           <Box>
             <Typography variant="caption" color="text.secondary">
               Line style

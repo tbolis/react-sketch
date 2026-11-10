@@ -5,6 +5,7 @@ import { LineStyle, SketchProperties, Tool } from "../../../types";
 import { lineStroke } from "../../../utils";
 import { EraserBrush } from "@react-sketch/eraser";
 import { CanvasEvent, EventInput } from "../events";
+import { PressureBrush } from "./PressureBrush";
 
 /**
  * Interface to support canvas events
@@ -169,7 +170,16 @@ export abstract class FabricCanvasTool {
     const current = this.canvas.freeDrawingBrush;
     if (current && !(current instanceof EraserBrush)) return current;
     current?.dispose();
-    return (this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas));
+    return (this.canvas.freeDrawingBrush = new PressureBrush(this.canvas));
+  }
+
+  /**
+   * Set whether the strokes of a pen are as wide as the pressure on it. The brush is kept
+   * from a tool to the next, so a tool which does not draw them turns it off.
+   */
+  protected setPressureSensitive(on: boolean): void {
+    const brush = this.brush;
+    if (brush instanceof PressureBrush) brush.pressureSensitive = on;
   }
 
   /**

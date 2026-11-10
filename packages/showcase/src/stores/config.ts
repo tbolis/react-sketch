@@ -35,6 +35,8 @@ export interface Config {
   lineColor: string;
   lineWidth: number;
   lineStyle: Types.LineStyle;
+  /** The strokes of a pen are as wide as the pressure on it (the pencil) */
+  pressureSensitive: boolean;
   pinchZoom: boolean;
   minZoom: number;
   maxZoom: number;
@@ -107,6 +109,7 @@ export class ConfigStore implements Config {
   public lineColor = "#000000";
   public lineWidth = 1;
   public lineStyle: Types.LineStyle = "solid";
+  public pressureSensitive = true;
   public pinchZoom = true;
   public minZoom = 0.5;
   public maxZoom = 8;
