@@ -542,23 +542,11 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   canRedo = (): boolean => this.history.canRedo();
 
   /**
-   * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
+   * Exports the canvas as a data URL. The image is of the whole drawing, whatever the view
+   * shows. With a multiplier the crop area is scaled by it too.
    *
-   * Available Options are
-   * <table style="width:100%">
-   *
-   * <tr><td><b>Name</b></td><td><b>Type</b></td><td><b>Argument</b></td><td><b>Default</b></td><td><b>Description</b></td></tr>
-   * <tr><td>format</td> <td>String</td> <td><optional></td><td>the imageFormat property, then png</td><td>The format of the output image. Either "jpeg" or "png"</td></tr>
-   * <tr><td>quality</td><td>Number</td><td><optional></td><td>1</td><td>Quality level (0..1). Only used for jpeg.</td></tr>
-   * <tr><td>multiplier</td><td>Number | "original"</td><td><optional></td><td>1</td><td>Multiplier to scale by. "original" gives the background image one pixel for each of its own</td></tr>
-   * <tr><td>left</td><td>Number</td><td><optional></td><td></td><td>Cropping left offset. Introduced in v1.2.14</td></tr>
-   * <tr><td>top</td><td>Number</td><td><optional></td><td></td><td>Cropping top offset. Introduced in v1.2.14</td></tr>
-   * <tr><td>width</td><td>Number</td><td><optional></td><td></td><td>Cropping width. Introduced in v1.2.14</td></tr>
-   * <tr><td>height</td><td>Number</td><td><optional></td><td></td><td>Cropping height. Introduced in v1.2.14</td></tr>
-   *
-   * </table>
-   *
-   * @returns URL containing a representation of the object in the format specified by options.format
+   * @param options see {@link DataUrlOptions}
+   * @returns URL containing a representation of the drawing in the format of the options
    */
   toDataURL = (options?: DataUrlOptions): string => {
     const { multiplier, ...rest } = options ?? {};

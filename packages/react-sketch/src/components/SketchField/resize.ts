@@ -49,8 +49,6 @@ export const autoresize = (
   const prevHeight = canvas.getHeight();
   if (width <= 0 || height <= 0 || !prevWidth || !prevHeight) return undefined;
 
-  // The factors are not rounded: a rounded factor leaves the drawing a little off its
-  // size, and the error adds up with every resize
   const wfactor = width / prevWidth;
   const hfactor = height / prevHeight;
   canvas.setDimensions({ width, height });
