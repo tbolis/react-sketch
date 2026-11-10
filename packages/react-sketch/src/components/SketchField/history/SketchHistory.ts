@@ -2,6 +2,7 @@ import * as fabric from "fabric";
 import { UndoHistory } from "./index";
 import type { Erasure } from "../tools/Eraser";
 import { linkedObjects } from "../tools/RectangleLabel/RectangleLabelObject";
+import { SketchGroup } from "../SketchGroup";
 
 /**
  * What a modification did to an object: its state (as JSON) before and after it
@@ -13,6 +14,18 @@ interface Change {
 }
 
 /**
+ * A group and its objects, for making the group and for taking it apart. `index` is where
+ * the group is among the objects of the canvas, and `indices` where each of the `members`
+ * is when it is not in the group (the members are in the order of the canvas).
+ */
+interface Grouping {
+  group: SketchGroup;
+  members: fabric.FabricObject[];
+  indices: number[];
+  index: number;
+}
+
+/**
  * One undoable action of the sketch. A modification can be of many objects, as
  * the ones of a selection which is moved.
  */
@@ -20,7 +33,8 @@ type HistoryEntry =
   | { action: "add"; object: fabric.FabricObject }
   | { action: "remove"; object: fabric.FabricObject }
   | { action: "modify"; changes: Change[] }
-  | { action: "erase"; erasures: Erasure[] };
+  | { action: "erase"; erasures: Erasure[] }
+  | ({ action: "group" | "ungroup" } & Grouping);
 
 /**
  * Properties of the serialized state which are not restored: the type cannot
@@ -200,6 +214,56 @@ export class SketchHistory {
   }
 
   /**
+   * Make a group of the objects, and of the ones which follow them (the text box of a
+   * label). The group takes the place of the topmost of them, and it is one action.
+   *
+   * @returns the group, or undefined when there are not two objects of the canvas to group
+   */
+  group(objects: fabric.FabricObject[]): SketchGroup | undefined {
+    const onCanvas = this.canvas.getObjects();
+    const members = [
+      ...new Set(objects.flatMap((object) => [object, ...linkedObjects(object)])),
+    ]
+      .filter((object) => onCanvas.includes(object))
+      .sort((a, b) => onCanvas.indexOf(a) - onCanvas.indexOf(b));
+    if (members.length < 2) return undefined;
+    const indices = members.map((object) => onCanvas.indexOf(object));
+    const index = indices[indices.length - 1] - (members.length - 1);
+    const group = this.silently(() => {
+      this.canvas.remove(...members);
+      const made = new SketchGroup(members);
+      this.canvas.insertAt(index, made);
+      return made;
+    });
+    this.refresh(group, ...members);
+    this.entries.keep({ action: "group", group, members, indices, index });
+    return group;
+  }
+
+  /**
+   * Take a group apart: its objects take its place on the canvas, with the position, the
+   * scale and the turn which the group gave them. It is one action.
+   *
+   * @returns the objects of the group, which are not in it any more
+   */
+  ungroup(group: SketchGroup): fabric.FabricObject[] {
+    const index = this.canvas.getObjects().indexOf(group);
+    if (index === -1) return [];
+    const members = group.getObjects();
+    const entry: HistoryEntry = {
+      action: "ungroup",
+      group,
+      members,
+      indices: members.map((_, place) => index + place),
+      index,
+    };
+    this.silently(() => this.leaveGroup(entry));
+    this.refresh(group, ...members);
+    this.entries.keep(entry);
+    return members;
+  }
+
+  /**
    * Record the removal of the objects and remove them from the canvas
    */
   remove(objects: fabric.FabricObject[]): void {
@@ -293,6 +357,45 @@ export class SketchHistory {
     this.pressed.clear();
   }
 
+  /**
+   * Run a change of the canvas which is not an action of its own, so the objects it adds are
+   * not recorded, nor announced
+   */
+  private silently<T>(change: () => T): T {
+    this.applying = true;
+    try {
+      return change();
+    } finally {
+      this.applying = false;
+    }
+  }
+
+  /** The state of the objects is the one they have now, which is the "before" of their next modification */
+  private refresh(...objects: fabric.FabricObject[]): void {
+    objects.forEach((object) => this.snapshots.set(object, stateOf(object)));
+    this.pressed.clear();
+  }
+
+  /**
+   * The objects leave the group, which leaves the canvas: they take its place, as it
+   * turned and scaled them
+   */
+  private leaveGroup({ group, members, indices }: Grouping): void {
+    group.removeAll();
+    this.canvas.remove(group);
+    members.forEach((member, place) => this.canvas.insertAt(indices[place], member));
+  }
+
+  /**
+   * The objects, which are on the canvas, go into the group, which takes their place. It
+   * is the group they left, so what refers to it (the modifications of it) still does.
+   */
+  private enterGroup({ group, members, index }: Grouping): void {
+    this.canvas.remove(...members);
+    group.add(...members);
+    this.canvas.insertAt(index, group);
+  }
+
   private apply(entry: HistoryEntry, forward: boolean): void {
     this.applying = true;
     try {
@@ -302,6 +405,15 @@ export class SketchHistory {
           break;
         case "modify":
           this.applyChanges(entry.changes, forward);
+          break;
+        case "group":
+        case "ungroup":
+          // The group, or its objects, may be selected: they are not any more
+          this.canvas.discardActiveObject();
+          // redo of a group, and undo of an ungroup, put the objects in the group
+          if ((entry.action === "group") === forward) this.enterGroup(entry);
+          else this.leaveGroup(entry);
+          this.refresh(entry.group, ...entry.members);
           break;
         case "add":
         case "remove":

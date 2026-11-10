@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import {
   copy,
+  groupSelected,
   openShortcuts,
   paste,
   redo,
@@ -9,6 +10,7 @@ import {
   save,
   selectTool,
   undo,
+  ungroupSelected,
   zoomBy,
 } from "./actions";
 import { CONFIG } from "./stores/config";
@@ -38,6 +40,8 @@ export const SHORTCUTS: { group: string; items: Shortcut[] }[] = [
       { keys: "Ctrl Shift Z", description: "Redo" },
       { keys: "Ctrl C", description: "Copy the selected objects" },
       { keys: "Ctrl V", description: "Paste" },
+      { keys: "Ctrl G", description: "Group the selected objects" },
+      { keys: "Ctrl Shift G", description: "Ungroup the selected group" },
       { keys: "Delete", description: "Delete the selected objects" },
       { keys: "Ctrl S", description: "Save the drawing" },
     ],
@@ -98,6 +102,11 @@ export const runShortcut = (event: KeyboardEvent): boolean => {
       case "v":
         if (!CONFIG.canPaste) return false;
         paste();
+        return true;
+      case "g":
+        // The browser finds the next match with it, which is not wanted with objects selected
+        if (!(event.shiftKey ? CONFIG.canUngroup : CONFIG.canGroup)) return false;
+        (event.shiftKey ? ungroupSelected : groupSelected)();
         return true;
       case "s":
         save();

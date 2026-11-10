@@ -375,6 +375,10 @@ throws.
 | `removeSelected()`                            | `void`                           | Remove the selected object or objects. It can be undone.                                                                                                                                                                                                                                              |
 | `copy()`                                      | `void`                           | Copy the selected object. Does nothing without a selection.                                                                                                                                                                                                                                           |
 | `paste()`                                     | `void`                           | Paste the copied object, 10 pixels further down and to the right of the previous one. Does nothing when nothing was copied.                                                                                                                                                                           |
+| `canGroup()`                                  | `boolean`                        | Whether two or more objects are selected, which `group()` makes a group of.                                                                                                                                                                                                                           |
+| `canUngroup()`                                | `boolean`                        | Whether the selected object is a group which `group()` made.                                                                                                                                                                                                                                          |
+| `group()`                                     | `void`                           | Make a group of the selected objects, and select it. One undo step. See [Groups](#groups).                                                                                                                                                                                                            |
+| `ungroup()`                                   | `void`                           | Take the selected group apart, and select its objects. One undo step.                                                                                                                                                                                                                                 |
 | `enableTouchScroll()`                         | `void`                           | Allow the page to scroll on touch devices when touching the canvas.                                                                                                                                                                                                                                   |
 | `disableTouchScroll()`                        | `void`                           | Do not scroll the page when touching the canvas.                                                                                                                                                                                                                                                      |
 
@@ -513,6 +517,23 @@ hard one a wider line (up to twice). A pen which reports a constant pressure dra
   copied as any path. The color is its `fill`.
 - `lineStyle` does not apply to it (it has no dashes), and neither does the straight line of the shift key.
 - The highlighter does not have it.
+
+### Groups
+
+`group()` makes one object of the selected objects (two or more) and selects it: the group is moved, scaled,
+rotated, copied and removed as one object, `toJSON()` saves it and `value`, `defaultValue` and `fromJSON()` load
+it. `ungroup()` takes the selected group apart and selects its objects, which keep where they are on the canvas,
+with the move, the scale and the turn which the group gave them. Both are one undo step, and both call
+`onChange` (and, as undo and redo do, not `onObjectAdded`). `canGroup()` and `canUngroup()` tell whether they
+will do something, for example to enable a button.
+
+- The group takes the place of the topmost of its objects among the others, so what is above it stays above it.
+  Undo puts every object back in its own place.
+- The text box of a rectangle label goes into the group with its rectangle.
+- A group can be in another group, and taking that one apart gives back the inner group.
+- A group is one object to the select tool: its objects cannot be selected or changed until it is taken apart.
+- The group of an arrow is not one which can be taken apart.
+- The eraser cuts a group as a whole, so taking the group apart gives back what was erased from it.
 
 ## Exports
 
