@@ -199,6 +199,55 @@ export const Editor = ({ imageUrl }: { imageUrl: string }) => {
 };
 ```
 
+### Keeping the resolution of an image
+
+The canvas has the size of its container, so `toDataURL()` draws the drawing at that size, and a photo which is shown
+smaller than it is loses pixels in the file. `multiplier: "original"` draws it at the resolution of the background
+image, one pixel of the picture for each pixel of the image, at any size of the canvas (without a background image it
+is 1). `getOriginalSize()` returns the size of the image in pixels, and a canvas of that size shows the image pixel for
+pixel, so it can be restored with it:
+
+```tsx
+import { useRef, useState } from "react";
+import { SketchField, Types } from "react-sketch";
+
+export const OnPhoto = ({ photo }: { photo: string }) => {
+  const sketch = useRef<SketchField>(null);
+  const [size, setSize] = useState<Types.SketchSize>({ width: 800, height: 600 });
+
+  const download = () => {
+    const link = document.createElement("a");
+    // The resolution of the photo, whatever the size of the canvas
+    link.href = sketch.current?.toDataURL({ multiplier: "original" }) ?? "";
+    link.download = "photo.png";
+    link.click();
+  };
+
+  // The drawing is scaled with the canvas, so it stays on the same part of the photo
+  const restoreSize = () => setSize(sketch.current?.getOriginalSize() ?? size);
+
+  return (
+    <>
+      <button onClick={download}>Download</button>
+      <button onClick={restoreSize}>Original size</button>
+      <SketchField
+        ref={sketch}
+        autoresize={false}
+        width={size.width}
+        height={size.height}
+        backgroundImage={photo}
+        backgroundImageOptions={{ stretched: true }}
+      />
+    </>
+  );
+};
+```
+
+To keep the resolution of the image, keep the image as the background and the drawing as objects (`toJSON()` saves
+them), and export once, at the end. Exporting the drawing and using it as the next background draws it again at the
+size of the canvas each time. Browsers limit the area of a canvas (a phone about 16 million pixels, for example), and
+an export over the limit is empty.
+
 ### A preview of the drawing
 
 `toDataURL()` draws the whole drawing, whatever the zoom and the pan of the view, so a small copy of it,
@@ -300,31 +349,33 @@ The methods are properties of the component instance, access them through a `ref
 the moment the component is mounted until it is unmounted. Calling one before the component is mounted
 throws.
 
-| Method                                        | Returns            | Description                                                                                                                                                                                                                     |
-| --------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `undo()`                                      | `void`             | Undo the last action. Does nothing when there is nothing to undo. Calls `onChange` when it undid something.                                                                                                                     |
-| `redo()`                                      | `void`             | Redo the last undone action. Does nothing when there is nothing to redo. Calls `onChange` when it redid something.                                                                                                              |
-| `canUndo()`                                   | `boolean`          | Whether `undo()` has something to undo.                                                                                                                                                                                         |
-| `canRedo()`                                   | `boolean`          | Whether `redo()` has something to redo.                                                                                                                                                                                         |
-| `toDataURL(options?)`                         | `string`           | The sketch as a data URL. Options: `format` (`"png"` or `"jpeg"`, default `imageFormat`, then `"png"`), `quality` (0 to 1, jpeg only, default 1), `multiplier` (default 1), and the crop area `left`, `top`, `width`, `height`. |
-| `toJSON(propertiesToInclude?)`                | `Types.SketchData` | The sketch as an object. `propertiesToInclude` lists additional properties of the objects to include.                                                                                                                           |
-| `fromJSON(json?)`                             | `void`             | Load a drawing (object or JSON string). Loads after 100 ms, starts the undo history again with the loaded objects, applies the tool configuration again and calls `onChange`. Does nothing for an empty argument.               |
-| `clear(propertiesToInclude?)`                 | `Types.SketchData` | Remove all objects, the background image and the overlay image, and reset the undo history. Returns the discarded content as JSON. The `backgroundColor` property is kept.                                                      |
-| `addImg(dataUrl, options?)`                   | `void`             | Add an image, given as URL or data URL, as an object. It is added when it has loaded. Options: `left`, `top` (default: random position), `scale` (default `0.5`), `crossOrigin` (see Background and overlay images).            |
-| `addText(text, options?)`                     | `void`             | Add an editable text. It is centered unless `left` or `top` are given. `options` are the options of a fabric text object, for example `fontSize`, `fill`.                                                                       |
-| `setBackgroundFromDataUrl(dataUrl, options?)` | `void`             | Use an image as background. Options: `stretched` (fill the canvas, the proportions change), `stretchedX` (fit the width), `stretchedY` (fit the height), both are `stretched`; `crossOrigin`; the others are image options.     |
-| `removeBackgroundImage()`                     | `void`             | Remove the background image, also one that is still loading. The objects, the overlay image and the `backgroundColor` are kept. Like `setBackgroundFromDataUrl`, it is not part of the undo history.                            |
-| `setOverlayFromDataUrl(dataUrl, options?)`    | `void`             | Use an image as overlay, above the objects. It takes no mouse events, `toJSON` and `toDataURL` include it, and it is not part of the undo history. The options are those of `setBackgroundFromDataUrl`.                         |
-| `removeOverlayImage()`                        | `void`             | Remove the overlay image, also one that is still loading. The objects, the background image and the `backgroundColor` are kept.                                                                                                 |
-| `zoom(factor)`                                | `void`             | Scale the objects, the background image and the overlay image by a factor: 2 doubles their size, 0.5 halves it.                                                                                                                 |
-| `resetView()`                                 | `void`             | Put the view back to the whole canvas, after it was zoomed or panned with two fingers.                                                                                                                                          |
-| `hasSelection()`                              | `boolean`          | Whether an object is selected.                                                                                                                                                                                                  |
-| `clearSelection()`                            | `void`             | Deselect the selected object or objects.                                                                                                                                                                                        |
-| `removeSelected()`                            | `void`             | Remove the selected object or objects. It can be undone.                                                                                                                                                                        |
-| `copy()`                                      | `void`             | Copy the selected object. Does nothing without a selection.                                                                                                                                                                     |
-| `paste()`                                     | `void`             | Paste the copied object, 10 pixels further down and to the right of the previous one. Does nothing when nothing was copied.                                                                                                     |
-| `enableTouchScroll()`                         | `void`             | Allow the page to scroll on touch devices when touching the canvas.                                                                                                                                                             |
-| `disableTouchScroll()`                        | `void`             | Do not scroll the page when touching the canvas.                                                                                                                                                                                |
+| Method                                        | Returns                          | Description                                                                                                                                                                                                                                                                                           |
+| --------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `undo()`                                      | `void`                           | Undo the last action. Does nothing when there is nothing to undo. Calls `onChange` when it undid something.                                                                                                                                                                                           |
+| `redo()`                                      | `void`                           | Redo the last undone action. Does nothing when there is nothing to redo. Calls `onChange` when it redid something.                                                                                                                                                                                    |
+| `canUndo()`                                   | `boolean`                        | Whether `undo()` has something to undo.                                                                                                                                                                                                                                                               |
+| `canRedo()`                                   | `boolean`                        | Whether `redo()` has something to redo.                                                                                                                                                                                                                                                               |
+| `toDataURL(options?)`                         | `string`                         | The sketch as a data URL. Options: `format` (`"png"` or `"jpeg"`, default `imageFormat`, then `"png"`), `quality` (0 to 1, jpeg only, default 1), `multiplier` (a number, default 1, or `"original"` for the resolution of the background image), and the crop area `left`, `top`, `width`, `height`. |
+| `getOriginalSize()`                           | `{ width, height } \| undefined` | The size in pixels of the background image, as the file has it, not as it is shown. Undefined without a background image, or while it loads.                                                                                                                                                          |
+| `getOriginalSize()`                           | `{ width, height } \| undefined` | The size in pixels of the background image, as the file has it, not as it is shown. Undefined without a background image, or while it loads.                                                                                                                                                          |
+| `toJSON(propertiesToInclude?)`                | `Types.SketchData`               | The sketch as an object. `propertiesToInclude` lists additional properties of the objects to include.                                                                                                                                                                                                 |
+| `fromJSON(json?)`                             | `void`                           | Load a drawing (object or JSON string). Loads after 100 ms, starts the undo history again with the loaded objects, applies the tool configuration again and calls `onChange`. Does nothing for an empty argument.                                                                                     |
+| `clear(propertiesToInclude?)`                 | `Types.SketchData`               | Remove all objects, the background image and the overlay image, and reset the undo history. Returns the discarded content as JSON. The `backgroundColor` property is kept.                                                                                                                            |
+| `addImg(dataUrl, options?)`                   | `void`                           | Add an image, given as URL or data URL, as an object. It is added when it has loaded. Options: `left`, `top` (default: random position), `scale` (default `0.5`), `crossOrigin` (see Background and overlay images).                                                                                  |
+| `addText(text, options?)`                     | `void`                           | Add an editable text. It is centered unless `left` or `top` are given. `options` are the options of a fabric text object, for example `fontSize`, `fill`.                                                                                                                                             |
+| `setBackgroundFromDataUrl(dataUrl, options?)` | `void`                           | Use an image as background. Options: `stretched` (fill the canvas, the proportions change), `stretchedX` (fit the width), `stretchedY` (fit the height), both are `stretched`; `crossOrigin`; the others are image options.                                                                           |
+| `removeBackgroundImage()`                     | `void`                           | Remove the background image, also one that is still loading. The objects, the overlay image and the `backgroundColor` are kept. Like `setBackgroundFromDataUrl`, it is not part of the undo history.                                                                                                  |
+| `setOverlayFromDataUrl(dataUrl, options?)`    | `void`                           | Use an image as overlay, above the objects. It takes no mouse events, `toJSON` and `toDataURL` include it, and it is not part of the undo history. The options are those of `setBackgroundFromDataUrl`.                                                                                               |
+| `removeOverlayImage()`                        | `void`                           | Remove the overlay image, also one that is still loading. The objects, the background image and the `backgroundColor` are kept.                                                                                                                                                                       |
+| `zoom(factor)`                                | `void`                           | Scale the objects, the background image and the overlay image by a factor: 2 doubles their size, 0.5 halves it.                                                                                                                                                                                       |
+| `resetView()`                                 | `void`                           | Put the view back to the whole canvas, after it was zoomed or panned with two fingers.                                                                                                                                                                                                                |
+| `hasSelection()`                              | `boolean`                        | Whether an object is selected.                                                                                                                                                                                                                                                                        |
+| `clearSelection()`                            | `void`                           | Deselect the selected object or objects.                                                                                                                                                                                                                                                              |
+| `removeSelected()`                            | `void`                           | Remove the selected object or objects. It can be undone.                                                                                                                                                                                                                                              |
+| `copy()`                                      | `void`                           | Copy the selected object. Does nothing without a selection.                                                                                                                                                                                                                                           |
+| `paste()`                                     | `void`                           | Paste the copied object, 10 pixels further down and to the right of the previous one. Does nothing when nothing was copied.                                                                                                                                                                           |
+| `enableTouchScroll()`                         | `void`                           | Allow the page to scroll on touch devices when touching the canvas.                                                                                                                                                                                                                                   |
+| `disableTouchScroll()`                        | `void`                           | Do not scroll the page when touching the canvas.                                                                                                                                                                                                                                                      |
 
 ## Tools
 

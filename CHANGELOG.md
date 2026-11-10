@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.2.0
+
+### Added
+
+- `toDataURL({ multiplier: "original" })` (#75): the drawing at the resolution of the background image, one
+  pixel of the picture for each pixel of the image, at any size of the canvas. Without a background image the
+  multiplier is 1. An image which is scaled differently in the two directions is exported at the larger
+  scale, so no pixel of it is lost.
+- `getOriginalSize()`: the size of the background image in pixels, as the file has it, and the new
+  `Types.SketchSize`. A canvas of that size shows the image pixel for pixel.
+- The showcase has an Original size button in the Canvas tab, which gives the canvas the size of the
+  background image, and its download has the resolution of the image.
+
+### Fixed
+
+- Undo and redo of a move, scale or rotation of a straight line (the line tool) put the line at the top left
+  corner of the canvas, where it was not seen. A line has its points relative to its center, and setting them
+  again moved it to the origin. Undo and redo now set the properties which the modification changed, and no
+  others.
+- Undo after the move, scale or rotation of a selection of many objects removed the last object which was drawn,
+  as the modification of a selection was not recorded. It is now one action, which undo and redo apply to all
+  the objects of the selection, and the selection is left when they do.
+- Undo of the move of a rectangle with a label made the rectangle disappear, as it went back to the size it had
+  when the pointer was pressed to draw it, and left its text box behind. They go back together, to where they
+  were.
+- Undo of a modification goes back to the state of the object when the pointer was pressed on it, and not to the
+  one it had when it was added or last modified by the history. A modification which changes nothing is not an
+  action to undo.
+- The drawing is scaled by exact factors when the canvas is resized. The factors were rounded to two
+  decimals, which left the drawing and the background image a little off their size, and the error added up
+  with every resize, so a canvas could not go back to the size it had.
+
 ## 1.1.0 (2026-11-04)
 
 The eraser, laser pointer and polygon tools, pinch zoom, and features that forks of react-sketch had, written again for the TypeScript code and fabric 7.

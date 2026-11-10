@@ -7,6 +7,7 @@ import {
   ImageOptions,
   SketchData,
   SketchProperties,
+  SketchSize,
   SketchValue,
   TextOptions,
   Tool,
@@ -541,37 +542,54 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   canRedo = (): boolean => this.history.canRedo();
 
   /**
-   * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
+   * Exports the canvas as a data URL. The image is of the whole drawing, whatever the view
+   * shows. With a multiplier the crop area is scaled by it too.
    *
-   * Available Options are
-   * <table style="width:100%">
-   *
-   * <tr><td><b>Name</b></td><td><b>Type</b></td><td><b>Argument</b></td><td><b>Default</b></td><td><b>Description</b></td></tr>
-   * <tr><td>format</td> <td>String</td> <td><optional></td><td>the imageFormat property, then png</td><td>The format of the output image. Either "jpeg" or "png"</td></tr>
-   * <tr><td>quality</td><td>Number</td><td><optional></td><td>1</td><td>Quality level (0..1). Only used for jpeg.</td></tr>
-   * <tr><td>multiplier</td><td>Number</td><td><optional></td><td>1</td><td>Multiplier to scale by</td></tr>
-   * <tr><td>left</td><td>Number</td><td><optional></td><td></td><td>Cropping left offset. Introduced in v1.2.14</td></tr>
-   * <tr><td>top</td><td>Number</td><td><optional></td><td></td><td>Cropping top offset. Introduced in v1.2.14</td></tr>
-   * <tr><td>width</td><td>Number</td><td><optional></td><td></td><td>Cropping width. Introduced in v1.2.14</td></tr>
-   * <tr><td>height</td><td>Number</td><td><optional></td><td></td><td>Cropping height. Introduced in v1.2.14</td></tr>
-   *
-   * </table>
-   *
-   * @returns URL containing a representation of the object in the format specified by options.format
+   * @param options see {@link DataUrlOptions}
+   * @returns URL containing a representation of the drawing in the format of the options
    */
   toDataURL = (options?: DataUrlOptions): string => {
+    const { multiplier, ...rest } = options ?? {};
     // The image is of the drawing, not of the part which the view shows
     const view = this.canvas.viewportTransform;
     this.canvas.viewportTransform = [...IDENTITY_VIEW];
     try {
       return this.canvas.toDataURL({
         format: this.props.imageFormat,
-        ...options,
+        ...rest,
+        multiplier:
+          multiplier === "original" ? this.originalMultiplier() : multiplier,
       } as fabric.TDataUrlOptions);
     } finally {
       this.canvas.viewportTransform = view;
     }
   };
+
+  /**
+   * The size of the background image in pixels, as the file it was loaded from has it, and
+   * not as it is shown (the canvas scales it to its size). It is the size of the canvas at
+   * which the drawing is on the image pixel for pixel. Undefined when there is no
+   * background image, or it is still loading.
+   */
+  getOriginalSize = (): SketchSize | undefined => {
+    const image = this.canvas.backgroundImage;
+    return image?.width && image.height
+      ? { width: image.width, height: image.height }
+      : undefined;
+  };
+
+  /**
+   * The multiplier of an export which gives the background image one pixel for each of
+   * its own. An image which is scaled differently in the two directions is exported at
+   * the multiplier of the larger scale, so no pixel of it is lost. 1 without an image.
+   */
+  private originalMultiplier(): number {
+    const image = this.canvas.backgroundImage;
+    const scale = image
+      ? Math.min(Math.abs(image.scaleX ?? 1), Math.abs(image.scaleY ?? 1))
+      : 0;
+    return scale > 0 ? 1 / scale : 1;
+  }
 
   /**
    * Returns JSON representation of canvas
