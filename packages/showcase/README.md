@@ -10,7 +10,8 @@ The canvas fills the window, and the panels float over it:
 - **Properties** (left): line color, fill color, line weight and line style of the tool, and copy, paste and delete
   of the selected objects.
 - **Settings** (right, the gear): the **Scenario** tab (what the scenario shows and its actions), the **Canvas** tab
-  (size, background color and image, pinch zoom, view, grid) and the **Insert** tab (text, image from a URL,
+  (size, with a button for the original size of the background image, background color and image, pinch zoom,
+  view, grid) and the **Insert** tab (text, image from a URL,
   overlay).
 - **Top left**: the menu, and undo and redo, which fade out until the first change.
 - **Bottom**: zoom (the percentage resets the view), and a hint for the tool in use. The **preview** is at the
