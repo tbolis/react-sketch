@@ -13,6 +13,8 @@ interface LabeledSliderProps {
   disabled?: boolean;
   startIcon?: ReactNode;
   endIcon?: ReactNode;
+  /** Something to the right of the label, for example a switch */
+  action?: ReactNode;
   onChange: (value: number) => void;
 }
 
@@ -21,13 +23,18 @@ interface LabeledSliderProps {
  */
 const LabeledSlider = (props: LabeledSliderProps): ReactElement => {
   const labelId = useId();
-  const { label, startIcon, endIcon, onChange, ...slider } = props;
+  const { label, startIcon, endIcon, action, onChange, ...slider } = props;
 
   return (
     <>
-      <Typography id={labelId} variant="body2">
-        {label}
-      </Typography>
+      <Stack
+        direction="row"
+        sx={{ alignItems: "center", justifyContent: "space-between" }}>
+        <Typography id={labelId} variant="body2">
+          {label}
+        </Typography>
+        {action}
+      </Stack>
       <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
         {startIcon}
         <Slider
