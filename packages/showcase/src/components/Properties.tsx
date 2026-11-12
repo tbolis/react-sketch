@@ -88,131 +88,147 @@ const Properties = observer((): ReactElement => {
       sx={{
         width: 232,
         maxHeight: "100%",
-        overflowY: "auto",
-        p: 1.5,
+        // The scrollbar is inside the rounded border, and a thin one: the panel is
+        // often taller than a short window, for example a tablet on its side
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
       }}>
-      <Stack
-        direction="row"
-        sx={{ alignItems: "center", justifyContent: "space-between" }}>
-        <Typography variant="overline" component="h2" sx={{ lineHeight: 2 }}>
-          {drawing ? (tool?.label ?? "Tool") : "Selection"}
-        </Typography>
-        <Tooltip title="Hide the properties">
-          <IconButton
-            size="small"
-            aria-label="Hide the properties"
-            aria-expanded
-            onClick={() => (CONFIG.propertiesOpen = false)}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      </Stack>
-      {drawing && (
-        <Stack spacing={1.5} sx={{ mb: 1.5 }}>
-          <ColorPicker
-            label="Line color"
-            value={CONFIG.lineColor}
-            onChange={(color) => color && (CONFIG.lineColor = color)}
-          />
-          <ColorPicker
-            label="Fill color"
-            allowNone
-            value={CONFIG.fillWithColor ? CONFIG.fillColor : null}
-            fallback={CONFIG.fillColor}
-            onChange={(color) => {
-              CONFIG.fillWithColor = color !== null;
-              if (color) CONFIG.fillColor = color;
-            }}
-          />
-          <Box>
-            <ToggleButtonGroup
-              exclusive
+      <Box
+        sx={{
+          minHeight: 0,
+          overflowY: "auto",
+          p: 1.5,
+          scrollbarWidth: "thin",
+          scrollbarColor: "var(--mui-palette-text-disabled) transparent",
+        }}>
+        <Stack
+          direction="row"
+          sx={{ alignItems: "center", justifyContent: "space-between" }}>
+          <Typography variant="overline" component="h2" sx={{ lineHeight: 2 }}>
+            {drawing ? (tool?.label ?? "Tool") : "Selection"}
+          </Typography>
+          <Tooltip title="Hide the properties">
+            <IconButton
               size="small"
-              color="primary"
-              fullWidth
-              aria-label="Line weight presets"
-              value={CONFIG.lineWidth}
-              onChange={(_event, value: number | null) => {
-                if (value !== null) CONFIG.lineWidth = value;
-              }}>
-              {QUICK_WIDTHS.map(({ value, label }) => (
-                <ToggleButton
-                  key={value}
-                  value={value}
-                  aria-label={label}
-                  title={label}>
-                  <Box
-                    sx={{
-                      width: 24,
-                      height: `${Math.min(value, 10)}px`,
-                      bgcolor: "currentColor",
-                      borderRadius: 1,
-                    }}
-                  />
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
-            <LabeledSlider
-              label="Line weight"
-              value={CONFIG.lineWidth}
-              min={1}
-              max={100}
-              startIcon={<RemoveIcon fontSize="small" />}
-              endIcon={<AddIcon fontSize="small" />}
-              onChange={(value) => (CONFIG.lineWidth = value)}
-            />
-          </Box>
-          {selectedTool === Types.Tool.PENCIL && (
-            <Tooltip
-              title="A pen (a stylus) draws a wider line the harder it presses. The mouse and the fingers draw as before."
-              placement="right">
-              <FormControlLabel
-                label="Pen pressure"
-                control={
-                  <Switch
-                    size="small"
-                    checked={CONFIG.pressureSensitive}
-                    onChange={(event) =>
-                      (CONFIG.pressureSensitive = event.target.checked)
-                    }
-                  />
-                }
-                sx={{ ml: 0 }}
-              />
-            </Tooltip>
-          )}
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              Line style
-            </Typography>
-            <LineStyleSelector
-              selected={CONFIG.lineStyle}
-              disabled={NO_LINE_STYLE.includes(selectedTool)}
-            />
-          </Box>
-          <Divider />
+              aria-label="Hide the properties"
+              aria-expanded
+              onClick={() => (CONFIG.propertiesOpen = false)}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Stack>
-      )}
-      <Typography variant="caption" color="text.secondary" component="p">
-        Selected objects
-      </Typography>
-      <Stack direction="row" spacing={0.5}>
-        <Action
-          label="Copy selected (Ctrl C)"
-          disabled={!hasSelection}
-          onClick={copy}>
-          <CopyIcon />
-        </Action>
-        <Action label="Paste (Ctrl V)" disabled={!canPaste} onClick={paste}>
-          <PasteIcon />
-        </Action>
-        <Action
-          label="Delete selected (Delete)"
-          disabled={!hasSelection}
-          onClick={removeSelected}>
-          <DeleteIcon />
-        </Action>
-      </Stack>
+        {drawing && (
+          <Stack spacing={1.5} sx={{ mb: 1.5 }}>
+            <ColorPicker
+              label="Line color"
+              value={CONFIG.lineColor}
+              onChange={(color) => color && (CONFIG.lineColor = color)}
+            />
+            <ColorPicker
+              label="Fill color"
+              allowNone
+              value={CONFIG.fillWithColor ? CONFIG.fillColor : null}
+              fallback={CONFIG.fillColor}
+              onChange={(color) => {
+                CONFIG.fillWithColor = color !== null;
+                if (color) CONFIG.fillColor = color;
+              }}
+            />
+            <Box>
+              <ToggleButtonGroup
+                exclusive
+                size="small"
+                color="primary"
+                fullWidth
+                aria-label="Line weight presets"
+                value={CONFIG.lineWidth}
+                onChange={(_event, value: number | null) => {
+                  if (value !== null) CONFIG.lineWidth = value;
+                }}>
+                {QUICK_WIDTHS.map(({ value, label }) => (
+                  <ToggleButton
+                    key={value}
+                    value={value}
+                    aria-label={label}
+                    title={label}>
+                    <Box
+                      sx={{
+                        width: 24,
+                        height: `${Math.min(value, 10)}px`,
+                        bgcolor: "currentColor",
+                        borderRadius: 1,
+                      }}
+                    />
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
+              <LabeledSlider
+                label="Line weight"
+                action={
+                  selectedTool === Types.Tool.PENCIL && (
+                    <Tooltip
+                      title="A pen (a stylus) draws a wider line the harder it presses. The mouse and the fingers draw as before."
+                      placement="right">
+                      <FormControlLabel
+                        label="Pen pressure"
+                        labelPlacement="start"
+                        slotProps={{ typography: { variant: "caption" } }}
+                        control={
+                          <Switch
+                            size="small"
+                            checked={CONFIG.pressureSensitive}
+                            onChange={(event) =>
+                              (CONFIG.pressureSensitive = event.target.checked)
+                            }
+                          />
+                        }
+                        sx={{ mx: 0 }}
+                      />
+                    </Tooltip>
+                  )
+                }
+                value={CONFIG.lineWidth}
+                min={1}
+                max={100}
+                startIcon={<RemoveIcon fontSize="small" />}
+                endIcon={<AddIcon fontSize="small" />}
+                onChange={(value) => (CONFIG.lineWidth = value)}
+              />
+            </Box>
+            <Box>
+              <Typography variant="caption" color="text.secondary">
+                Line style
+              </Typography>
+              <LineStyleSelector
+                selected={CONFIG.lineStyle}
+                disabled={NO_LINE_STYLE.includes(selectedTool)}
+              />
+            </Box>
+            <Divider />
+          </Stack>
+        )}
+        <Typography variant="caption" color="text.secondary" component="p">
+          Selected objects
+        </Typography>
+        <Stack direction="row" spacing={0.5}>
+          <Action
+            label="Copy selected (Ctrl C)"
+            disabled={!hasSelection}
+            onClick={copy}>
+            <CopyIcon />
+          </Action>
+          <Action label="Paste (Ctrl V)" disabled={!canPaste} onClick={paste}>
+            <PasteIcon />
+          </Action>
+          <Action
+            label="Delete selected (Delete)"
+            disabled={!hasSelection}
+            onClick={removeSelected}>
+            <DeleteIcon />
+          </Action>
+        </Stack>
+      </Box>
     </Island>
   );
 });
