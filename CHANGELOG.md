@@ -4,6 +4,10 @@
 
 ### Added
 
+- The panels of the showcase (the tools, the properties, the settings and the preview) can be moved, for the
+  times when they are over the drawing: a grip at the top left of each is dragged by a mouse, a pen or a finger, or
+  moved with the arrow keys. A double click on it, Home, or "Put the panels back" in the menu puts them back. The
+  library is not changed.
 - The `pressureSensitive` property (#136): the strokes of the pencil which a pen (a stylus) draws are as wide as
   the pressure on it, read from `PointerEvent.pressure`. `lineWidth` is the width at a medium pressure, and a stroke
   is between a tenth and twice of it. The strokes of a mouse and of a finger are drawn as before, and the canvas

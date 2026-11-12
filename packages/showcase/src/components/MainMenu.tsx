@@ -9,6 +9,7 @@ import ImageIcon from "@mui/icons-material/AddPhotoAlternate";
 import KeyboardIcon from "@mui/icons-material/Keyboard";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import MenuIcon from "@mui/icons-material/Menu";
+import ResetIcon from "@mui/icons-material/RestartAlt";
 import SaveIcon from "@mui/icons-material/Save";
 import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
 import TuneIcon from "@mui/icons-material/Tune";
@@ -23,7 +24,14 @@ import MenuItem from "@mui/material/MenuItem";
 import { useColorScheme } from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { clear, download, openSettings, openShortcuts, save } from "../actions";
+import {
+  clear,
+  download,
+  openSettings,
+  openShortcuts,
+  resetPanels,
+  save,
+} from "../actions";
 import logo from "../assets/react-sketch-logo.jpg";
 import Island from "./Island";
 
@@ -118,6 +126,12 @@ const MainMenu = (): ReactElement => {
             <TuneIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>Canvas settings</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={run(resetPanels)}>
+          <ListItemIcon>
+            <ResetIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Put the panels back</ListItemText>
         </MenuItem>
         <MenuItem onClick={run(clear)}>
           <ListItemIcon>

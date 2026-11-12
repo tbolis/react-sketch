@@ -17,6 +17,10 @@ The canvas fills the window, and the panels float over it:
 - **Top left**: the menu, and undo and redo, which fade out until the first change.
 - **Bottom**: zoom (the percentage resets the view), and a hint for the tool in use. The **preview** is at the
   right, with the frame of the view when it is zoomed or panned.
+- **Moving the panels**: the toolbar, the properties, the settings and the preview have a grip (six dots) at their
+  top left, to move them when they are over the drawing: drag it with a mouse, a pen or a finger, or use the arrow
+  keys on it (shift for larger steps). A double click on the grip, or Home, puts the panel back, and so does
+  "Put the panels back" in the menu. The panels stay in the window.
 - **Menu** (top left): save the drawing, download the PNG and the JSON, clear the canvas, the color scheme
   (light, dark, system), the keyboard shortcuts and the repository.
 - **Scenarios** (top right): `Playground`, `defaultValue`, `value + forceValue`, `addImg` and `backgroundImage`.
