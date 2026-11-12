@@ -9,6 +9,7 @@ import { selectTool } from "../actions";
 import { CONFIG } from "../stores/config";
 import { TOOL_GROUPS, toolDigit } from "../tools";
 import Island from "./Island";
+import { useMovable } from "./Movable";
 
 /**
  * The tools of the canvas, in groups. It is one choice: selecting a tool in a group
@@ -16,9 +17,12 @@ import Island from "./Island";
  */
 const Toolbar = observer((): ReactElement => {
   const selected = CONFIG.selectedTool;
+  const { ref, style, grip } = useMovable("toolbar", "tools");
 
   return (
     <Island
+      ref={ref}
+      style={style}
       component="nav"
       aria-label="Tools"
       sx={{
@@ -29,6 +33,8 @@ const Toolbar = observer((): ReactElement => {
         maxWidth: "calc(100vw - 16px)",
         overflowX: "auto",
       }}>
+      {grip}
+      <Divider orientation="vertical" flexItem sx={{ my: 0.5 }} />
       {TOOL_GROUPS.map((group, index) => (
         <Box
           key={group[0].value}

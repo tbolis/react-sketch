@@ -10,6 +10,7 @@ import { observer } from "mobx-react-lite";
 import { PREVIEW_MULTIPLIER } from "../sketchRef";
 import { CONFIG } from "../stores/config";
 import Island from "./Island";
+import { useMovable } from "./Movable";
 
 /**
  * A small copy of the whole drawing, drawn again after each change with
@@ -18,6 +19,7 @@ import Island from "./Island";
  */
 const Preview = observer((): ReactElement => {
   const { preview, view, previewOpen, empty } = CONFIG;
+  const { ref, style, grip } = useMovable("preview", "preview");
   // The size of the image, which is the size of the canvas times the multiplier
   const [size, setSize] = useState({ width: 0, height: 0 });
   const moved = view.zoom !== 1 || view.x !== 0 || view.y !== 0;
@@ -30,16 +32,21 @@ const Preview = observer((): ReactElement => {
   };
 
   return (
-    <Island component="section" aria-label="Preview" sx={{ p: 1, width: "100%" }}>
+    <Island
+      ref={ref}
+      style={style}
+      component="section"
+      aria-label="Preview"
+      sx={{ p: 1, width: "100%" }}>
       <Stack
         direction="row"
         sx={{ alignItems: "center", justifyContent: "space-between" }}>
-        <Typography
-          variant="overline"
-          component="h2"
-          sx={{ lineHeight: 2, pl: 0.5 }}>
-          Preview
-        </Typography>
+        <Stack direction="row" sx={{ alignItems: "center", gap: 0.5 }}>
+          {grip}
+          <Typography variant="overline" component="h2" sx={{ lineHeight: 2 }}>
+            Preview
+          </Typography>
+        </Stack>
         <IconButton
           size="small"
           aria-label={previewOpen ? "Hide the preview" : "Show the preview"}
