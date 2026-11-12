@@ -15,6 +15,25 @@ export type Scenario =
 /** The tabs of the settings panel */
 export type SettingsTab = "scenario" | "canvas" | "insert";
 
+/** The panels which float over the canvas and can be moved */
+export type PanelId = "toolbar" | "properties" | "preview" | "settings";
+
+/** How far a panel is from its place in the layout, in pixels */
+export interface Offset {
+  x: number;
+  y: number;
+}
+
+export const NO_OFFSET: Offset = { x: 0, y: 0 };
+
+/** Every panel in its place */
+export const PANELS_IN_PLACE = (): Record<PanelId, Offset> => ({
+  toolbar: NO_OFFSET,
+  properties: NO_OFFSET,
+  preview: NO_OFFSET,
+  settings: NO_OFFSET,
+});
+
 /** The view of a canvas which was not zoomed nor panned */
 export const INITIAL_VIEW: Types.SketchView = { zoom: 1, x: 0, y: 0 };
 
@@ -75,6 +94,10 @@ export interface Config {
   drawings: Drawing[];
   /** A message for the user, shown for a moment. Empty when there is none */
   notice: string;
+  /** Where the panels were moved to, from their place in the layout */
+  panelOffsets: Record<PanelId, Offset>;
+  /** The panel which was used last: it is above the others when they overlap */
+  frontPanel: PanelId | null;
   /** The panel of the line, the colors and the style of the tools */
   propertiesOpen: boolean;
   /** The panel of the scenario, the canvas and what to insert */
@@ -141,6 +164,8 @@ export class ConfigStore implements Config {
   public grid = false;
   public drawings: Drawing[] = [];
   public notice = "";
+  public panelOffsets = PANELS_IN_PLACE();
+  public frontPanel: PanelId | null = null;
   public propertiesOpen = isDesktop();
   public settingsOpen = false;
   public settingsTab: SettingsTab = "scenario";
