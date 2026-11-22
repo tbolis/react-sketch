@@ -1,4 +1,4 @@
-# react-sketch
+# <img src="docs/react-sketch-logo.png" alt="" width="64" height="64" align="absmiddle"> react-sketch
 
 [![CI][ci-image]][ci-url]
 [![NPM release][npm-image]][npm-url]
