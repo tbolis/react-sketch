@@ -14,6 +14,7 @@ export class Pencil extends FabricCanvasTool {
     this.brush.width = config.lineWidth ? config.lineWidth : 1;
     this.brush.color = config.lineColor ? config.lineColor : "black";
     this.setBrushStroke(config.lineStyle, this.brush.width);
+    this.setPressureSensitive(config.pressureSensitive === true);
   }
 
   type(): Tool {

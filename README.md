@@ -306,6 +306,7 @@ All properties are optional.
 | `lineColor`              | `string`                             | `"black"`       | Color of the line.                                                                                                                                                                                                                                                                                                                                                           |
 | `lineWidth`              | `number`                             | `10`            | Width of the line.                                                                                                                                                                                                                                                                                                                                                           |
 | `lineStyle`              | `Types.LineStyle`                    | `"solid"`       | Style of the line: `"solid"`, `"dashed"`, `"dotted"` or `"dash-dot"`. See [Line style](#line-style).                                                                                                                                                                                                                                                                         |
+| `pressureSensitive`      | `boolean`                            | `false`         | Draw the strokes of a pen (a stylus) with a width which follows its pressure. Only the pencil has it. See [Pen pressure](#pen-pressure).                                                                                                                                                                                                                                     |
 | `fillColor`              | `string`                             | `"transparent"` | Fill color of the shapes, where applicable (rectangle, rectangle-label, circle).                                                                                                                                                                                                                                                                                             |
 | `backgroundColor`        | `string`                             | `"transparent"` | Background color of the sketch, in hex or rgba format.                                                                                                                                                                                                                                                                                                                       |
 | `backgroundImage`        | `string`                             |                 | URL or data URL of the background image. It is set when the component mounts and when it changes, and removed when it is gone. It takes the place of the background image of `value` and `defaultValue`.                                                                                                                                                                     |
@@ -490,6 +491,28 @@ start and disappears about a second after it was drawn. It has the color (`lineC
 The line is drawn on the top canvas of fabric only, it is never an object of the sketch. It is not in
 `toJSON()` or `toDataURL()`, it is not an undo step, `onObjectAdded` is not called for it, and `onChange` is
 not called when it is drawn. Switching to another tool clears what is left of the line.
+
+### Pen pressure
+
+With `pressureSensitive`, the strokes of the pencil which a pen (a stylus) draws are as wide as the pressure on it:
+`lineWidth` is the width at a medium pressure, a light pressure draws a thinner line (down to a tenth of it) and a
+hard one a wider line (up to twice). A pen which reports a constant pressure draws a line of `lineWidth`.
+
+```tsx
+<SketchField tool="pencil" lineWidth={8} pressureSensitive />
+```
+
+- The pressure is read from the pointer events of the page (`PointerEvent.pressure` and `pointerType`), which come
+  before the mouse and the touch events the canvas draws with, so the mouse, the touches and the pinch zoom work as
+  before. The strokes of a mouse and of a finger are drawn as they are, as they have no pressure. It needs a browser
+  which sends pointer events for the pen, which the current ones do.
+- A stroke is a filled path, the outline of the stroke, and not a line with a width: it is the type `PressureStroke`
+  in `toJSON()` (a path of fabric, with the discs along the stroke as `discs` and not the commands of the path,
+  which are twenty times as long), and it is loaded as one by `value`, `defaultValue` and `fromJSON()`. A version
+  without this cannot load it. It is one object and one undo step, which is selected, moved, scaled, erased and
+  copied as any path. The color is its `fill`.
+- `lineStyle` does not apply to it (it has no dashes), and neither does the straight line of the shift key.
+- The highlighter does not have it.
 
 ## Exports
 

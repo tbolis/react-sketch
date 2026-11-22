@@ -4,6 +4,12 @@
 
 ### Added
 
+- The `pressureSensitive` property (#136): the strokes of the pencil which a pen (a stylus) draws are as wide as
+  the pressure on it, read from `PointerEvent.pressure`. `lineWidth` is the width at a medium pressure, and a stroke
+  is between a tenth and twice of it. The strokes of a mouse and of a finger are drawn as before, and the canvas
+  still reads the mouse and the touches, so the pinch zoom is not changed. Such a stroke is a filled path, saved
+  as the type `PressureStroke` with the discs along it (a few kilobytes for a long stroke, where the commands of
+  the path would be a few hundred), one object and one undo step. The showcase has a Pen pressure switch for the pencil.
 - `toDataURL({ multiplier: "original" })` (#75): the drawing at the resolution of the background image, one
   pixel of the picture for each pixel of the image, at any size of the canvas. Without a background image the
   multiplier is 1. An image which is scaled differently in the two directions is exported at the larger

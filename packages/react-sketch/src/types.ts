@@ -189,6 +189,14 @@ export interface SketchProperties {
    * polygon draw it, the highlighter, eraser and laser pointer do not.
    */
   lineStyle?: LineStyle;
+  /**
+   * Draw the strokes of a pen (a stylus) with a width which follows its pressure: `lineWidth` is
+   * the width at a medium pressure, and a light one is thinner (down to a tenth of it) and a
+   * hard one wider (up to twice). Only the pencil has it, and only the strokes of a pen: those
+   * of a mouse and of a finger are drawn as they are. Such a stroke is a filled path (the
+   * outline of the stroke) and not a line, so `lineStyle` does not apply to it. Defaults to false
+   */
+  pressureSensitive?: boolean;
   /** The fill color of the shape when applicable. Defaults to "transparent" */
   fillColor?: string;
   /** The background color of the sketch, in rgba or hex format. Defaults to "transparent" */

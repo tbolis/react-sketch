@@ -20,6 +20,7 @@ import { FabricCanvasTool } from "./tools";
 import { create_tool } from "./tools/factory";
 import { Eraser } from "./tools/Eraser";
 import { Polygon } from "./tools/Polygon";
+import { releasePen } from "./tools/PressureBrush";
 
 /**
  * The properties which always have a value, because SketchField provides
@@ -292,6 +293,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
       props.lineColor !== prevProps.lineColor ||
       props.lineWidth !== prevProps.lineWidth ||
       props.lineStyle !== prevProps.lineStyle ||
+      props.pressureSensitive !== prevProps.pressureSensitive ||
       props.fillColor !== prevProps.fillColor
     ) {
       this.configureTool();
@@ -324,6 +326,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     this.tool.dispose();
     // The canvas element is released at once, so it can be used again (React
     // strict mode mounts twice). The rest is freed once the pending render is done.
+    releasePen(this.canvas);
     void this.canvas.dispose();
   }
 

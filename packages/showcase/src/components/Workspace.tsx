@@ -153,6 +153,7 @@ const Workspace = observer((): ReactElement => {
             lineColor={CONFIG.lineColor}
             lineWidth={CONFIG.lineWidth}
             lineStyle={CONFIG.lineStyle}
+            pressureSensitive={CONFIG.pressureSensitive}
             pinchZoom={CONFIG.pinchZoom}
             minZoom={CONFIG.minZoom}
             maxZoom={CONFIG.maxZoom}

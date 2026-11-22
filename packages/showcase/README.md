@@ -7,7 +7,8 @@ The canvas fills the window, and the panels float over it:
 
 - **Toolbar** (top): select, pan, rectangle, rectangle label, circle, polygon, line, arrow, pencil, highlighter,
   eraser and laser pointer. The keys of the tools are on the buttons and in the shortcuts dialog.
-- **Properties** (left): line color, fill color, line weight and line style of the tool, and copy, paste and delete
+- **Properties** (left): line color, fill color, line weight and line style of the tool (and, for the pencil, the
+  Pen pressure switch), and copy, paste and delete
   of the selected objects.
 - **Settings** (right, the gear): the **Scenario** tab (what the scenario shows and its actions), the **Canvas** tab
   (size, with a button for the original size of the background image, background color and image, pinch zoom,
