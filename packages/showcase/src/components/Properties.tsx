@@ -26,6 +26,7 @@ import {
   removeSelected,
 } from "../actions";
 import { CONFIG } from "../stores/config";
+import { useMovable } from "./Movable";
 import { toolByValue } from "../tools";
 import ColorPicker from "./ColorPicker";
 import Island from "./Island";
@@ -63,12 +64,13 @@ const Action = ({ label, disabled, onClick, children }: ActionProps) => (
  */
 const Properties = observer((): ReactElement => {
   const { selectedTool, propertiesOpen, hasSelection, canPaste } = CONFIG;
+  const { ref, style, grip } = useMovable("properties", "properties panel");
   const drawing = !NO_PROPERTIES.includes(selectedTool);
   const tool = toolByValue(selectedTool);
 
   if (!propertiesOpen) {
     return (
-      <Island sx={{ p: 0.5, width: "fit-content" }}>
+      <Island ref={ref} style={style} sx={{ p: 0.5, width: "fit-content" }}>
         <Tooltip title="Properties">
           <IconButton
             aria-label="Show the properties"
@@ -83,6 +85,8 @@ const Properties = observer((): ReactElement => {
 
   return (
     <Island
+      ref={ref}
+      style={style}
       component="section"
       aria-label="Properties"
       sx={{
@@ -105,9 +109,12 @@ const Properties = observer((): ReactElement => {
         <Stack
           direction="row"
           sx={{ alignItems: "center", justifyContent: "space-between" }}>
-          <Typography variant="overline" component="h2" sx={{ lineHeight: 2 }}>
-            {drawing ? (tool?.label ?? "Tool") : "Selection"}
-          </Typography>
+          <Stack direction="row" sx={{ alignItems: "center", gap: 0.5 }}>
+            {grip}
+            <Typography variant="overline" component="h2" sx={{ lineHeight: 2 }}>
+              {drawing ? (tool?.label ?? "Tool") : "Selection"}
+            </Typography>
+          </Stack>
           <Tooltip title="Hide the properties">
             <IconButton
               size="small"

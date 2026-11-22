@@ -3,6 +3,7 @@ import controlledValue from "./data/controlledValue";
 import {
   CONFIG,
   INITIAL_VIEW,
+  PANELS_IN_PLACE,
   createDrawing,
   type Scenario,
   type SettingsTab,
@@ -136,6 +137,11 @@ export const restoreOriginalSize = (): void =>
     CONFIG.sketchHeight = size.height;
     CONFIG.controlledSize = true;
   });
+
+/** Put the panels which were moved back in their place */
+export const resetPanels = (): void => {
+  CONFIG.panelOffsets = PANELS_IN_PLACE();
+};
 
 export const copy = (): void =>
   withSketch((sketch) => {

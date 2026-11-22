@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
 import Tab from "@mui/material/Tab";
@@ -8,6 +9,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { observer } from "mobx-react-lite";
 import { CONFIG, type SettingsTab } from "../../stores/config";
 import Island from "../Island";
+import { useMovable } from "../Movable";
 import CanvasTab from "./CanvasTab";
 import InsertTab from "./InsertTab";
 import ScenarioTab from "./ScenarioTab";
@@ -24,9 +26,12 @@ const TABS: { value: SettingsTab; label: string }[] = [
  */
 const Settings = observer((): ReactElement => {
   const { settingsTab } = CONFIG;
+  const { ref, style, grip } = useMovable("settings", "settings");
 
   return (
     <Island
+      ref={ref}
+      style={style}
       component="section"
       aria-label="Settings"
       sx={{
@@ -39,6 +44,7 @@ const Settings = observer((): ReactElement => {
       <Stack
         direction="row"
         sx={{ alignItems: "center", borderBottom: 1, borderColor: "divider" }}>
+        <Box sx={{ pl: 0.5 }}>{grip}</Box>
         <Tabs
           value={settingsTab}
           variant="fullWidth"
