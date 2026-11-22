@@ -1,3 +1,5 @@
+<img src="docs/react-sketch-logo-original.jpg" alt="react-sketch logo" width="96" height="96">
+
 # react-sketch
 
 [![CI][ci-image]][ci-url]
