@@ -1,8 +1,8 @@
 # Changelog
 
-## 1.2.0
+## 1.2.0 (2026-11-22)
 
-The bucket fill tool, the export at the resolution of the background image, and fixes to undo and redo of a move.
+The bucket fill tool, group and ungroup, strokes of a pen as wide as the pressure on it, the export at the resolution of the background image, panels of the showcase which can be moved, and fixes to undo and redo of a move.
 
 ### Added
 
