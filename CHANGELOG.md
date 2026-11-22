@@ -14,6 +14,13 @@
   still reads the mouse and the touches, so the pinch zoom is not changed. Such a stroke is a filled path, saved
   as the type `PressureStroke` with the discs along it (a few kilobytes for a long stroke, where the commands of
   the path would be a few hundred), one object and one undo step. The showcase has a Pen pressure switch for the pencil.
+- Group and ungroup (#42): `group()` makes one object of the selected objects, `ungroup()` takes it apart,
+  and `canGroup()` and `canUngroup()` tell whether they can be used. A group is moved, scaled, rotated,
+  copied and removed as one object, and `toJSON()` saves it (as a `SketchGroup`) and `value`,
+  `defaultValue` and `fromJSON()` load it. Each is one undo step, and the group is put back as the same
+  object, so the modifications of it can still be undone. The text box of a rectangle label goes into the
+  group with its rectangle. The showcase has Group and Ungroup buttons in the selection panel, with Ctrl G
+  and Ctrl Shift G.
 - `toDataURL({ multiplier: "original" })` (#75): the drawing at the resolution of the background image, one
   pixel of the picture for each pixel of the image, at any size of the canvas. Without a background image the
   multiplier is 1. An image which is scaled differently in the two directions is exported at the larger

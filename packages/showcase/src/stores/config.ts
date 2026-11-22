@@ -86,6 +86,8 @@ export interface Config {
   canUndo: boolean;
   canRedo: boolean;
   hasSelection: boolean;
+  canGroup: boolean;
+  canUngroup: boolean;
   canPaste: boolean;
   /** Whether nothing is drawn on the canvas */
   empty: boolean;
@@ -159,6 +161,8 @@ export class ConfigStore implements Config {
   public canUndo = false;
   public canRedo = false;
   public hasSelection = false;
+  public canGroup = false;
+  public canUngroup = false;
   public canPaste = false;
   public empty = true;
   public grid = false;
