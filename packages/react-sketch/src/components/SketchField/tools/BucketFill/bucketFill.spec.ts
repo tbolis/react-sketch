@@ -562,6 +562,8 @@ describe("bucketFill", () => {
     const result = bucketFill(canvas, { x: 700, y: 500 }, { color: "#123456" });
 
     expect(result).not.toBeNull();
-    expect(performance.now() - start).toBeLessThan(2000);
+    // It takes less than a second on a computer, and three on a runner of the CI which is busy with
+    // the other suites. The limit is for a fill which gets much slower, not for the load of the runner.
+    expect(performance.now() - start).toBeLessThan(10000);
   });
 });
