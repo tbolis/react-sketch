@@ -16,6 +16,7 @@ export enum Tool {
   PAN = "pan",
   HIGHLIGHTER = "highlighter",
   ERASER = "eraser",
+  BUCKET_FILL = "bucket-fill",
   LASER_POINTER = "laser-pointer",
   DEFAULT_TOOL = "default-tool",
 }
@@ -37,6 +38,7 @@ export const Tools = {
   DefaultTool: Tool.DEFAULT_TOOL,
   Highlighter: Tool.HIGHLIGHTER,
   Eraser: Tool.ERASER,
+  BucketFill: Tool.BUCKET_FILL,
   LaserPointer: Tool.LASER_POINTER,
 } as const;
 
@@ -75,6 +77,14 @@ export interface SketchEvent {
 }
 
 /**
+ * A size in pixels, for example the one of the image of the background
+ */
+export interface SketchSize {
+  width: number;
+  height: number;
+}
+
+/**
  * Content of a sketch, as returned by `toJSON` and accepted by `value`,
  * `defaultValue` and `fromJSON`: an object, or the same object as JSON string.
  */
@@ -93,8 +103,13 @@ export interface DataUrlOptions {
   format?: string;
   /** Quality level (0..1). Only used for jpeg. Defaults to 1 */
   quality?: number;
-  /** Multiplier to scale by. Defaults to 1 */
-  multiplier?: number;
+  /**
+   * Multiplier to scale by. Defaults to 1. "original" scales by what gives the
+   * background image one pixel of the picture for each pixel of the image it was
+   * loaded from, so a drawing on a photo is exported at the resolution of the photo.
+   * Without a background image it is 1
+   */
+  multiplier?: number | "original";
   /** Cropping left offset */
   left?: number;
   /** Cropping top offset */
@@ -176,7 +191,18 @@ export interface SketchProperties {
    * polygon draw it, the highlighter, eraser and laser pointer do not.
    */
   lineStyle?: LineStyle;
-  /** The fill color of the shape when applicable. Defaults to "transparent" */
+  /**
+   * Draw the strokes of a pen (a stylus) with a width which follows its pressure: `lineWidth` is
+   * the width at a medium pressure, and a light one is thinner (down to a tenth of it) and a
+   * hard one wider (up to twice). Only the pencil has it, and only the strokes of a pen: those
+   * of a mouse and of a finger are drawn as they are. Such a stroke is a filled path (the
+   * outline of the stroke) and not a line, so `lineStyle` does not apply to it. Defaults to false
+   */
+  pressureSensitive?: boolean;
+  /**
+   * The fill color of the shape when applicable. Defaults to "transparent". The
+   * bucket fill fills with it, and with `lineColor` while it is transparent
+   */
   fillColor?: string;
   /** The background color of the sketch, in rgba or hex format. Defaults to "transparent" */
   backgroundColor?: string;
@@ -235,8 +261,8 @@ export interface SketchProperties {
   style?: CSS.Properties;
   /**
    * Called when the mouse was released on the canvas, or left it, after an object was
-   * added, changed or removed since it was pressed, and after undo, redo and loading a
-   * value. Not called for a click which only selects, or for a pointer which comes and
+   * added, changed or removed since it was pressed, and after undo, redo, group, ungroup
+   * and loading a value. Not called for a click which only selects, or for a pointer which comes and
    * goes. The argument is the DOM event of the former, nothing in the latter
    */
   onChange?: (event?: Event) => void;

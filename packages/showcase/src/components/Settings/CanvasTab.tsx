@@ -8,6 +8,7 @@ import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import Typography from "@mui/material/Typography";
 import { observer } from "mobx-react-lite";
+import { restoreOriginalSize } from "../../actions";
 import { withSketch } from "../../sketchRef";
 import { CONFIG } from "../../stores/config";
 import { readAsDataUrl } from "../../utils/files";
@@ -170,11 +171,19 @@ const CanvasTab = observer((): ReactElement => {
           checked={controlledSize}
           onChange={(checked) => (CONFIG.controlledSize = checked)}
         />
+        <Typography variant="body2" color="text.secondary">
+          Original size gives the canvas the size of the background image, so the
+          drawing is on the image pixel for pixel. The download has the resolution of
+          the image, at any size of the canvas.
+        </Typography>
+        <Button variant="outlined" onClick={restoreOriginalSize}>
+          Original size
+        </Button>
         <LabeledSlider
           label="Change Canvas Width"
           value={sketchWidth}
           min={10}
-          max={1000}
+          max={Math.max(1000, sketchWidth)}
           disabled={!controlledSize}
           onChange={(value) => (CONFIG.sketchWidth = value)}
         />
@@ -182,7 +191,7 @@ const CanvasTab = observer((): ReactElement => {
           label="Change Canvas Height"
           value={sketchHeight}
           min={10}
-          max={1000}
+          max={Math.max(1000, sketchHeight)}
           disabled={!controlledSize}
           onChange={(value) => (CONFIG.sketchHeight = value)}
         />

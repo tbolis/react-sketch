@@ -199,6 +199,55 @@ export const Editor = ({ imageUrl }: { imageUrl: string }) => {
 };
 ```
 
+### Keeping the resolution of an image
+
+The canvas has the size of its container, so `toDataURL()` draws the drawing at that size, and a photo which is shown
+smaller than it is loses pixels in the file. `multiplier: "original"` draws it at the resolution of the background
+image, one pixel of the picture for each pixel of the image, at any size of the canvas (without a background image it
+is 1). `getOriginalSize()` returns the size of the image in pixels, and a canvas of that size shows the image pixel for
+pixel, so it can be restored with it:
+
+```tsx
+import { useRef, useState } from "react";
+import { SketchField, Types } from "react-sketch";
+
+export const OnPhoto = ({ photo }: { photo: string }) => {
+  const sketch = useRef<SketchField>(null);
+  const [size, setSize] = useState<Types.SketchSize>({ width: 800, height: 600 });
+
+  const download = () => {
+    const link = document.createElement("a");
+    // The resolution of the photo, whatever the size of the canvas
+    link.href = sketch.current?.toDataURL({ multiplier: "original" }) ?? "";
+    link.download = "photo.png";
+    link.click();
+  };
+
+  // The drawing is scaled with the canvas, so it stays on the same part of the photo
+  const restoreSize = () => setSize(sketch.current?.getOriginalSize() ?? size);
+
+  return (
+    <>
+      <button onClick={download}>Download</button>
+      <button onClick={restoreSize}>Original size</button>
+      <SketchField
+        ref={sketch}
+        autoresize={false}
+        width={size.width}
+        height={size.height}
+        backgroundImage={photo}
+        backgroundImageOptions={{ stretched: true }}
+      />
+    </>
+  );
+};
+```
+
+To keep the resolution of the image, keep the image as the background and the drawing as objects (`toJSON()` saves
+them), and export once, at the end. Exporting the drawing and using it as the next background draws it again at the
+size of the canvas each time. Browsers limit the area of a canvas (a phone about 16 million pixels, for example), and
+an export over the limit is empty.
+
 ### A preview of the drawing
 
 `toDataURL()` draws the whole drawing, whatever the zoom and the pan of the view, so a small copy of it,
@@ -257,7 +306,8 @@ All properties are optional.
 | `lineColor`              | `string`                             | `"black"`       | Color of the line.                                                                                                                                                                                                                                                                                                                                                           |
 | `lineWidth`              | `number`                             | `10`            | Width of the line.                                                                                                                                                                                                                                                                                                                                                           |
 | `lineStyle`              | `Types.LineStyle`                    | `"solid"`       | Style of the line: `"solid"`, `"dashed"`, `"dotted"` or `"dash-dot"`. See [Line style](#line-style).                                                                                                                                                                                                                                                                         |
-| `fillColor`              | `string`                             | `"transparent"` | Fill color of the shapes, where applicable (rectangle, rectangle-label, circle).                                                                                                                                                                                                                                                                                             |
+| `pressureSensitive`      | `boolean`                            | `false`         | Draw the strokes of a pen (a stylus) with a width which follows its pressure. Only the pencil has it. See [Pen pressure](#pen-pressure).                                                                                                                                                                                                                                     |
+| `fillColor`              | `string`                             | `"transparent"` | Fill color of the shapes, where applicable (rectangle, rectangle-label, circle), and the color of the bucket fill, which uses `lineColor` while it is transparent.                                                                                                                                                                                                           |
 | `backgroundColor`        | `string`                             | `"transparent"` | Background color of the sketch, in hex or rgba format.                                                                                                                                                                                                                                                                                                                       |
 | `backgroundImage`        | `string`                             |                 | URL or data URL of the background image. It is set when the component mounts and when it changes, and removed when it is gone. It takes the place of the background image of `value` and `defaultValue`.                                                                                                                                                                     |
 | `backgroundImageOptions` | `Types.BackgroundOptions`            |                 | Options of `backgroundImage`, those of `setBackgroundFromDataUrl`. Options written inline in a render do not load the image again when their content is the same.                                                                                                                                                                                                            |
@@ -300,31 +350,37 @@ The methods are properties of the component instance, access them through a `ref
 the moment the component is mounted until it is unmounted. Calling one before the component is mounted
 throws.
 
-| Method                                        | Returns            | Description                                                                                                                                                                                                                     |
-| --------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `undo()`                                      | `void`             | Undo the last action. Does nothing when there is nothing to undo. Calls `onChange` when it undid something.                                                                                                                     |
-| `redo()`                                      | `void`             | Redo the last undone action. Does nothing when there is nothing to redo. Calls `onChange` when it redid something.                                                                                                              |
-| `canUndo()`                                   | `boolean`          | Whether `undo()` has something to undo.                                                                                                                                                                                         |
-| `canRedo()`                                   | `boolean`          | Whether `redo()` has something to redo.                                                                                                                                                                                         |
-| `toDataURL(options?)`                         | `string`           | The sketch as a data URL. Options: `format` (`"png"` or `"jpeg"`, default `imageFormat`, then `"png"`), `quality` (0 to 1, jpeg only, default 1), `multiplier` (default 1), and the crop area `left`, `top`, `width`, `height`. |
-| `toJSON(propertiesToInclude?)`                | `Types.SketchData` | The sketch as an object. `propertiesToInclude` lists additional properties of the objects to include.                                                                                                                           |
-| `fromJSON(json?)`                             | `void`             | Load a drawing (object or JSON string). Loads after 100 ms, starts the undo history again with the loaded objects, applies the tool configuration again and calls `onChange`. Does nothing for an empty argument.               |
-| `clear(propertiesToInclude?)`                 | `Types.SketchData` | Remove all objects, the background image and the overlay image, and reset the undo history. Returns the discarded content as JSON. The `backgroundColor` property is kept.                                                      |
-| `addImg(dataUrl, options?)`                   | `void`             | Add an image, given as URL or data URL, as an object. It is added when it has loaded. Options: `left`, `top` (default: random position), `scale` (default `0.5`), `crossOrigin` (see Background and overlay images).            |
-| `addText(text, options?)`                     | `void`             | Add an editable text. It is centered unless `left` or `top` are given. `options` are the options of a fabric text object, for example `fontSize`, `fill`.                                                                       |
-| `setBackgroundFromDataUrl(dataUrl, options?)` | `void`             | Use an image as background. Options: `stretched` (fill the canvas, the proportions change), `stretchedX` (fit the width), `stretchedY` (fit the height), both are `stretched`; `crossOrigin`; the others are image options.     |
-| `removeBackgroundImage()`                     | `void`             | Remove the background image, also one that is still loading. The objects, the overlay image and the `backgroundColor` are kept. Like `setBackgroundFromDataUrl`, it is not part of the undo history.                            |
-| `setOverlayFromDataUrl(dataUrl, options?)`    | `void`             | Use an image as overlay, above the objects. It takes no mouse events, `toJSON` and `toDataURL` include it, and it is not part of the undo history. The options are those of `setBackgroundFromDataUrl`.                         |
-| `removeOverlayImage()`                        | `void`             | Remove the overlay image, also one that is still loading. The objects, the background image and the `backgroundColor` are kept.                                                                                                 |
-| `zoom(factor)`                                | `void`             | Scale the objects, the background image and the overlay image by a factor: 2 doubles their size, 0.5 halves it.                                                                                                                 |
-| `resetView()`                                 | `void`             | Put the view back to the whole canvas, after it was zoomed or panned with two fingers.                                                                                                                                          |
-| `hasSelection()`                              | `boolean`          | Whether an object is selected.                                                                                                                                                                                                  |
-| `clearSelection()`                            | `void`             | Deselect the selected object or objects.                                                                                                                                                                                        |
-| `removeSelected()`                            | `void`             | Remove the selected object or objects. It can be undone.                                                                                                                                                                        |
-| `copy()`                                      | `void`             | Copy the selected object. Does nothing without a selection.                                                                                                                                                                     |
-| `paste()`                                     | `void`             | Paste the copied object, 10 pixels further down and to the right of the previous one. Does nothing when nothing was copied.                                                                                                     |
-| `enableTouchScroll()`                         | `void`             | Allow the page to scroll on touch devices when touching the canvas.                                                                                                                                                             |
-| `disableTouchScroll()`                        | `void`             | Do not scroll the page when touching the canvas.                                                                                                                                                                                |
+| Method                                        | Returns                          | Description                                                                                                                                                                                                                                                                                           |
+| --------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `undo()`                                      | `void`                           | Undo the last action. Does nothing when there is nothing to undo. Calls `onChange` when it undid something.                                                                                                                                                                                           |
+| `redo()`                                      | `void`                           | Redo the last undone action. Does nothing when there is nothing to redo. Calls `onChange` when it redid something.                                                                                                                                                                                    |
+| `canUndo()`                                   | `boolean`                        | Whether `undo()` has something to undo.                                                                                                                                                                                                                                                               |
+| `canRedo()`                                   | `boolean`                        | Whether `redo()` has something to redo.                                                                                                                                                                                                                                                               |
+| `toDataURL(options?)`                         | `string`                         | The sketch as a data URL. Options: `format` (`"png"` or `"jpeg"`, default `imageFormat`, then `"png"`), `quality` (0 to 1, jpeg only, default 1), `multiplier` (a number, default 1, or `"original"` for the resolution of the background image), and the crop area `left`, `top`, `width`, `height`. |
+| `getOriginalSize()`                           | `{ width, height } \| undefined` | The size in pixels of the background image, as the file has it, not as it is shown. Undefined without a background image, or while it loads.                                                                                                                                                          |
+| `getOriginalSize()`                           | `{ width, height } \| undefined` | The size in pixels of the background image, as the file has it, not as it is shown. Undefined without a background image, or while it loads.                                                                                                                                                          |
+| `toJSON(propertiesToInclude?)`                | `Types.SketchData`               | The sketch as an object. `propertiesToInclude` lists additional properties of the objects to include.                                                                                                                                                                                                 |
+| `fromJSON(json?)`                             | `void`                           | Load a drawing (object or JSON string). Loads after 100 ms, starts the undo history again with the loaded objects, applies the tool configuration again and calls `onChange`. Does nothing for an empty argument.                                                                                     |
+| `clear(propertiesToInclude?)`                 | `Types.SketchData`               | Remove all objects, the background image and the overlay image, and reset the undo history. Returns the discarded content as JSON. The `backgroundColor` property is kept.                                                                                                                            |
+| `addImg(dataUrl, options?)`                   | `void`                           | Add an image, given as URL or data URL, as an object. It is added when it has loaded. Options: `left`, `top` (default: random position), `scale` (default `0.5`), `crossOrigin` (see Background and overlay images).                                                                                  |
+| `addText(text, options?)`                     | `void`                           | Add an editable text. It is centered unless `left` or `top` are given. `options` are the options of a fabric text object, for example `fontSize`, `fill`.                                                                                                                                             |
+| `setBackgroundFromDataUrl(dataUrl, options?)` | `void`                           | Use an image as background. Options: `stretched` (fill the canvas, the proportions change), `stretchedX` (fit the width), `stretchedY` (fit the height), both are `stretched`; `crossOrigin`; the others are image options.                                                                           |
+| `removeBackgroundImage()`                     | `void`                           | Remove the background image, also one that is still loading. The objects, the overlay image and the `backgroundColor` are kept. Like `setBackgroundFromDataUrl`, it is not part of the undo history.                                                                                                  |
+| `setOverlayFromDataUrl(dataUrl, options?)`    | `void`                           | Use an image as overlay, above the objects. It takes no mouse events, `toJSON` and `toDataURL` include it, and it is not part of the undo history. The options are those of `setBackgroundFromDataUrl`.                                                                                               |
+| `removeOverlayImage()`                        | `void`                           | Remove the overlay image, also one that is still loading. The objects, the background image and the `backgroundColor` are kept.                                                                                                                                                                       |
+| `zoom(factor)`                                | `void`                           | Scale the objects, the background image and the overlay image by a factor: 2 doubles their size, 0.5 halves it.                                                                                                                                                                                       |
+| `resetView()`                                 | `void`                           | Put the view back to the whole canvas, after it was zoomed or panned with two fingers.                                                                                                                                                                                                                |
+| `hasSelection()`                              | `boolean`                        | Whether an object is selected.                                                                                                                                                                                                                                                                        |
+| `clearSelection()`                            | `void`                           | Deselect the selected object or objects.                                                                                                                                                                                                                                                              |
+| `removeSelected()`                            | `void`                           | Remove the selected object or objects. It can be undone.                                                                                                                                                                                                                                              |
+| `copy()`                                      | `void`                           | Copy the selected object. Does nothing without a selection.                                                                                                                                                                                                                                           |
+| `paste()`                                     | `void`                           | Paste the copied object, 10 pixels further down and to the right of the previous one. Does nothing when nothing was copied.                                                                                                                                                                           |
+| `canGroup()`                                  | `boolean`                        | Whether two or more objects are selected, which `group()` makes a group of.                                                                                                                                                                                                                           |
+| `canUngroup()`                                | `boolean`                        | Whether the selected object is a group which `group()` made.                                                                                                                                                                                                                                          |
+| `group()`                                     | `void`                           | Make a group of the selected objects, and select it. One undo step. See [Groups](#groups).                                                                                                                                                                                                            |
+| `ungroup()`                                   | `void`                           | Take the selected group apart, and select its objects. One undo step.                                                                                                                                                                                                                                 |
+| `enableTouchScroll()`                         | `void`                           | Allow the page to scroll on touch devices when touching the canvas.                                                                                                                                                                                                                                   |
+| `disableTouchScroll()`                        | `void`                           | Do not scroll the page when touching the canvas.                                                                                                                                                                                                                                                      |
 
 ## Tools
 
@@ -344,6 +400,7 @@ Use the tools by name (`"pencil"`), with `Tools` (`Tools.Pencil`) or with the en
 | Pan             | `Tools.Pan`            | `pan`             | Disables drawing. Dragging moves the whole canvas, useful after zooming (contributed by [wmaillard](https://github.com/wmaillard)).                                                                            |
 | Highlighter     | `Tools.Highlighter`    | `highlighter`     | Free drawing in a semi-transparent color. `lineColor` must be a hex code or a color name; any other value falls back to the default color.                                                                     |
 | Eraser          | `Tools.Eraser`         | `eraser`          | Erases parts of the objects, with the width of `lineWidth`. The cursor shows the size of the brush. The background color and the background image are not erased. See [Eraser](#eraser).                       |
+| Bucket fill     | `Tools.BucketFill`     | `bucket-fill`     | Fills the area which is closed around a click with `fillColor` (`lineColor` while it is transparent). See [Bucket fill](#bucket-fill).                                                                         |
 | Laser pointer   | `Tools.LaserPointer`   | `laser-pointer`   | A line that follows the pointer, fades out and disappears. It is not part of the drawing. See [Laser pointer](#laser-pointer).                                                                                 |
 | Default tool    | `Tools.DefaultTool`    | `default-tool`    | Disables drawing and selection. Use it to show a drawing that is not edited.                                                                                                                                   |
 
@@ -358,8 +415,8 @@ thick line has long dashes and wide dots.
 ```
 
 The pencil, line, arrow, rectangle, rectangle label, circle and polygon draw it. The head of an arrow and the
-text box of a rectangle label are not dashed, and the highlighter, the eraser and the laser pointer do not
-draw it. A change of `lineStyle` is for the next drawing: what is drawn already keeps its style. The style is
+text box of a rectangle label are not dashed, and the highlighter, the eraser, the bucket fill and the laser
+pointer do not draw it. A change of `lineStyle` is for the next drawing: what is drawn already keeps its style. The style is
 saved by `toJSON()` and loaded by `fromJSON()` with the object (`strokeDashArray` and `strokeLineCap`), and
 the polygon in progress is shown in it.
 
@@ -430,6 +487,26 @@ A stroke is one undo step. The erased parts are kept on the objects, so `toJSON(
 `defaultValue` and `fromJSON()` load them. An object is only cut where the eraser crosses it, the rest of
 the sketch stays, and the background color and the background image are not erased.
 
+### Bucket fill
+
+The bucket fill fills the area around the point of a click with `fillColor`, or with `lineColor` while
+`fillColor` is transparent (its default). What closes the area is what is drawn: lines, rectangles, circles,
+polygons, strokes of the pencil, texts, the overlay image, and any other object, whatever its color. The
+background color and the background image do not close an area.
+
+The area has to be closed within the canvas, as it is shown with the zoom and the position of the view. Where
+the lines do not meet, or the area reaches the edge of the canvas, the color would get out: a click there fills
+nothing, and `onChange` is not called. A dashed or dotted line has gaps, so it does not close an area.
+
+The fill is an object of the sketch, a path of the shape of the area. It is one undo step, `onObjectAdded` and
+`onChange` are called for it, `toJSON()` saves it (as a `BucketFill` object), `value`, `defaultValue` and
+`fromJSON()` load it, and it scales with the canvas. It is over the object the area is in and under the objects
+around it, and goes a pixel under their lines, so a line is never covered and there is no seam at its edge. A
+click in an area which has a fill fills it again, over the first one. The select tool moves and removes the fills,
+and the eraser cuts them, as it does the other objects.
+
+The fill is made by the private package [`@react-sketch/bucket`](packages/bucket).
+
 ### Laser pointer
 
 The laser pointer points at something on the sketch: the line follows the pointer, gets thinner towards its
@@ -440,12 +517,51 @@ The line is drawn on the top canvas of fabric only, it is never an object of the
 `toJSON()` or `toDataURL()`, it is not an undo step, `onObjectAdded` is not called for it, and `onChange` is
 not called when it is drawn. Switching to another tool clears what is left of the line.
 
+### Pen pressure
+
+With `pressureSensitive`, the strokes of the pencil which a pen (a stylus) draws are as wide as the pressure on it:
+`lineWidth` is the width at a medium pressure, a light pressure draws a thinner line (down to a tenth of it) and a
+hard one a wider line (up to twice). A pen which reports a constant pressure draws a line of `lineWidth`.
+
+```tsx
+<SketchField tool="pencil" lineWidth={8} pressureSensitive />
+```
+
+- The pressure is read from the pointer events of the page (`PointerEvent.pressure` and `pointerType`), which come
+  before the mouse and the touch events the canvas draws with, so the mouse, the touches and the pinch zoom work as
+  before. The strokes of a mouse and of a finger are drawn as they are, as they have no pressure. It needs a browser
+  which sends pointer events for the pen, which the current ones do.
+- A stroke is a filled path, the outline of the stroke, and not a line with a width: it is the type `PressureStroke`
+  in `toJSON()` (a path of fabric, with the discs along the stroke as `discs` and not the commands of the path,
+  which are twenty times as long), and it is loaded as one by `value`, `defaultValue` and `fromJSON()`. A version
+  without this cannot load it. It is one object and one undo step, which is selected, moved, scaled, erased and
+  copied as any path. The color is its `fill`.
+- `lineStyle` does not apply to it (it has no dashes), and neither does the straight line of the shift key.
+- The highlighter does not have it.
+
+### Groups
+
+`group()` makes one object of the selected objects (two or more) and selects it: the group is moved, scaled,
+rotated, copied and removed as one object, `toJSON()` saves it and `value`, `defaultValue` and `fromJSON()` load
+it. `ungroup()` takes the selected group apart and selects its objects, which keep where they are on the canvas,
+with the move, the scale and the turn which the group gave them. Both are one undo step, and both call
+`onChange` (and, as undo and redo do, not `onObjectAdded`). `canGroup()` and `canUngroup()` tell whether they
+will do something, for example to enable a button.
+
+- The group takes the place of the topmost of its objects among the others, so what is above it stays above it.
+  Undo puts every object back in its own place.
+- The text box of a rectangle label goes into the group with its rectangle.
+- A group can be in another group, and taking that one apart gives back the inner group.
+- A group is one object to the select tool: its objects cannot be selected or changed until it is taken apart.
+- The group of an arrow is not one which can be taken apart.
+- The eraser cuts a group as a whole, so taking the group apart gives back what was erased from it.
+
 ## Exports
 
 | Export         | Description                                                                                                                                                                                                               |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `SketchField`  | The component (named export). Also usable as a type, for the `ref`.                                                                                                                                                       |
-| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Polygon`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`, `Eraser`, `LaserPointer`.                                                |
+| `Tools`        | The tools by name: `Select`, `Pencil`, `Line`, `Arrow`, `Rectangle`, `RectangleLabel`, `Polygon`, `Circle`, `Pan`, `DefaultTool`, `Highlighter`, `Eraser`, `BucketFill`, `LaserPointer`.                                  |
 | `Types`        | Namespace of the types: `Tool` (enumeration), `Tools`, `LineStyle`, `SketchProperties`, `SketchEvent`, `SketchObject`, `SketchValue`, `SketchData`, `DataUrlOptions`, `ImageOptions`, `BackgroundOptions`, `TextOptions`. |
 | default export | The component, which also carries `SketchField` and `Tools` (as in 0.5.x).                                                                                                                                                |
 
@@ -469,6 +585,7 @@ This is a Yarn 1 workspaces monorepo.
 | Path                    | Description                                                                                                                                                                               |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `packages/react-sketch` | The library, published to npm as `react-sketch`. The build output is `dist/index.js` (UMD bundle, `react` and `fabric` are external) and `dist/index.d.ts` (type declarations).           |
+| `packages/bucket`       | The bucket fill, which finds the area closed around a point and makes its fill (private, bundled into `react-sketch`).                                                                    |
 | `packages/eraser`       | The eraser brush, from `@erase2d/fabric` (private, bundled into `react-sketch`).                                                                                                          |
 | `packages/laserpointer` | The laser pointer brush (private, bundled into `react-sketch`).                                                                                                                           |
 | `packages/showcase`     | Demo application (not published), live on GitHub Pages: a canvas with floating tools, properties and settings, and the `defaultValue`, `value`, `addImg` and `backgroundImage` scenarios. |

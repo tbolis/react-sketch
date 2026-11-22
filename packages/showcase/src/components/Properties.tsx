@@ -6,23 +6,32 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import PasteIcon from "@mui/icons-material/ContentPaste";
 import RemoveIcon from "@mui/icons-material/Remove";
 import StyleIcon from "@mui/icons-material/Palette";
+import GroupIcon from "@mui/icons-material/Workspaces";
+import UngroupIcon from "@mui/icons-material/WorkspacesOutlined";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
+import Switch from "@mui/material/Switch";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import { Types } from "react-sketch";
 import { observer } from "mobx-react-lite";
 import {
+  FILL_ONLY,
   NO_LINE_STYLE,
   NO_PROPERTIES,
   copy,
+  groupSelected,
   paste,
   removeSelected,
+  ungroupSelected,
 } from "../actions";
 import { CONFIG } from "../stores/config";
+import { useMovable } from "./Movable";
 import { toolByValue } from "../tools";
 import ColorPicker from "./ColorPicker";
 import Island from "./Island";
@@ -46,7 +55,11 @@ interface ActionProps {
 const Action = ({ label, disabled, onClick, children }: ActionProps) => (
   <Tooltip title={label}>
     <span>
-      <IconButton aria-label={label} disabled={disabled} onClick={onClick}>
+      <IconButton
+        size="small"
+        aria-label={label}
+        disabled={disabled}
+        onClick={onClick}>
         {children}
       </IconButton>
     </span>
@@ -54,73 +67,32 @@ const Action = ({ label, disabled, onClick, children }: ActionProps) => (
 );
 
 /**
- * The line, the colors and the style of what the tool draws, and the actions on the
- * selected objects. It floats at the left of the canvas, and the tools which draw
- * nothing leave it with the actions only.
+ * The colors, the weight and the style of the line of what the tool draws. The tools which
+ * fill an area have the fill color only, which is never none for them.
  */
-const Properties = observer((): ReactElement => {
-  const { selectedTool, propertiesOpen, hasSelection, canPaste } = CONFIG;
-  const drawing = !NO_PROPERTIES.includes(selectedTool);
-  const tool = toolByValue(selectedTool);
-
-  if (!propertiesOpen) {
-    return (
-      <Island sx={{ p: 0.5, width: "fit-content" }}>
-        <Tooltip title="Properties">
-          <IconButton
-            aria-label="Show the properties"
-            aria-expanded={false}
-            onClick={() => (CONFIG.propertiesOpen = true)}>
-            <StyleIcon sx={{ color: CONFIG.lineColor }} />
-          </IconButton>
-        </Tooltip>
-      </Island>
-    );
-  }
-
+const DrawingProperties = observer(({ tool }: { tool: string }): ReactElement => {
+  const fillOnly = FILL_ONLY.includes(tool);
   return (
-    <Island
-      component="section"
-      aria-label="Properties"
-      sx={{
-        width: 232,
-        maxHeight: "100%",
-        overflowY: "auto",
-        p: 1.5,
-      }}>
-      <Stack
-        direction="row"
-        sx={{ alignItems: "center", justifyContent: "space-between" }}>
-        <Typography variant="overline" component="h2" sx={{ lineHeight: 2 }}>
-          {drawing ? (tool?.label ?? "Tool") : "Selection"}
-        </Typography>
-        <Tooltip title="Hide the properties">
-          <IconButton
-            size="small"
-            aria-label="Hide the properties"
-            aria-expanded
-            onClick={() => (CONFIG.propertiesOpen = false)}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      </Stack>
-      {drawing && (
-        <Stack spacing={1.5} sx={{ mb: 1.5 }}>
-          <ColorPicker
-            label="Line color"
-            value={CONFIG.lineColor}
-            onChange={(color) => color && (CONFIG.lineColor = color)}
-          />
-          <ColorPicker
-            label="Fill color"
-            allowNone
-            value={CONFIG.fillWithColor ? CONFIG.fillColor : null}
-            fallback={CONFIG.fillColor}
-            onChange={(color) => {
-              CONFIG.fillWithColor = color !== null;
-              if (color) CONFIG.fillColor = color;
-            }}
-          />
+    <Stack spacing={1.5} sx={{ mb: 1.5 }}>
+      {!fillOnly && (
+        <ColorPicker
+          label="Line color"
+          value={CONFIG.lineColor}
+          onChange={(color) => color && (CONFIG.lineColor = color)}
+        />
+      )}
+      <ColorPicker
+        label="Fill color"
+        allowNone={!fillOnly}
+        value={fillOnly || CONFIG.fillWithColor ? CONFIG.fillColor : null}
+        fallback={CONFIG.fillColor}
+        onChange={(color) => {
+          if (color) CONFIG.fillColor = color;
+          if (!fillOnly) CONFIG.fillWithColor = color !== null;
+        }}
+      />
+      {!fillOnly && (
+        <>
           <Box>
             <ToggleButtonGroup
               exclusive
@@ -151,6 +123,29 @@ const Properties = observer((): ReactElement => {
             </ToggleButtonGroup>
             <LabeledSlider
               label="Line weight"
+              action={
+                tool === Types.Tool.PENCIL && (
+                  <Tooltip
+                    title="A pen (a stylus) draws a wider line the harder it presses. The mouse and the fingers draw as before."
+                    placement="right">
+                    <FormControlLabel
+                      label="Pen pressure"
+                      labelPlacement="start"
+                      slotProps={{ typography: { variant: "caption" } }}
+                      control={
+                        <Switch
+                          size="small"
+                          checked={CONFIG.pressureSensitive}
+                          onChange={(event) =>
+                            (CONFIG.pressureSensitive = event.target.checked)
+                          }
+                        />
+                      }
+                      sx={{ mx: 0 }}
+                    />
+                  </Tooltip>
+                )
+              }
               value={CONFIG.lineWidth}
               min={1}
               max={100}
@@ -165,32 +160,125 @@ const Properties = observer((): ReactElement => {
             </Typography>
             <LineStyleSelector
               selected={CONFIG.lineStyle}
-              disabled={NO_LINE_STYLE.includes(selectedTool)}
+              disabled={NO_LINE_STYLE.includes(tool)}
             />
           </Box>
-          <Divider />
-        </Stack>
+        </>
       )}
-      <Typography variant="caption" color="text.secondary" component="p">
-        Selected objects
-      </Typography>
-      <Stack direction="row" spacing={0.5}>
-        <Action
-          label="Copy selected (Ctrl C)"
-          disabled={!hasSelection}
-          onClick={copy}>
-          <CopyIcon />
-        </Action>
-        <Action label="Paste (Ctrl V)" disabled={!canPaste} onClick={paste}>
-          <PasteIcon />
-        </Action>
-        <Action
-          label="Delete selected (Delete)"
-          disabled={!hasSelection}
-          onClick={removeSelected}>
-          <DeleteIcon />
-        </Action>
-      </Stack>
+      <Divider />
+    </Stack>
+  );
+});
+
+/**
+ * The line, the colors and the style of what the tool draws, and the actions on the
+ * selected objects. It floats at the left of the canvas, and the tools which draw
+ * nothing leave it with the actions only.
+ */
+const Properties = observer((): ReactElement => {
+  const {
+    selectedTool,
+    propertiesOpen,
+    hasSelection,
+    canGroup,
+    canUngroup,
+    canPaste,
+  } = CONFIG;
+  const { ref, style, grip } = useMovable("properties", "properties panel");
+  const drawing = !NO_PROPERTIES.includes(selectedTool);
+  const tool = toolByValue(selectedTool);
+
+  if (!propertiesOpen) {
+    return (
+      <Island ref={ref} style={style} sx={{ p: 0.5, width: "fit-content" }}>
+        <Tooltip title="Properties">
+          <IconButton
+            aria-label="Show the properties"
+            aria-expanded={false}
+            onClick={() => (CONFIG.propertiesOpen = true)}>
+            <StyleIcon sx={{ color: CONFIG.lineColor }} />
+          </IconButton>
+        </Tooltip>
+      </Island>
+    );
+  }
+
+  return (
+    <Island
+      ref={ref}
+      style={style}
+      component="section"
+      aria-label="Properties"
+      sx={{
+        width: 232,
+        maxHeight: "100%",
+        // The scrollbar is inside the rounded border, and a thin one: the panel is
+        // often taller than a short window, for example a tablet on its side
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+      }}>
+      <Box
+        sx={{
+          minHeight: 0,
+          overflowY: "auto",
+          p: 1.5,
+          scrollbarWidth: "thin",
+          scrollbarColor: "var(--mui-palette-text-disabled) transparent",
+        }}>
+        <Stack
+          direction="row"
+          sx={{ alignItems: "center", justifyContent: "space-between" }}>
+          <Stack direction="row" sx={{ alignItems: "center", gap: 0.5 }}>
+            {grip}
+            <Typography variant="overline" component="h2" sx={{ lineHeight: 2 }}>
+              {drawing ? (tool?.label ?? "Tool") : "Selection"}
+            </Typography>
+          </Stack>
+          <Tooltip title="Hide the properties">
+            <IconButton
+              size="small"
+              aria-label="Hide the properties"
+              aria-expanded
+              onClick={() => (CONFIG.propertiesOpen = false)}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+        {drawing && <DrawingProperties tool={selectedTool} />}
+        <Typography variant="caption" color="text.secondary" component="p">
+          Selected objects
+        </Typography>
+        <Stack direction="row" spacing={0.5}>
+          <Action
+            label="Copy selected (Ctrl C)"
+            disabled={!hasSelection}
+            onClick={copy}>
+            <CopyIcon />
+          </Action>
+          <Action label="Paste (Ctrl V)" disabled={!canPaste} onClick={paste}>
+            <PasteIcon />
+          </Action>
+          <Action
+            label="Group (Ctrl G)"
+            disabled={!canGroup}
+            onClick={groupSelected}>
+            <GroupIcon />
+          </Action>
+          <Action
+            label="Ungroup (Ctrl Shift G)"
+            disabled={!canUngroup}
+            onClick={ungroupSelected}>
+            <UngroupIcon />
+          </Action>
+          <Action
+            label="Delete selected (Delete)"
+            disabled={!hasSelection}
+            onClick={removeSelected}>
+            <DeleteIcon />
+          </Action>
+        </Stack>
+      </Box>
     </Island>
   );
 });

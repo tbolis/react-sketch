@@ -116,6 +116,8 @@ export class FabricCanvasEventsManager
 
   public onMouseDown({ event, tool, props }: EventInput): void {
     this.changed = false;
+    // What is pressed is what the press may move, scale or rotate: its state now is the one undo goes back to
+    if (event.target) this.history.onMouseDown(event.target);
     tool.doMouseDown(event);
     props.onMouseDown?.(sketchEvent(event));
   }

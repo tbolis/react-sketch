@@ -6,15 +6,21 @@ and is not published to npm.
 The canvas fills the window, and the panels float over it:
 
 - **Toolbar** (top): select, pan, rectangle, rectangle label, circle, polygon, line, arrow, pencil, highlighter,
-  eraser and laser pointer. The keys of the tools are on the buttons and in the shortcuts dialog.
-- **Properties** (left): line color, fill color, line weight and line style of the tool, and copy, paste and delete
-  of the selected objects.
+  eraser, bucket fill and laser pointer. The keys of the tools are on the buttons and in the shortcuts dialog.
+- **Properties** (left): line color, fill color, line weight and line style of the tool (the bucket fill has the fill
+  color only, and the pencil has the Pen pressure switch), and copy, paste, group, ungroup and delete of the selected
+  objects (Ctrl G and Ctrl Shift G group and ungroup).
 - **Settings** (right, the gear): the **Scenario** tab (what the scenario shows and its actions), the **Canvas** tab
-  (size, background color and image, pinch zoom, view, grid) and the **Insert** tab (text, image from a URL,
+  (size, with a button for the original size of the background image, background color and image, pinch zoom,
+  view, grid) and the **Insert** tab (text, image from a URL,
   overlay).
 - **Top left**: the menu, and undo and redo, which fade out until the first change.
 - **Bottom**: zoom (the percentage resets the view), and a hint for the tool in use. The **preview** is at the
   right, with the frame of the view when it is zoomed or panned.
+- **Moving the panels**: the toolbar, the properties, the settings and the preview have a grip (six dots) at their
+  top left, to move them when they are over the drawing: drag it with a mouse, a pen or a finger, or use the arrow
+  keys on it (shift for larger steps). A double click on the grip, or Home, puts the panel back, and so does
+  "Put the panels back" in the menu. The panels stay in the window.
 - **Menu** (top left): save the drawing, download the PNG and the JSON, clear the canvas, the color scheme
   (light, dark, system), the keyboard shortcuts and the repository.
 - **Scenarios** (top right): `Playground`, `defaultValue`, `value + forceValue`, `addImg` and `backgroundImage`.

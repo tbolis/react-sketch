@@ -7,6 +7,7 @@ import {
   ImageOptions,
   SketchData,
   SketchProperties,
+  SketchSize,
   SketchValue,
   TextOptions,
   Tool,
@@ -15,10 +16,12 @@ import { CanvasEvent, FabricCanvasEventsManager, SketchEventAware } from "./even
 import { SketchHistory } from "./history/SketchHistory";
 import { IDENTITY_VIEW, PinchZoom } from "./pinch";
 import { autoresize, scaleContent } from "./resize";
+import { SketchGroup } from "./SketchGroup";
 import { FabricCanvasTool } from "./tools";
 import { create_tool } from "./tools/factory";
 import { Eraser } from "./tools/Eraser";
 import { Polygon } from "./tools/Polygon";
+import { releasePen } from "./tools/PressureBrush";
 
 /**
  * The properties which always have a value, because SketchField provides
@@ -291,6 +294,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
       props.lineColor !== prevProps.lineColor ||
       props.lineWidth !== prevProps.lineWidth ||
       props.lineStyle !== prevProps.lineStyle ||
+      props.pressureSensitive !== prevProps.pressureSensitive ||
       props.fillColor !== prevProps.fillColor
     ) {
       this.configureTool();
@@ -323,6 +327,7 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
     this.tool.dispose();
     // The canvas element is released at once, so it can be used again (React
     // strict mode mounts twice). The rest is freed once the pending render is done.
+    releasePen(this.canvas);
     void this.canvas.dispose();
   }
 
@@ -541,37 +546,54 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
   canRedo = (): boolean => this.history.canRedo();
 
   /**
-   * Exports canvas element to a dataurl image. Note that when multiplier is used, cropping is scaled appropriately
+   * Exports the canvas as a data URL. The image is of the whole drawing, whatever the view
+   * shows. With a multiplier the crop area is scaled by it too.
    *
-   * Available Options are
-   * <table style="width:100%">
-   *
-   * <tr><td><b>Name</b></td><td><b>Type</b></td><td><b>Argument</b></td><td><b>Default</b></td><td><b>Description</b></td></tr>
-   * <tr><td>format</td> <td>String</td> <td><optional></td><td>the imageFormat property, then png</td><td>The format of the output image. Either "jpeg" or "png"</td></tr>
-   * <tr><td>quality</td><td>Number</td><td><optional></td><td>1</td><td>Quality level (0..1). Only used for jpeg.</td></tr>
-   * <tr><td>multiplier</td><td>Number</td><td><optional></td><td>1</td><td>Multiplier to scale by</td></tr>
-   * <tr><td>left</td><td>Number</td><td><optional></td><td></td><td>Cropping left offset. Introduced in v1.2.14</td></tr>
-   * <tr><td>top</td><td>Number</td><td><optional></td><td></td><td>Cropping top offset. Introduced in v1.2.14</td></tr>
-   * <tr><td>width</td><td>Number</td><td><optional></td><td></td><td>Cropping width. Introduced in v1.2.14</td></tr>
-   * <tr><td>height</td><td>Number</td><td><optional></td><td></td><td>Cropping height. Introduced in v1.2.14</td></tr>
-   *
-   * </table>
-   *
-   * @returns URL containing a representation of the object in the format specified by options.format
+   * @param options see {@link DataUrlOptions}
+   * @returns URL containing a representation of the drawing in the format of the options
    */
   toDataURL = (options?: DataUrlOptions): string => {
+    const { multiplier, ...rest } = options ?? {};
     // The image is of the drawing, not of the part which the view shows
     const view = this.canvas.viewportTransform;
     this.canvas.viewportTransform = [...IDENTITY_VIEW];
     try {
       return this.canvas.toDataURL({
         format: this.props.imageFormat,
-        ...options,
+        ...rest,
+        multiplier:
+          multiplier === "original" ? this.originalMultiplier() : multiplier,
       } as fabric.TDataUrlOptions);
     } finally {
       this.canvas.viewportTransform = view;
     }
   };
+
+  /**
+   * The size of the background image in pixels, as the file it was loaded from has it, and
+   * not as it is shown (the canvas scales it to its size). It is the size of the canvas at
+   * which the drawing is on the image pixel for pixel. Undefined when there is no
+   * background image, or it is still loading.
+   */
+  getOriginalSize = (): SketchSize | undefined => {
+    const image = this.canvas.backgroundImage;
+    return image?.width && image.height
+      ? { width: image.width, height: image.height }
+      : undefined;
+  };
+
+  /**
+   * The multiplier of an export which gives the background image one pixel for each of
+   * its own. An image which is scaled differently in the two directions is exported at
+   * the multiplier of the larger scale, so no pixel of it is lost. 1 without an image.
+   */
+  private originalMultiplier(): number {
+    const image = this.canvas.backgroundImage;
+    const scale = image
+      ? Math.min(Math.abs(image.scaleX ?? 1), Math.abs(image.scaleY ?? 1))
+      : 0;
+    return scale > 0 ? 1 / scale : 1;
+  }
 
   /**
    * Returns JSON representation of canvas
@@ -715,6 +737,59 @@ class SketchField extends PureComponent<SketchProperties & DefaultedProps> {
       })
       // A paste which fails must not stop the next ones
       .catch(() => undefined);
+  };
+
+  /**
+   * Whether the selection can be made a group: two or more objects are selected
+   */
+  canGroup = (): boolean => {
+    const selected = this.canvas.getActiveObject();
+    return (
+      selected instanceof fabric.ActiveSelection && selected.getObjects().length > 1
+    );
+  };
+
+  /**
+   * Whether the selected object is a group which `group()` made. The group of an arrow is not.
+   */
+  canUngroup = (): boolean => this.canvas.getActiveObject() instanceof SketchGroup;
+
+  /**
+   * Make a group of the selected objects, which is selected then. The group is one object:
+   * it is moved, scaled, rotated, copied and removed as one, and it is saved by `toJSON()`.
+   * It takes the place of the topmost of the objects, and the text box of a rectangle label
+   * goes into the group with its rectangle. It is one undo step. Like undo and redo, it
+   * calls `onChange` and not `onObjectAdded`. Nothing happens when `canGroup()` is false.
+   */
+  group = (): void => {
+    const canvas = this.canvas;
+    const selected = canvas.getActiveObject();
+    if (!this.canGroup() || !(selected instanceof fabric.ActiveSelection)) return;
+    const objects = selected.getObjects();
+    // Leaving the selection first gives the objects back their own position
+    canvas.discardActiveObject();
+    const group = this.history.group(objects);
+    if (group) canvas.setActiveObject(group);
+    canvas.requestRenderAll();
+    this.props.onChange?.();
+  };
+
+  /**
+   * Take the selected group apart: its objects are selected then, where they were in the
+   * drawing, with the position, the scale and the turn which the group gave them. It is one
+   * undo step. Nothing happens when `canUngroup()` is false.
+   */
+  ungroup = (): void => {
+    const canvas = this.canvas;
+    const group = canvas.getActiveObject();
+    if (!(group instanceof SketchGroup)) return;
+    canvas.discardActiveObject();
+    const objects = this.history.ungroup(group);
+    if (objects.length) {
+      canvas.setActiveObject(new fabric.ActiveSelection(objects, { canvas }));
+    }
+    canvas.requestRenderAll();
+    this.props.onChange?.();
   };
 
   /**
