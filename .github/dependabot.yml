@@ -1,0 +1,33 @@
+version: 2
+
+updates:
+  # The yarn workspaces share the lockfile of the root, so one entry covers
+  # the library, the showcase and the private packages.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      # Minor and patch updates come in one pull request for each kind of
+      # dependency. A major update gets a pull request of its own.
+      dev-dependencies:
+        dependency-type: development
+        update-types: [minor, patch]
+      dependencies:
+        dependency-type: production
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "chore(ci)"
+    groups:
+      actions:
+        patterns: ["*"]
