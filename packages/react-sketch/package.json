@@ -39,7 +39,7 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "csstype": "^3.2.3",
+    "csstype": "^3.2.4",
     "fabric": "^7.4.0"
   },
   "peerDependencies": {
